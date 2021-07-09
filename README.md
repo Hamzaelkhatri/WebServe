@@ -5,7 +5,7 @@
 
 # Resources 
 </br>
-<a gref="https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa">Everything you need to know to Build a simple HTTP server from scratch</a>
+<a href="https://medium.com/from-the-scratch/http-server-what-do-you-need-to-know-to-build-a-simple-http-server-from-scratch-d1ef8945e4fa">Everything you need to know to Build a simple HTTP server from scratch</a>
 </br>
 <a href="https://ncona.com/2019/04/building-a-simple-server-with-cpp/">Building a simple server with C++</a>
 </br>
