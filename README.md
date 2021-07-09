@@ -17,3 +17,4 @@
 </br>
 <a href="https://www.rfc-editor.org/rfc/pdfrfc/rfc7230.txt.pdf">Building a Web Server in C++</a>
 </br>
+<a href="https://www.nginx.com/blog/http-keepalives-and-web-performance/"> nginx http 1.1 behavor </a> </br>
