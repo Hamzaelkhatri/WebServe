@@ -1,6 +1,6 @@
 # WebServe
     The Hypertext Transfer Protocol (HTTP) is an application protocol for distributed, 
-    collaborative, hypermedia information systems
+        collaborative, hypermedia information systems
                                 by : Hamza Elkhatri && Zainab Dnaya
 
 # Resources 
