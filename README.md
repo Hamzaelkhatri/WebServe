@@ -21,3 +21,5 @@
 </br>
 <a href="https://www.nginx.com/resources/wiki/start/topics/examples/full/"> Nginx Full Configuration file</a>
 </br>
+<a href="https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm"> CGI </a>
+</br>
