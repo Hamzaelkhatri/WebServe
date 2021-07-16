@@ -13,13 +13,15 @@
 </br>
 <a href="https://www.youtube.com/watch?v=YwHErWJIh6Y&ab_channel=EricOMeehan">Creating a Socket Object</a>
 </br>
-<a href="https://www.youtube.com/watch?v=Kc1kwm1WyVM&ab_channel=SloanKelly">Building a Web Server in C++</a>
+<a href="https://www.youtube.com/watch?v=Kc1kwm1WyVM&ab_channel=SloanKelly">Building a Web Server in C++ 1</a>
 </br>
-<a href="https://www.rfc-editor.org/rfc/pdfrfc/rfc7230.txt.pdf">Building a Web Server in C++</a>
+<a href="https://www.rfc-editor.org/rfc/pdfrfc/rfc7230.txt.pdf">Building a Web Server in C++ 2</a>
 </br>
 <a href="https://www.ibm.com/docs/en/i/7.4?topic=characteristics-socket-address-structure">Socket adress</a>
 </br>
 <a href="https://www.nginx.com/resources/wiki/start/topics/examples/full/"> Nginx Full Configuration file</a>
 </br>
 <a href="https://www.tutorialspoint.com/cplusplus/cpp_web_programming.htm"> CGI </a>
+</br>
+<a href="https://www.journaldev.com/26618/nginx-configuration-file">Understanding NGINX Configuration File</a>
 </br>
