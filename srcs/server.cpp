@@ -84,8 +84,7 @@ void server::_listen()
         exit(EXIT_FAILURE);
     }
     valread = read(new_socket, buffer, 1024);
-    // std::cout << "BUFFER " << buffer << std::endl;
-    printf("%s", buffer);
+    std::cout << "BUFFER " << buffer << std::endl;
     send(new_socket, message, strlen(message), 0);
     std::cout << "Message Sent " << std::endl;
 }
