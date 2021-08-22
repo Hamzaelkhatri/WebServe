@@ -14,86 +14,87 @@
 
 ErrorHandling::ErrorHandling(char *file)
 {
-    this->nbr_server = 0;
+    this->nbr_server = 1;
     this->nbr_location = 0;
     this->server = 0;
     this->location = 0;
     this->file = file;
-    set_map( clean_map(get_map(file)));
+    set_map(clean_map(get_map(file)));
 }
 
-void    ErrorHandling::set_map(std::map<int, std::string> map)
+void ErrorHandling::set_map(std::map<int, std::string> map)
 {
     this->map_s = map;
 }
 
-std::map<int , std::string> ErrorHandling::get_map_s()
+std::map<int, std::string> ErrorHandling::get_map_s()
 {
     std::map<int, std::string>::iterator it = this->map_s.begin();
     for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
+    {
+        if (it->second == "server")
         {
-            std::cout << "[ " << it->first;
-            std::cout << " ] \t\t\t ==> [ ";
-            std::cout << it->second <<  " ]"<< std::endl;
+            std::cout << "Server index : " << this->nbr_server << std::endl;
+            this->nbr_server++;
         }
-    return(this->map_s);
+        std::cout << "[ " << it->first;
+        std::cout << " ] \t\t\t ==> [ ";
+        std::cout << it->second << " ]" << std::endl;
+    }
+    return (this->map_s);
 }
 
-std::unordered_multimap<std::string ,std::string>ErrorHandling::get_cmap(void)
-{
-        std::map<int, std::string>::iterator it = this->map_s.begin();
-        // std::vector<std::string> vc;
+// std::unordered_multimap<std::string, std::string> ErrorHandling::get_cmap(void)
+// {
+//     std::map<int, std::string>::iterator it = this->map_s.begin();
+//     // std::vector<std::string> vc;
 
-        for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
-        {
-            // if( it->second != std::string("server") && it->second != std::string("}") && it->second != std::string("{"))
-            {
-                char *str1 = (char *)it->second.c_str();
-                char **ptr = ft_charSplit(str1, (char *)" \t");
-                int i  = 1;
-                std::string str ;
-                std::string  key = ptr[0];
+//     for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
+//     {
+//         // if( it->second != std::string("server") && it->second != std::string("}") && it->second != std::string("{"))
+//         {
+//             char *str1 = (char *)it->second.c_str();
+//             char **ptr = ft_charSplit(str1, (char *)" \t");
+//             int i = 1;
+//             std::string str;
+//             std::string key = ptr[0];
 
-                while(ptr[i])
-                {
-                    // std::cout << ptr[i] << std::endl;
-                    if ( i == 1)
-                    str = ptr[i];
-                    else
-                    {
-                    str = str + " " +  ptr[i];
-                    // std::cout << "sr ==> "<<  str  << std::endl;
-                    }
-                    i++;
-                }
-                this->tst.insert(std::pair<std::string,std::string> (key, str));
-                // std::cout << "key ==> " << key << " value ==> " << str << std::endl;
-                i = 1;
+//             while (ptr[i])
+//             {
+//                 // std::cout << ptr[i] << std::endl;
+//                 if (i == 1)
+//                     str = ptr[i];
+//                 else
+//                 {
+//                     str = str + " " + ptr[i];
+//                     // std::cout << "sr ==> "<<  str  << std::endl;
+//                 }
+//                 i++;
+//             }
+//             this->tst.insert(std::pair<std::string, std::string>(key, str));
+//             // std::cout << "key ==> " << key << " value ==> " << str << std::endl;
+//             i = 1;
+//         }
+//     }
 
-            }
-        }
-               
-         std::unordered_multimap<std::string, std::string>::iterator it_s; 
+//     std::unordered_multimap<std::string, std::string>::iterator it_s;
 
-
-
-
-        // for (it_s = this->tst.begin(); it_s != this->tst.end(); ++it_s)
-        // {
-        //     std::cout << "[ " << it_s->first;
-        //     std::cout << " ] \t\t\t ==> [ ";
-        //     std::cout << it_s->second <<  " ]"<< std::endl;
-        // }
-        return(this->tst);
-}
+//     // for (it_s = this->tst.begin(); it_s != this->tst.end(); ++it_s)
+//     // {
+//     //     std::cout << "[ " << it_s->first;
+//     //     std::cout << " ] \t\t\t ==> [ ";
+//     //     std::cout << it_s->second <<  " ]"<< std::endl;
+//     // }
+//     return (this->tst);
+// }
 /****************  Those lines **********************************************/
 
-int check_end_of_string(std::string str, int i,int j)
+int check_end_of_string(std::string str, int i, int j)
 {
-    while(i < j)
+    while (i < j)
     {
-        if(str[i] == '\0')
-            return(0);
+        if (str[i] == '\0')
+            return (0);
         i++;
     }
     return (1);
@@ -114,16 +115,16 @@ std::string Those_lines(std::string txt, int nbr_line, int txt_lines)
     while (txt[j] != '\n' && std::isspace(txt[j])) // for the space befor  txt start from where the txt begins
         j++;
     w = 0;
-    while ( txt[j + w] && txt[w + j] != '\n' && std::isprint(txt[j+w]) ) // when the line ends until \n
-        {
-            w++;
+    while (txt[j + w] && txt[w + j] != '\n' && std::isprint(txt[j + w])) // when the line ends until \n
+    {
+        w++;
         // std::cout << std::string(txt, j, w) << std::endl;
-        }
+    }
     // printf(" for line %d : j == %d || w == %d\n",i,j,w);
     while (w > 0 && std::isspace(txt[w + j - 1])) // escape space after the txt o the line
-        {
-            w--;
-        }
+    {
+        w--;
+    }
     return (std::string(txt, j, w));
 }
 /****************************************************************************/
@@ -147,13 +148,12 @@ std::map<int, std::string> get_map(char *av)
         while (i < 1024)
             line[i++] = 0;
     }
-    int i  = 0;
+    int i = 0;
     int len = nbr_lines(result);
     while (i < len)
     {
-        map_s[i] = Those_lines(result, i , (len)); // no spaces befor or after
-        // printf("[%s]\n",Those_lines(result, i, nbr_lines(result)).c_str()); /// string ----> char *
-        i++;   
+        map_s[i] = Those_lines(result, i, (len)); // no spaces befor or after
+        i++;
     }
     return (map_s);
 }
@@ -209,16 +209,30 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
     //     std::cout << "  the value: \t\t\t";
     //     std::cout << it->second << std::endl;
     // }
+    int m = 0;
     for (it = res.begin(); it != res.end(); ++it)
     {
-        if (res[it->first].find("location") != std::string::npos)
+        if ((res[it->first].find("server") != std::string::npos && m == 1) || (res[it->first].find("server") != std::string::npos && res[it->first - 1].find("}") != std::string::npos))
+        {
+            std::map<int, std::string>::iterator it1 = it;
+            it1++;
+            while (it1 != res.end())
+            {
+                if (res[it1->first].find("server") != std::string::npos && res[it1->first + 1].find("{") != std::string::npos)
+                    error_msg("Error!! not 2 server inside another one");
+                else
+                    it1++;
+            }
+            m++;
+        }
+        else if (res[it->first].find("location") != std::string::npos)
         {
             std::map<int, std::string>::iterator it1 = it;
             it1++;
 
             while (it1 != res.end())
             {
-                if ( k != 0 && (res[it->first].find("server") != std::string::npos || res[it->first].find("location") != std::string::npos) )
+                if (k != 0 && (res[it->first].find("server") != std::string::npos || res[it->first].find("location") != std::string::npos))
                     error_msg("Error!!");
                 else
                     it1++;
