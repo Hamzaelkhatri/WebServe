@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "*.tcc": "cpp",
-        "compare": "cpp",
-        "system_error": "cpp"
-    }
-}

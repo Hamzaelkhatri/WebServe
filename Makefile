@@ -10,6 +10,7 @@ SRC_NAME= main.cpp\
 		  ErrorHandling.cpp\
 		  tools.cpp\
 		  server.cpp\
+		  pars.cpp\
 
 OBJ_NAME= $(SRC_NAME:.cpp=.o)
 

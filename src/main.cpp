@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/21 16:40:11 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/08/22 19:04:43 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int main(int ac, char **av)
     if (compare_end(av[1], ".conf") == true)
     {
         ErrorHandling error(av[1]);
-        error.get_map_s();
+        Parsing(error.get_map_s());
     }
     else
         std::cerr << "wrong file \n";
