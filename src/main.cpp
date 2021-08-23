@@ -22,6 +22,8 @@ int main(int ac, char **av)
     if (compare_end(av[1], ".conf") == true)
     {
         ErrorHandling error(av[1]);
+        // error.get_map,._s();
+
         Parsing(error.get_map_s(), error.get_nbr_server(), error.get_nbr_location());
     }
     else

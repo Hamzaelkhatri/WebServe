@@ -45,6 +45,9 @@ std::map<int, std::string> ErrorHandling::get_map_s()
             this->nbr_server++;
         if (it->second.find("location") != std::string::npos)
             this->nbr_location++;
+        // std::cout << "[ " << it->first;
+        // std::cout << " ] \t\t\t ==> [ ";
+        // std::cout << it->second << " ]" << std::endl;
     }
     return (this->map_s);
 }

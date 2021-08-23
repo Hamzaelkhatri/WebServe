@@ -12,7 +12,8 @@
 
 #ifndef PARS_HPP
 #define PARS_HPP
-
+#include <iostream>
+#include <map>
 #include "ErrorHandling.hpp"
 
 class LocationManage
@@ -38,8 +39,8 @@ class Parsing
 {
 private:
     Server_element *server;
-    std::map<int, Server_element>
-        parsing;
+    std::map<int, Server_element> parsing;
+    std::multimap<std::string, std::string> pars_map;
 
 public:
     Parsing(std::map<int, std::string>, int nbr_server, int nbr_location);
