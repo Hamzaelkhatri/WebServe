@@ -14,7 +14,7 @@
 
 ErrorHandling::ErrorHandling(char *file)
 {
-    this->nbr_server = 1;
+    this->nbr_server = 0;
     this->nbr_location = 0;
     this->server = 0;
     this->location = 0;
@@ -22,6 +22,15 @@ ErrorHandling::ErrorHandling(char *file)
     set_map(clean_map(get_map(file)));
 }
 
+int ErrorHandling::get_nbr_server(void)
+{
+    return (this->nbr_server);
+}
+
+int ErrorHandling::get_nbr_location(void)
+{
+    return (this->nbr_location);
+}
 void ErrorHandling::set_map(std::map<int, std::string> map)
 {
     this->map_s = map;
@@ -33,13 +42,9 @@ std::map<int, std::string> ErrorHandling::get_map_s()
     for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
     {
         if (it->second == "server")
-        {
-            std::cout << "Server index : " << this->nbr_server << std::endl;
             this->nbr_server++;
-        }
-        std::cout << "[ " << it->first;
-        std::cout << " ] \t\t\t ==> [ ";
-        std::cout << it->second << " ]" << std::endl;
+        if (it->second.find("location") != std::string::npos)
+            this->nbr_location++;
     }
     return (this->map_s);
 }

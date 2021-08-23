@@ -22,8 +22,6 @@
 #include <unordered_map>
 #include <ctype.h>
 
-
-
 class ErrorHandling
 {
 private:
@@ -31,15 +29,18 @@ private:
     unsigned int nbr_location;
     unsigned int server;
     unsigned int location;
-    
-    std::map<int , std::string> map_s;
+
+    std::map<int, std::string> map_s;
     char *file;
     std::unordered_multimap<std::string, std::string> tst;
+
 public:
-     ErrorHandling(char *file);
+    ErrorHandling(char *file);
     ~ErrorHandling();
     void set_map(std::map<int, std::string> map_s);
-    std::map<int , std::string> get_map_s();
+    std::map<int, std::string> get_map_s();
+    int get_nbr_server();
+    int get_nbr_location();
     std::unordered_multimap<std::string, std::string> get_cmap(void);
 };
 

@@ -17,29 +17,32 @@
 
 class LocationManage
 {
-    private:
-
-
-    public:
-    
+private:
+public:
 };
 
-class  Server_element
+class Server_element
 {
-    private:
+private:
+    int nb_port;
+    int *port;
 
-    public:
-    
+public:
+    Server_element();
+    void setPorts(int *ports);
+    void GetPorts();
+    void add_ports(int *port, int nb_port);
 };
 
 class Parsing
 {
-    private:
-    std::map<int,Server_element>parsing;
-        
+private:
+    Server_element *server;
+    std::map<int, Server_element>
+        parsing;
 
-    public:
-        Parsing(std::map<int, std::string>);
-        ~Parsing();
+public:
+    Parsing(std::map<int, std::string>, int nbr_server, int nbr_location);
+    ~Parsing();
 };
 #endif

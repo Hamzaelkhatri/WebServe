@@ -22,7 +22,7 @@ int main(int ac, char **av)
     if (compare_end(av[1], ".conf") == true)
     {
         ErrorHandling error(av[1]);
-        Parsing(error.get_map_s());
+        Parsing(error.get_map_s(), error.get_nbr_server(), error.get_nbr_location());
     }
     else
         std::cerr << "wrong file \n";
