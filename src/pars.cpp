@@ -101,8 +101,8 @@ Parsing::Parsing(char *av, int nbr_server, int nbr_location)
                             str = str + " " + ptr[k];
                         k++;
                     }
-                    std::cout << Those_lines(result, i, len) << std::endl;
-                    // this->loc_map.insert(std::pair<std::string, std::string>(key, str));
+                    // std::cout << Those_lines(result, i, len) << std::endl;
+                    this->loc_map.insert(std::pair<std::string, std::string>(key, str));
                 }
                 i++;
             }
@@ -111,9 +111,23 @@ Parsing::Parsing(char *av, int nbr_server, int nbr_location)
             this->_loc_map[d++] = tmp;
             this->loc_map.clear();
         }
+        // this->all.insert(std::pair<std::map<int, std::multimap<std::string, std::string> >, std::map<int, std::multimap<std::string, std::string> > >(this->_server_map,this->_loc_map));
         if (i < len)
             i++;
     }
+
+    // std::multimap<std::map<int, std::multimap<std::string, std::string> >, std::map<int, std::multimap<std::string, std::string> > >::iterator it;
+    // for (it = this->all.begin(); it != this->all.end(); ++it)
+    // {
+    //     std::map<int, std::multimap<std::string, std::string> >::iterator it1 = it->first;
+    //     std::cout << "-----------------------------------------------------";
+    //     for (it1 = it->first.begin(); it1 != it->first.end(); ++it1)
+    //     {
+    //         // std::cout << it1->first << std::endl;
+    //     }
+    //     std::cout << "-----------------------------------------------------";
+    // }
+
     // std::map<int, std::multimap<std::string, std::string>>::iterator it0;
 
     // std::multimap<std::string, std::string>::iterator it;
