@@ -29,7 +29,7 @@ private:
     int *port;
 
 public:
-    Server_element();
+    Server_element(int index, std::map<int, std::multimap<std::string, std::string>> _server_map, std::map<int, std::multimap<std::string, std::string> > _loc_map);
     void setPorts(int *ports);
     void GetPorts();
     void add_ports(int *port, int nb_port);
@@ -42,7 +42,7 @@ private:
     std::map<int, Server_element> parsing;
     std::multimap<std::string, std::string> server_map;
     std::multimap<std::string, std::string> loc_map;
-    std::map<int, std::multimap<std::string, std::string> > _server_map;
+    std::map<int, std::multimap<std::string, std::string>> _server_map;
     std::map<int, std::multimap<std::string, std::string>> _loc_map;
 
 public:
