@@ -42,11 +42,11 @@ private:
     std::map<int, Server_element> parsing;
     std::multimap<std::string, std::string> server_map;
     std::multimap<std::string, std::string> loc_map;
-    std::map< int , std::multimap<std::string, std::string> > _server_map;
-    std::map <int, std::multimap<std::string, std::string> > _loc_map;
+    std::map<int, std::multimap<std::string, std::string> > _server_map;
+    std::map<int, std::multimap<std::string, std::string>> _loc_map;
 
 public:
-    Parsing( char *, int nbr_server, int nbr_location);
+    Parsing(char *, int nbr_server, int nbr_location);
     ~Parsing();
 };
 #endif
