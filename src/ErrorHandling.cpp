@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/21 16:20:51 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/08/24 07:36:34 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ ErrorHandling::ErrorHandling(char *file)
     this->location = 0;
     this->file = file;
     set_map(clean_map(get_map(file)));
+    get_map_s();
 }
 
 int ErrorHandling::get_nbr_server(void)
@@ -117,8 +118,9 @@ std::string Those_lines(std::string txt, int nbr_line, int txt_lines)
         return (std::string(NULL));
     while (i < nbr_line)
     {
-        if (txt[j++] == '\n')
+        if (txt[j] == '\n')
             i++;
+        j++;
     }
     while (txt[j] != '\n' && std::isspace(txt[j])) // for the space befor  txt start from where the txt begins
         j++;
@@ -160,7 +162,11 @@ std::map<int, std::string> get_map(char *av)
     int len = nbr_lines(result);
     while (i < len)
     {
-        map_s[i] = Those_lines(result, i, (len)); // no spaces befor or after
+        // std::cout << " |"<<  Those_lines(result, i, (len))  << "|"<< std::endl;
+        // if ( Those_lines(result, i, len) != std::string(NULL))
+        // {
+            map_s[i] = Those_lines(result, i, (len)); // no spaces befor or after
+        // }
         i++;
     }
     return (map_s);
@@ -210,13 +216,6 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
     }
     if (k != 0)
         error_msg("Error : check The number of brackets");
-    // for (it = res.begin(); it != res.end(); ++it)
-    // {
-
-    //     std::cout << "key is " << it->first;
-    //     std::cout << "  the value: \t\t\t";
-    //     std::cout << it->second << std::endl;
-    // }
     int m = 0;
     for (it = res.begin(); it != res.end(); ++it)
     {

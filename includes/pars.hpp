@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 19:31:17 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/22 19:06:37 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/08/24 12:42:22 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,13 @@ class Parsing
 private:
     Server_element *server;
     std::map<int, Server_element> parsing;
-    std::multimap<std::string, std::string> pars_map;
+    std::multimap<std::string, std::string> server_map;
+    std::multimap<std::string, std::string> loc_map;
+    std::map< int , std::multimap<std::string, std::string> > _server_map;
+    std::map <int, std::multimap<std::string, std::string> > _loc_map;
 
 public:
-    Parsing(std::map<int, std::string>, int nbr_server, int nbr_location);
+    Parsing( char *, int nbr_server, int nbr_location);
     ~Parsing();
 };
 #endif
