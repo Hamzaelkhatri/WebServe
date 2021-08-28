@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 19:03:57 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 14:01:37 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/28 16:43:32 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,16 @@
 Server_element::Server_element()
 {
     this->port = 0;
+}
+
+std::multimap <int, std::multimap<std::string, std::string> > Parsing::Getloc_map()
+{
+    return (this->_loc_map);
+}
+
+std::map< int , std::multimap<std::string, std::string> > Parsing::GetServerMap()
+{
+    return (this->_server_map);
 }
 
 Parsing::Parsing(char *av)
@@ -45,7 +55,7 @@ Parsing::Parsing(char *av)
     int d = 0;
     while (i < len )
     {
-    std::cout << "=== here " << Those_lines(result, i, len) ;
+    // std::cout << "=== here " << Those_lines(result, i, len) ;
         while(std::strcmp(Those_lines(result, i, len).c_str(), "") == 0 )
                     i++;
         if(std::strcmp(Those_lines(result, i, len).c_str(), "server") == 0 )
@@ -114,31 +124,31 @@ Parsing::Parsing(char *av)
             }
             i++;
     }
-    std::map<int, std::multimap<std::string, std::string>  >::iterator it0;
+    // std::map<int, std::multimap<std::string, std::string>  >::iterator it0;
     
-    std::multimap<std::string, std::string>::iterator it;
-    for(it0 = _server_map.begin(); it0 != _server_map.end(); ++it0)
-    {
-        // std::cout << "----------------------------------\n";
-        std::cout << "for server " << it0->first << std::endl;
-        for(it = it0->second.begin(); it != it0->second.end(); ++it)
-        {
-            std::cout << it->first << " ==> " << it->second << std::endl;
-        }
-    }
+    // std::multimap<std::string, std::string>::iterator it;
+    // for(it0 = _server_map.begin(); it0 != _server_map.end(); ++it0)
+    // {
+    //     // std::cout << "----------------------------------\n";
+    //     std::cout << "for server " << it0->first << std::endl;
+    //     for(it = it0->second.begin(); it != it0->second.end(); ++it)
+    //     {
+    //         std::cout << it->first << " ==> " << it->second << std::endl;
+    //     }
+    // }
     
-    std::cout << "----------------------------------\n";
-        std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
+    // std::cout << "----------------------------------\n";
+    //     std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
         
-     std::multimap<std::string, std::string>::iterator it1;
-     for(it2 = _loc_map.begin(); it2 != _loc_map.end(); ++it2)
-    {
-        std::cout << "for location " << it2->first << std::endl;
-        for(it1 = it2->second.begin(); it1 != it2->second.end(); ++it1)
-        {
-            std::cout << it1->first << " ==> " << it1->second << std::endl;
-        }
-    }
+    //  std::multimap<std::string, std::string>::iterator it1;
+    //  for(it2 = _loc_map.begin(); it2 != _loc_map.end(); ++it2)
+    // {
+    //     std::cout << "for location " << it2->first << std::endl;
+    //     for(it1 = it2->second.begin(); it1 != it2->second.end(); ++it1)
+    //     {
+    //         std::cout << it1->first << " ==> " << it1->second << std::endl;
+    //     }
+    // }
 }
 
 Parsing::~Parsing()

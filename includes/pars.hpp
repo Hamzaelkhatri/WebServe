@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 19:31:17 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 14:01:32 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/28 16:21:07 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,8 @@ private:
 
 public:
     Parsing( char *av);
+    std::map< int , std::multimap<std::string, std::string> > GetServerMap();
+    std::multimap <int, std::multimap<std::string, std::string> > Getloc_map();
     ~Parsing();
 };
 #endif

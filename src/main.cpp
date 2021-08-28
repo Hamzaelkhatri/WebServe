@@ -6,11 +6,12 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 14:01:49 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/28 16:42:58 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Webserv.hpp"
+
 
 int main(int ac, char **av)
 {
@@ -22,69 +23,11 @@ int main(int ac, char **av)
     if (compare_end(av[1], ".conf") == true)
     {
         ErrorHandling error(av[1]);
-        Parsing pars(av[1]);
+        Parsing *pars = new Parsing(av[1]);
+        Server server(pars);
     }
     else
         std::cerr << "wrong file \n";
     return (0);
 }
 
-/*----------------------------------------------------------------
-std::map<std::string, std::string> map_simpl(std::ifstream &my_file)
-{
-    std::map <std::string,std::string> map_s;
-    std::string key;
-    std::string str1;
-    std::string str;
-    while (my_file >> str)
-    {
-        while ((str == "{" || str == "server"))
-            my_file >> str;
-        if (str == "}" && my_file.eof())
-            my_file >> str;
-        else if (str == "}" && !my_file.eof())
-            break;
-        else if (str == "http_methods")
-        {
-            key = str;
-            my_file >> str;
-            str1 = "";
-            while (str == "GET" || str == "HEAD" || str == "POST" || str == "PUT" || str == "OPTIONS" || str == "DELETE")
-            {
-                str1 += str + " ";
-                my_file >> str;
-            }
-            map_s[key] = str1;
-            if (str == "error_page")
-            {
-                key = str;
-                my_file >> str;
-                str1 = str;
-                my_file >> str;
-                map_s[key] = str1 + " " + str;
-            }
-            else
-            {
-                key = str;
-                my_file >> str;
-                map_s[key] = str;
-            }
-        }
-        else if (str == "error_page")
-        {
-            key = str;
-            my_file >> str;
-            str1 = str;
-            my_file >> str;
-            map_s[key] = str1 + " " + str;
-        }
-        else
-        {
-            key = str;
-            my_file >> str;
-            map_s[key] = str;
-        }
-    }
-    return (map_s);
-}
-*/

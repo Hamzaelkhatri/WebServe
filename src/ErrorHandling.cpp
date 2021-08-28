@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 12:59:30 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/28 16:43:44 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,7 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
             it++;
         }
     
-                        std::cout << "hello " << it->second << std::endl ;
+                        // std::cout << "hello " << it->second << std::endl ;
     }
     int k = 0;
     for (it = res.begin(); it != res.end(); ++it)

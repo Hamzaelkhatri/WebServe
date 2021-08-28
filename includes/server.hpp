@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/21 19:27:57 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/08/28 17:18:44 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,11 @@
 #include <cstring>
 #include <fcntl.h>
 #include <sstream>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include "pars.hpp"
 #include "ErrorHandling.hpp"
+
 
 class Server
 {
@@ -30,9 +34,8 @@ class Server
         int new_socket;
         struct sockaddr_in add;
         int sizeof_add;
-        std::unordered_multimap<std::string, std::string> serv_map;
     public:
-        Server(std::unordered_multimap<std::string, std::string>);
+        Server(Parsing *p);
         ~Server();
         int creatSocket_fd(void);
         void set_strructAddr(struct sockaddr_in add);
