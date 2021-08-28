@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 11:50:07 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/28 14:01:49 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,7 @@ int main(int ac, char **av)
     if (compare_end(av[1], ".conf") == true)
     {
         ErrorHandling error(av[1]);
-        // std::cout << "hamza boo\n";
-        Parsing(av[1], error.get_nbr_server(), error.get_nbr_location());
+        Parsing pars(av[1]);
     }
     else
         std::cerr << "wrong file \n";

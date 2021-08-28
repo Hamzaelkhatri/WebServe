@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 11:51:13 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/28 12:59:30 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,7 +194,7 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
             it++;
         }
     
-                        // std::cout << "hello " << it->second << std::endl ;
+                        std::cout << "hello " << it->second << std::endl ;
     }
     int k = 0;
     for (it = res.begin(); it != res.end(); ++it)
@@ -205,7 +205,10 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
             error_msg("Error : file should start with server");
         if (res[it->first] == "server" && res[it->first + 1] != "{")
             error_msg("Error : after server should be only  open bracket");
-        if (res[it->first].find("location") != std::string::npos )
+        if(       (res[it->first].find("location") != std::string::npos ) &&    (res[it->first].find("}") != std::string::npos )
+)                error_msg("Error : close  bracket in new line alone");
+
+        if (res[it->first].find("location") != std::string::npos  )
         {
             it++;
 

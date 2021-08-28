@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 19:03:57 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 11:43:47 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/28 14:01:37 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Server_element::Server_element()
     this->port = 0;
 }
 
-Parsing::Parsing(char *av, int nbr_server, int nbr_location)
+Parsing::Parsing(char *av)
 {
     int  z = 0;
 
@@ -45,6 +45,7 @@ Parsing::Parsing(char *av, int nbr_server, int nbr_location)
     int d = 0;
     while (i < len )
     {
+    std::cout << "=== here " << Those_lines(result, i, len) ;
         while(std::strcmp(Those_lines(result, i, len).c_str(), "") == 0 )
                     i++;
         if(std::strcmp(Those_lines(result, i, len).c_str(), "server") == 0 )
