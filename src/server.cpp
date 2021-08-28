@@ -6,13 +6,11 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 17:21:10 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/28 17:56:27 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
-
-
 
 Server::Server(Parsing *p)
 {
@@ -38,7 +36,7 @@ std::memset((char *)&this->add, 0, sizeof(this->add));
 
   add.sin_port = htons(std::stoi(mtmp.find("listen")->second));
   add.sin_family = AF_INET;
-  add.sin_addr.s_addr = inet_addr((mtmp.find("server_addr")->second.c_str()));
+  add.sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());;
 
   memset(add.sin_zero, '\0', sizeof add.sin_zero); // why help to pad from sockaddr_in to sockaddr
 
@@ -70,7 +68,7 @@ std::memset((char *)&this->add, 0, sizeof(this->add));
       // std::cout << "Server Connected from " <<  inet_ntoa(client.sin_addr) << " port  "  <<  ntohs(client.sin_port) << std::endl;
       char buffer[1024] = {0};
       valrecv = recv(new_socket, buffer, 1024, 0);
-      // std::cout << buffer << std::endl;
+      std::cout << buffer << std::endl;
       write(new_socket , "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!", strlen("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!"));      std::cout << "------------------------------------------------------" << std::endl;
       }
       close(new_socket);

@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 17:18:44 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/28 17:34:06 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,6 @@
 #include <cstring>
 #include <fcntl.h>
 #include <sstream>
-#include <arpa/inet.h>
 #include <netinet/in.h>
 #include "pars.hpp"
 #include "ErrorHandling.hpp"
