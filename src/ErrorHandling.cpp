@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ErrorHandling.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/24 07:36:34 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/08/28 11:51:13 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,9 @@ ErrorHandling::ErrorHandling(char *file)
     this->server = 0;
     this->location = 0;
     this->file = file;
+
     set_map(clean_map(get_map(file)));
-    get_map_s();
+    // get_map_s();
 }
 
 int ErrorHandling::get_nbr_server(void)
@@ -40,16 +41,16 @@ void ErrorHandling::set_map(std::map<int, std::string> map)
 std::map<int, std::string> ErrorHandling::get_map_s()
 {
     std::map<int, std::string>::iterator it = this->map_s.begin();
-    for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
-    {
-        if (it->second == "server")
-            this->nbr_server++;
-        if (it->second.find("location") != std::string::npos)
-            this->nbr_location++;
-        // std::cout << "[ " << it->first;
-        // std::cout << " ] \t\t\t ==> [ ";
-        // std::cout << it->second << " ]" << std::endl;
-    }
+    // for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
+    // {
+    //     if (it->second == "server")
+    //         this->nbr_server++;
+    //     if (it->second.find("location") != std::string::npos)
+    //         this->nbr_location++;
+    //     // std::cout << "[ " << it->first;
+    //     // std::cout << " ] \t\t\t ==> [ ";
+    //     // std::cout << it->second << " ]" << std::endl;
+    // }
     return (this->map_s);
 }
 
@@ -184,7 +185,6 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
     {
         if (is_whitespace(it->second) == true)
         {
-            while (is_whitespace(it->second) == true)
                 it++;
         }
         else
@@ -193,6 +193,8 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
             i++;
             it++;
         }
+    
+                        // std::cout << "hello " << it->second << std::endl ;
     }
     int k = 0;
     for (it = res.begin(); it != res.end(); ++it)
@@ -203,9 +205,10 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
             error_msg("Error : file should start with server");
         if (res[it->first] == "server" && res[it->first + 1] != "{")
             error_msg("Error : after server should be only  open bracket");
-        if (res[it->first].find("location") != std::string::npos && !res[it->first].find("{"))
+        if (res[it->first].find("location") != std::string::npos )
         {
             it++;
+
             if (res[it->first] != "{")
                 error_msg("Error : after location should be only open bracket");
         }

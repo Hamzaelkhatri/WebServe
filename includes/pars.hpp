@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pars.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 19:31:17 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/24 12:42:22 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/08/28 11:31:59 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ private:
     std::multimap<std::string, std::string> server_map;
     std::multimap<std::string, std::string> loc_map;
     std::map< int , std::multimap<std::string, std::string> > _server_map;
-    std::map <int, std::multimap<std::string, std::string> > _loc_map;
+    std::multimap <int, std::multimap<std::string, std::string> > _loc_map;
 
 public:
     Parsing( char *, int nbr_server, int nbr_location);
