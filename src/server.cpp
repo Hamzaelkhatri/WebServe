@@ -37,13 +37,15 @@ std::memset((char *)&this->add, 0, sizeof(this->add));
   add.sin_port = htons(std::stoi(mtmp.find("listen")->second));
   add.sin_family = AF_INET;
   add.sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());;
+//   add.sin_zero
 
   memset(add.sin_zero, '\0', sizeof add.sin_zero); // why help to pad from sockaddr_in to sockaddr
 
   // Forcefully attaching socket to the PORT 
   if (bind(server_fd, (struct sockaddr *)&add, sizeof(add)) < 0)
   {
-        std::cerr << "Bind failed" << std::endl;
+      perror("here");
+        std::cerr << "Bind failed"  <<std::endl;
         exit(EXIT_FAILURE);
   }
   // wait for an incoming connection
@@ -58,18 +60,19 @@ std::memset((char *)&this->add, 0, sizeof(this->add));
       // send and receive msg , now we use rcv and  a buffer size
      //read from new_socket
       while (1) {
-        std::cout << "\t\t\t Waiting for new connection\n";
+        std::cout << "\t\t\t Listening " << mtmp.find("listen")->second << std::endl;
       if ((new_socket = accept(server_fd, (struct sockaddr *)&client,
                                &size_client)) < 0)
       {
         std::cerr << "acceptance failed" << std::endl;
         exit(EXIT_FAILURE);
       }
-      // std::cout << "Server Connected from " <<  inet_ntoa(client.sin_addr) << " port  "  <<  ntohs(client.sin_port) << std::endl;
-      char buffer[1024] = {0};
-      valrecv = recv(new_socket, buffer, 1024, 0);
+      char buffer[30000] = {0};
+      valrecv = recv(new_socket, buffer, 30000, 0);
       std::cout << buffer << std::endl;
-      write(new_socket , "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!", strlen("HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello world!"));      std::cout << "------------------------------------------------------" << std::endl;
+      std::string header = "HTTP/1.1 301 OK\nContent-Type: text/plain\nContent-Length: 12\n\n<html><head></head><body><h1>Hello </h1></body><html>!";
+      write(new_socket , header.c_str(), strlen(header.c_str()));
+      std::cout << "------------------------------------------------------" << std::endl;
       }
       close(new_socket);
 }

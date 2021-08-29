@@ -95,7 +95,6 @@ Parsing::Parsing(char *av)
             }
                   if (Those_lines(result, i, len).find("location") != std::string::npos)
                 {
-                    
                     while (Those_lines(result, i, len).find("}") == std::string::npos)
                     {
                         if (Those_lines(result, i, len) != "" && Those_lines(result, i, len) != "}" && Those_lines(result, i, len) != "{")
