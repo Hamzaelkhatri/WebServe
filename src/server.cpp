@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 17:56:27 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/29 17:58:02 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,15 @@ Server::Server(Parsing *p)
     }
     // bind an IP add and a port to a  socket
     //   p->GetServerMap().find()
-    std::map<int, std::multimap<std::string, std::string>> tmp = p->GetServerMap();
+    std::map<int, std::multimap<std::string, std::string> > tmp = p->GetServerMap();
     std::multimap<std::string, std::string> mtmp = tmp[1];
 
     add.sin_port = htons(std::stoi(mtmp.find("listen")->second));
     add.sin_family = AF_INET;
-    add.sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());
-    ;
+    if (mtmp.find("server_addr")->second.c_str()!= NULL)
+      add.sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());
+    else
+      add.sin_addr.s_addr = INADDR_ANY;
 
     memset(add.sin_zero, '\0', sizeof add.sin_zero); // why help to pad from sockaddr_in to sockaddr
 
