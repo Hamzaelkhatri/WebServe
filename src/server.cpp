@@ -77,7 +77,8 @@ Server::Server(Parsing *p)
         }
         MyReadFile.close();
         int lenght = index.size();
-        std::string header = "HTTP/1.1 301 OK\nContent-Type: text/html\nContent-Length: " + std::to_string(lenght) + "\n\n" + index;
+        std::cout << buffer << std::endl;
+        std::string header = "HTTP/1.1 301 OK\nContent-Type: text/html\nSet-Cookie: email=hamzaelkhatri1@gmail.com\nContent-Length: " + std::to_string(lenght) + "\n\n" + index;
         write(new_socket, header.c_str(), strlen(header.c_str()));
         std::cout << "------------------------------------------------------" << std::endl;
     }
