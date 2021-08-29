@@ -21,3 +21,5 @@
 <a href="https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms" > understanding nginx server and location block selection algorithms 
 <a href="http://nginx.org/en/docs/http/request_processing.html"> How nginx processes a request </a></br>
 <a href="https://manpages.courier-mta.org/htmlman2/select.2.html"> select() </a></br>
+<a href="https://stackoverflow.com/questions/8695678/what-is-the-nfds-from-select-used-for">What is the nfds from select() used for</a></br>
+
