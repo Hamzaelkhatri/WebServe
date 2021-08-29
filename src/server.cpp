@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
-
+#include <string>
 Server::Server(Parsing *p)
 {
 std::memset((char *)&this->add, 0, sizeof(this->add)); 
@@ -37,14 +37,13 @@ std::memset((char *)&this->add, 0, sizeof(this->add));
   add.sin_port = htons(std::stoi(mtmp.find("listen")->second));
   add.sin_family = AF_INET;
   add.sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());;
-//   add.sin_zero
 
   memset(add.sin_zero, '\0', sizeof add.sin_zero); // why help to pad from sockaddr_in to sockaddr
 
   // Forcefully attaching socket to the PORT 
   if (bind(server_fd, (struct sockaddr *)&add, sizeof(add)) < 0)
   {
-      perror("here");
+        perror("Bind");
         std::cerr << "Bind failed"  <<std::endl;
         exit(EXIT_FAILURE);
   }
@@ -54,11 +53,6 @@ std::memset((char *)&this->add, 0, sizeof(this->add));
         std::cerr << "Listening failed" << std::endl;
         exit(EXIT_FAILURE);
       }
-      // The accept system call grabs the first connection request
-
-      // since we have a valid socket , we gonna print some information
-      // send and receive msg , now we use rcv and  a buffer size
-     //read from new_socket
       while (1) {
         std::cout << "\t\t\t Listening " << mtmp.find("listen")->second << std::endl;
       if ((new_socket = accept(server_fd, (struct sockaddr *)&client,
@@ -69,12 +63,28 @@ std::memset((char *)&this->add, 0, sizeof(this->add));
       }
       char buffer[30000] = {0};
       valrecv = recv(new_socket, buffer, 30000, 0);
+
+      std::ifstream out("../webpage/index.html");
+
+      std::string index;
       std::cout << buffer << std::endl;
-      std::string header = "HTTP/1.1 301 OK\nContent-Type: text/plain\nContent-Length: 12\n\n<html><head></head><body><h1>Hello </h1></body><html>!";
+
+      std::string tmp = "";
+      while (std::getline (out, tmp))
+      {
+          index+= tmp;
+          puts("here");
+      }
+      int lenght = index.size();
+      out.close();
+      std::cout <<"["<< index << "]";
+      out.close();
+      std::string header = "HTTP/1.1 301 OK\nContent-Type: text/plain\nContent-Length: "+std::to_string(lenght)+"\n\n"+index;
       write(new_socket , header.c_str(), strlen(header.c_str()));
       std::cout << "------------------------------------------------------" << std::endl;
       }
       close(new_socket);
+      close(server_fd);
 }
 
 int Server::creatSocket_fd()

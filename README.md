@@ -19,3 +19,4 @@
 </br>
 <a href="https://www.nginx.com/blog/http-keepalives-and-web-performance/"> nginx http 1.1 behavor </a> </br>
 <a href="https://www.digitalocean.com/community/tutorials/understanding-nginx-server-and-location-block-selection-algorithms" > understanding nginx server and location block selection algorithms 
+<a href="http://nginx.org/en/docs/http/request_processing.html"> How nginx processes a request </a></br>
