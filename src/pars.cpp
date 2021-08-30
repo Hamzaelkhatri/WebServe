@@ -55,9 +55,8 @@ Parsing::Parsing(char *av)
     int d = 0;
     while (i < len )
     {
-    // std::cout << "=== here " << Those_lines(result, i, len) ;
-        while(std::strcmp(Those_lines(result, i, len).c_str(), "") == 0 )
-                    i++;
+        // while(std::strcmp(Those_lines(result, i, len).c_str(), "") == 0 )
+        //             i++;
         if(std::strcmp(Those_lines(result, i, len).c_str(), "server") == 0 )
         {
             i++;

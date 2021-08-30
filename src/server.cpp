@@ -14,6 +14,7 @@
 #include <string>
 Server::Server(Parsing *p)
 {
+    std::map<std::string, std::string> stor;
     std::memset((char *)&this->add, 0, sizeof(this->add));
     int server_fd;  // socket descriptor, an integer!
     int new_socket; // conection establish btw client & server
@@ -36,10 +37,10 @@ Server::Server(Parsing *p)
 
     add.sin_port = htons(std::stoi(mtmp.find("listen")->second));
     add.sin_family = AF_INET;
-    if (mtmp.find("server_addr")->second.c_str()!= NULL)
-      add.sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());
+    if (mtmp.find("server_addr")->second.c_str() != NULL)
+        add.sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());
     else
-      add.sin_addr.s_addr = INADDR_ANY;
+        add.sin_addr.s_addr = INADDR_ANY;
 
     memset(add.sin_zero, '\0', sizeof add.sin_zero); // why help to pad from sockaddr_in to sockaddr
 
@@ -69,22 +70,62 @@ Server::Server(Parsing *p)
         valrecv = recv(new_socket, buffer, 30000, 0);
 
         std::string tmp;
-        std::string index ="";
+        std::string body = "";
 
         std::ifstream MyReadFile("webpage/index.html");
         while (std::getline(MyReadFile, tmp))
         {
-            index+= tmp;
-            index+= "\n";
+            body += tmp;
+            body += "\n";
         }
         MyReadFile.close();
-        int lenght = index.size();
+        int lenght = body.size();
         std::cout << buffer << std::endl;
-        std::string header = "HTTP/1.1 301 OK\nContent-Type: text/html\nSet-Cookie: email=hamzaelkhatri1@gmail.com\nContent-Length: " + std::to_string(lenght) + "\n\n" + index;
+        std::cout << "/*******************************Store respond**********************/\n";
+        std::string someString(buffer);
+        std::stringstream out;
+
+        out << someString;
+        std::string line1;
+        std::string first;
+        char *str = ":";
+        int i = 0;
+        while (std::getline(out, line1))
+        {
+            // std::cout <<"["<< line1 <<"]"<< "\n";
+            // printf("[%i,%s]\n",i,line1.c_str());
+            if (i == 0)
+                first = line1;
+            else
+            {
+                if (line1 != std::string(""))
+                {
+                    char **res = ft_charSplit(line1.c_str(), str);
+                    std::string key = res[0];
+                    if (res[1])
+                    {
+                        std::string value = res[1];
+                        std::cout << value << std::endl;
+                    }
+                    // stor[key] = value;
+                    // for(int j = 0 ; j < 3; j++)
+                    //         std::cout <<  " ==> " << res[j]  << std::endl;
+                }
+            }
+            i++;
+        }
+
+        //\nSet-Cookie email=hamzaelkhatri1@gmail.com
+        std::string header = "HTTP/1.1 301 OK\nContent-Type: text/html\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
         write(new_socket, header.c_str(), strlen(header.c_str()));
-        std::cout << "------------------------------------------------------" << std::endl;
+        // std::cout << "------------------------------------------------------" << std::endl;
+        close(new_socket);
     }
-    close(new_socket);
+    // std::map<std::string, std::string>::iterator it2;
+    // for (it2 = stor.begin(); it2 != stor.end(); ++it2)
+    // {
+    //         std::cout << it2->first << " ==> " << it2->second << std::endl;
+    // }
     close(server_fd);
 }
 

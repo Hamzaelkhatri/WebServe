@@ -116,7 +116,7 @@ std::string Those_lines(std::string txt, int nbr_line, int txt_lines)
     int j = 0;
     int w = 0;
     if (nbr_line >= txt_lines)
-        return (std::string(NULL));
+        return ("");
     while (i < nbr_line)
     {
         if (txt[j] == '\n')
