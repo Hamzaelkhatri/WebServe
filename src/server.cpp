@@ -92,8 +92,6 @@ Server::Server(Parsing *p)
         int i = 0;
         while (std::getline(out, line1))
         {
-            // std::cout <<"["<< line1 <<"]"<< "\n";
-            // printf("[%i,%s]\n",i,line1.c_str());
             if (i == 0)
                 first = line1;
             else
