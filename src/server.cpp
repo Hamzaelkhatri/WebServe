@@ -24,6 +24,7 @@ std::string getBody(std::string path)
         while (getline(file, line))
         {
             body += line;
+            body+="\n";
         }
         file.close();
     }
@@ -90,9 +91,11 @@ Server::Server(Parsing *p)
         std::string tmp;
         std::string body = "";
         std::string someString(buffer);
+        std::cout << someString << std::endl;
         std::stringstream out;
         out << someString;
         std::string line1;
+        std::string status = "200 OK";
         std::string tmp2;
         int lenght = 0;
         int i = 0;
@@ -116,18 +119,45 @@ Server::Server(Parsing *p)
             std::multimap <int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
             std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
             std::string path = "webpage"+mtmp.find("location")->second;
-            if( stor.find("GET")->second== path)
+            if(stor.find("GET")->second== path)
             {
                 body = getBody(stor.find("GET")->second+"/index.html");
                 lenght = body.size();
             }
             else
             {
-                body = getBody("webpage/errors/404/index.html");
+                body = getBody("webpage/errors/404.html");
                 lenght = body.size();
+                status = "404 Not Found";
             }
         }
-        std::string header = "HTTP/1.1 301 OK\nContent-Type: text/html\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
+        else if(stor.find("POST") != stor.end())
+        {
+            std::multimap <int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
+            std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
+            if(mtmp.find("http_methods")->second.find("POST") != std::string::npos)
+            {
+                std::string path = "webpage"+mtmp.find("location")->second;
+                if(stor.find("POST")->second== path)
+                {
+                    body = getBody(stor.find("POST")->second+"/index.html");
+                   lenght = body.size();
+                 }
+                else
+                {
+                    body = getBody("webpage/errors/404.html");
+                    lenght = body.size();
+                    status = "404 Not Found";
+             }
+            }
+            else
+            {
+                   body = getBody("webpage/errors/405.html");
+                    lenght = body.size();
+                    status = "405 Not Allowed";
+            }
+        }
+        std::string header = "HTTP/1.1 "+status+"\nContent-Type: text/html\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
         write(new_socket, header.c_str(), strlen(header.c_str()));
         close(new_socket);
     }
