@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/31 17:57:39 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/31 19:44:03 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ Server::Server(Parsing *p)
     // bind an IP add and a port to a  socket
     //   p->GetServerMap().find()
     std::map<int, std::multimap<std::string, std::string> > tmp = p->GetServerMap();
+    std::multimap< int , std::multimap<std::string, std::string> > loc = p->Getloc_map() ;
     std::multimap<std::string, std::string> mtmp = tmp[1];
 
     add.sin_port = htons(std::stoi(mtmp.find("listen")->second));
@@ -62,7 +63,7 @@ Server::Server(Parsing *p)
         add.sin_addr.s_addr = INADDR_ANY;
 
     memset(add.sin_zero, '\0', sizeof add.sin_zero); // why help to pad from sockaddr_in to sockaddr
-
+                                                                                                                                                                                       
     // Forcefully attaching socket to the PORT
     if (bind(server_fd, (struct sockaddr *)&add, sizeof(add)) < 0)
     {
@@ -76,6 +77,17 @@ Server::Server(Parsing *p)
         std::cerr << "Listening failed" << std::endl;
         exit(EXIT_FAILURE);
     }
+    // std::multimap<int, std::multimap<std::string, std::string>  >::iterator it0;
+    // std::multimap<std::string, std::string>::iterator it;
+    // for(it0 = loc.begin(); it0 != loc.end(); ++it0)
+    // {
+    //     // std::cout << "----------------------------------\n";
+    //     std::cout << "for server " << it0->first << std::endl;
+    //     for(it = it0->second.begin(); it != it0->second.end(); ++it)
+    //     {
+    //         std::cout << it->first << " ==> " << it->second << std::endl;
+    //     }
+    // }
     while (1)
     {
         std::cout << "\t\t\t Listening " << mtmp.find("listen")->second << std::endl;
@@ -135,29 +147,64 @@ Server::Server(Parsing *p)
         {
             std::multimap <int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
             std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
+            std::multimap<std::string, std::string>::iterator it;
+            // for(it = mtmp.begin(); it != mtmp.end(); ++it)
+            // {
+            //     std::cout << it->first << " ==> " << it->second << std::endl;
+            // }
             if(mtmp.find("http_methods")->second.find("POST") != std::string::npos)
             {
-                std::string path = "webpage"+mtmp.find("location")->second;
-                if(stor.find("POST")->second== path)
+                std::string path = "webpage" + mtmp.find("location")->second;
+                if(stor.find("POST")->second == path)
                 {
                     body = getBody(stor.find("POST")->second+"/index.html");
                    lenght = body.size();
+                     for(it = mtmp.begin(); it != mtmp.end(); ++it)
+                     {
+                        if ( k == 1  || it->first == "upload")
+                        {
+                            if(it->first == "upload" && it->second == "on")
+                                int k = 1;
+                            if ( it->first == "upload_location")
+                            {
+                                if ( it->second != "/Users/zdnaya/Downloads")
+                                    std::cout << "Saved uploaded files in [/Users/zdnaya/Downloads]\n";
+                                else
+                                {
+                                    std::cout << "Save the upload\n"
+                                }
+
+                            }
+                                
+                        }
+                        else
+                        {
+                            std::cout << "NO upload saved\n"
+                        }
+
+                        //  std::cout << it->first << " ==> " << it->second << std::endl;
+                     }
+                    // if ( mtmp.find("upload")->first)
+                    // {
+                    //     std::cout << mtmp.find("upload")->second << std::endl;
+                    // }
                  }
                 else
                 {
                     body = getBody("webpage/errors/404.html");
                     lenght = body.size();
                     status = "404 Not Found";
-             }
+                }
             }
             else
             {
-                   body = getBody("webpage/errors/405.html");
-                    lenght = body.size();
-                    status = "405 Not Allowed";
+                body = getBody("webpage/errors/405.html");
+                lenght = body.size();
+                status = "405 Not Allowed";
             }
+
         }
-        std::string header = "HTTP/1.1 "+status+"\nContent-Type: text/html\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
+        std::string header = "HTTP/1.1 "+ status + "\nContent-Type: text/html\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
         write(new_socket, header.c_str(), strlen(header.c_str()));
         close(new_socket);
     }
