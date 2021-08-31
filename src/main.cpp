@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 16:42:58 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/31 17:56:18 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,19 +24,18 @@ int main(int ac, char **av)
     {
         ErrorHandling error(av[1]);
         Parsing *pars = new Parsing(av[1]);
-        std::map< int , std::multimap<std::string, std::string> > tmp = pars->GetServerMap() ;
-    std::map<int, std::multimap<std::string, std::string>  >::iterator it0;
-    std::multimap<std::string, std::string>::iterator it;
-    // for(it0 = tmp.begin(); it0 != tmp.end(); ++it0)
-    // {
-    //     // std::cout << "----------------------------------\n";
-    //     std::cout << "for server " << it0->first << std::endl;
-    //     for(it = it0->second.begin(); it != it0->second.end(); ++it)
-    //     {
-    //         std::cout << it->first << " ==> " << it->second << std::endl;
-    //     }
-    // }
-
+        //     std::map< int , std::multimap<std::string, std::string> > tmp = pars->GetServerMap() ;
+        // std::map<int, std::multimap<std::string, std::string>  >::iterator it0;
+        // std::multimap<std::string, std::string>::iterator it;
+        // for(it0 = tmp.begin(); it0 != tmp.end(); ++it0)
+        // {
+        //     // std::cout << "----------------------------------\n";
+        //     std::cout << "for server " << it0->first << std::endl;
+        //     for(it = it0->second.begin(); it != it0->second.end(); ++it)
+        //     {
+        //         std::cout << it->first << " ==> " << it->second << std::endl;
+        //     }
+        // }
         Server server(pars);
     }
     else

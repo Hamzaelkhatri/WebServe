@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 16:43:44 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/31 17:45:22 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,61 +42,18 @@ std::map<int, std::string> ErrorHandling::get_map_s()
 {
     std::map<int, std::string>::iterator it = this->map_s.begin();
     // for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
-    // {
-    //     if (it->second == "server")
-    //         this->nbr_server++;
-    //     if (it->second.find("location") != std::string::npos)
-    //         this->nbr_location++;
-    //     // std::cout << "[ " << it->first;
-    //     // std::cout << " ] \t\t\t ==> [ ";
-    //     // std::cout << it->second << " ]" << std::endl;
-    // }
+    {
+        // if (it->second == "server")
+            // this->nbr_server++;
+        // if (it->second.find("location") != std::string::npos)
+            // this->nbr_location++;
+        // std::cout << "[ " << it->first;
+        // std::cout << " ] \t\t\t ==> [ ";
+        // std::cout << it->second << " ]" << std::endl;
+    }
     return (this->map_s);
 }
 
-// std::unordered_multimap<std::string, std::string> ErrorHandling::get_cmap(void)
-// {
-//     std::map<int, std::string>::iterator it = this->map_s.begin();
-//     // std::vector<std::string> vc;
-
-//     for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
-//     {
-//         // if( it->second != std::string("server") && it->second != std::string("}") && it->second != std::string("{"))
-//         {
-//             char *str1 = (char *)it->second.c_str();
-//             char **ptr = ft_charSplit(str1, (char *)" \t");
-//             int i = 1;
-//             std::string str;
-//             std::string key = ptr[0];
-
-//             while (ptr[i])
-//             {
-//                 // std::cout << ptr[i] << std::endl;
-//                 if (i == 1)
-//                     str = ptr[i];
-//                 else
-//                 {
-//                     str = str + " " + ptr[i];
-//                     // std::cout << "sr ==> "<<  str  << std::endl;
-//                 }
-//                 i++;
-//             }
-//             this->tst.insert(std::pair<std::string, std::string>(key, str));
-//             // std::cout << "key ==> " << key << " value ==> " << str << std::endl;
-//             i = 1;
-//         }
-//     }
-
-//     std::unordered_multimap<std::string, std::string>::iterator it_s;
-
-//     // for (it_s = this->tst.begin(); it_s != this->tst.end(); ++it_s)
-//     // {
-//     //     std::cout << "[ " << it_s->first;
-//     //     std::cout << " ] \t\t\t ==> [ ";
-//     //     std::cout << it_s->second <<  " ]"<< std::endl;
-//     // }
-//     return (this->tst);
-// }
 /****************  Those lines **********************************************/
 
 int check_end_of_string(std::string str, int i, int j)
@@ -129,9 +86,7 @@ std::string Those_lines(std::string txt, int nbr_line, int txt_lines)
     while (txt[j + w] && txt[w + j] != '\n' && std::isprint(txt[j + w])) // when the line ends until \n
     {
         w++;
-        // std::cout << std::string(txt, j, w) << std::endl;
     }
-    // printf(" for line %d : j == %d || w == %d\n",i,j,w);
     while (w > 0 && std::isspace(txt[w + j - 1])) // escape space after the txt o the line
     {
         w--;
@@ -163,11 +118,7 @@ std::map<int, std::string> get_map(char *av)
     int len = nbr_lines(result);
     while (i < len)
     {
-        // std::cout << " |"<<  Those_lines(result, i, (len))  << "|"<< std::endl;
-        // if ( Those_lines(result, i, len) != std::string(NULL))
-        // {
-            map_s[i] = Those_lines(result, i, (len)); // no spaces befor or after
-        // }
+        map_s[i] = Those_lines(result, i, (len)); // no spaces befor or after
         i++;
     }
     return (map_s);
@@ -194,7 +145,6 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
             it++;
         }
     
-                        // std::cout << "hello " << it->second << std::endl ;
     }
     int k = 0;
     for (it = res.begin(); it != res.end(); ++it)
@@ -205,16 +155,10 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
             error_msg("Error : file should start with server");
         if (res[it->first] == "server" && res[it->first + 1] != "{")
             error_msg("Error : after server should be only  open bracket");
-        if(       (res[it->first].find("location") != std::string::npos ) &&    (res[it->first].find("}") != std::string::npos )
-)                error_msg("Error : close  bracket in new line alone");
-
-        if (res[it->first].find("location") != std::string::npos  )
-        {
-            it++;
-
-            if (res[it->first] != "{")
-                error_msg("Error : after location should be only open bracket");
-        }
+        if( (res[it->first].find("location") != std::string::npos ) &&    res[it->first].find("}") != std::string::npos )
+                error_msg("Error : close  bracket in new line alone");
+        if( (res[it->first].find("location") != std::string::npos ) &&    res[it->first].find("{") != std::string::npos )
+                error_msg("Error : open bracket in new line alone");    
         if (res[it->first].find("}") != std::string::npos)
             k++;
         if (res[it->first].find("{") != std::string::npos)
@@ -259,37 +203,3 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
 ErrorHandling::~ErrorHandling()
 {
 }
-// void check_error(char *file)
-// {
-//     std::string line = "";
-//     std::ifstream my_file;
-//     unsigned int w = 0;
-//     unsigned int h = 0;
-//     unsigned int k = 0;
-//     int nb_line = 0;
-//     my_file.open(file);
-//     if (!my_file.is_open())
-//         error_msg("Error: File not opned or not found");
-//     while (std::getline(my_file, line, '\n'))
-//     {
-//         nb_line++;
-//         if (nb_line == 1 && line.find("server") == std::string::npos)
-//             error_msg("Error: sould start with server ");
-//         if (line.find("#") != std::string::npos)
-//         {
-//             std::cout << " ERROR : line = " << nb_line + 1 << " ==> " << std::endl
-//                       << line << std::endl;
-//             exit(EXIT_FAILURE);
-//         }
-//         if (line.find("{") != std::string::npos)
-//         {
-//             k++;
-//         }
-//         if (line.find("}") != std::string::npos)
-//         {
-//             k--;
-//         }
-//     }
-//     if (k != 0)
-//         error_msg("Error: wrong number of brackets");
-// }
