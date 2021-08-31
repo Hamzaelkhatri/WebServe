@@ -12,6 +12,24 @@
 
 #include "../includes/server.hpp"
 #include <string>
+
+
+std::string getBody(std::string path)
+{
+    std::string body;
+    std::ifstream file(path);
+    if (file.is_open())
+    {
+        std::string line;
+        while (getline(file, line))
+        {
+            body += line;
+        }
+        file.close();
+    }
+    return body;
+}
+
 Server::Server(Parsing *p)
 {
     std::map<std::string, std::string> stor;
@@ -71,59 +89,48 @@ Server::Server(Parsing *p)
 
         std::string tmp;
         std::string body = "";
-
-        std::ifstream MyReadFile("webpage/index.html");
-        while (std::getline(MyReadFile, tmp))
-        {
-            body += tmp;
-            body += "\n";
-        }
-        MyReadFile.close();
-        int lenght = body.size();
-        std::cout << buffer << std::endl;
-        std::cout << "/*******************************Store respond**********************/\n";
         std::string someString(buffer);
         std::stringstream out;
-
         out << someString;
         std::string line1;
-        std::string first;
-        char *str = ":";
+        std::string tmp2;
+        int lenght = 0;
         int i = 0;
         while (std::getline(out, line1))
         {
-            if (i == 0)
-                first = line1;
+            if(line1.find_first_of(":") != std::string::npos)
+            {
+                tmp = line1.substr(0, line1.find_first_of(":"));
+                tmp2 = line1.substr(line1.find_first_of(":") + 1);
+                stor[tmp] = tmp2;
+            }
             else
             {
-                if (line1 != std::string(""))
-                {
-                    char **res = ft_charSplit(line1.c_str(), str);
-                    std::string key = res[0];
-                    if (res[1])
-                    {
-                        std::string value = res[1];
-                        std::cout << value << std::endl;
-                    }
-                    // stor[key] = value;
-                    // for(int j = 0 ; j < 3; j++)
-                    //         std::cout <<  " ==> " << res[j]  << std::endl;
-                }
+                tmp = line1.substr(0, line1.find_first_of(" "));
+                tmp2 = line1.substr(line1.find_first_of(" ") + 1);
+                stor[tmp] ="webpage" +tmp2.substr(0,tmp2.find_first_of(" "));
             }
-            i++;
         }
-
-        //\nSet-Cookie email=hamzaelkhatri1@gmail.com
+        if(stor.find("GET") != stor.end())
+        {
+            std::multimap <int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
+            std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
+            std::string path = "webpage"+mtmp.find("location")->second;
+            if( stor.find("GET")->second== path)
+            {
+                body = getBody(stor.find("GET")->second+"/index.html");
+                lenght = body.size();
+            }
+            else
+            {
+                body = getBody("webpage/errors/404/index.html");
+                lenght = body.size();
+            }
+        }
         std::string header = "HTTP/1.1 301 OK\nContent-Type: text/html\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
         write(new_socket, header.c_str(), strlen(header.c_str()));
-        // std::cout << "------------------------------------------------------" << std::endl;
         close(new_socket);
     }
-    // std::map<std::string, std::string>::iterator it2;
-    // for (it2 = stor.begin(); it2 != stor.end(); ++it2)
-    // {
-    //         std::cout << it2->first << " ==> " << it2->second << std::endl;
-    // }
     close(server_fd);
 }
 
