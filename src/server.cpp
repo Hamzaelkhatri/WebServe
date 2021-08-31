@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/31 19:44:03 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/08/31 20:01:21 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,10 +148,6 @@ Server::Server(Parsing *p)
             std::multimap <int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
             std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
             std::multimap<std::string, std::string>::iterator it;
-            // for(it = mtmp.begin(); it != mtmp.end(); ++it)
-            // {
-            //     std::cout << it->first << " ==> " << it->second << std::endl;
-            // }
             if(mtmp.find("http_methods")->second.find("POST") != std::string::npos)
             {
                 std::string path = "webpage" + mtmp.find("location")->second;
@@ -159,35 +155,24 @@ Server::Server(Parsing *p)
                 {
                     body = getBody(stor.find("POST")->second+"/index.html");
                    lenght = body.size();
+                   int k = 0;
                      for(it = mtmp.begin(); it != mtmp.end(); ++it)
                      {
                         if ( k == 1  || it->first == "upload")
                         {
-                            if(it->first == "upload" && it->second == "on")
-                                int k = 1;
-                            if ( it->first == "upload_location")
-                            {
-                                if ( it->second != "/Users/zdnaya/Downloads")
-                                    std::cout << "Saved uploaded files in [/Users/zdnaya/Downloads]\n";
+                            // if(it->first == "upload" && mtmp.find("on")->second )
+                            //     k = 1;
+                            // if ( it->first == "upload_location")
+                            // {
+                            //     if ( mtmp.find("/Users/zdnaya/Downloads")->second)
+                            //         std::cout << "Saved uploaded files in [/Users/zdnaya/Downloads]\n";
                                 else
                                 {
-                                    std::cout << "Save the upload\n"
+                                    std::cout << "\033[3;47;35m Save the upload\033[0m\t\n";
                                 }
-
-                            }
-                                
+                            }                               
                         }
-                        else
-                        {
-                            std::cout << "NO upload saved\n"
-                        }
-
-                        //  std::cout << it->first << " ==> " << it->second << std::endl;
                      }
-                    // if ( mtmp.find("upload")->first)
-                    // {
-                    //     std::cout << mtmp.find("upload")->second << std::endl;
-                    // }
                  }
                 else
                 {
