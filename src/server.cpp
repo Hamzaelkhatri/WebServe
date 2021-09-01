@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/01 13:43:11 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/01 15:42:15 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,14 @@ int check_dir(std::string dir, std::string str)
         {
             i++;
             std::string tmp = dir + "" + dp->d_name;
-            std::cout << tmp << "  " << str << "\n";
+            // std::cout << tmp << "  " << str << "\n";
             if (tmp.find(str) != std::string::npos)
                 return (1);
         }
         else if(dp->d_type == DT_REG)
         {
             std::string tmp = dir + "" + dp->d_name;
-            std::cout << tmp << "  " << str << "\n";
+            // std::cout << tmp << "  " << str << "\n";
             if (tmp.find(str) != std::string::npos)
                 return (2);
         }
@@ -161,6 +161,7 @@ Server::Server(Parsing *p)
         std::string line1;
         std::string status = "200 OK";
         std::string tmp2;
+        std::string Content;
         int t = 0;
         int i = 0;
         int lenght = 0;
@@ -183,16 +184,16 @@ Server::Server(Parsing *p)
             else
             {
                 t++;
-
-                std::cout <<  "\t Content " << line1 << std::endl;
+                Content += line1;
             }
             i++;
         }
-        std::map< std::string, std::string>::iterator tt;
-        for(tt  = stor.begin(); tt != stor.end(); tt++)
-        {
-            std::cout << "stror[" << tt->first << "] \t=> [" << tt->second << "]\n" ;
-        }
+        // std::map< std::string, std::string>::iterator tt;
+        // for(tt  = stor.begin(); tt != stor.end(); tt++)
+        // {
+        //     std::cout << "stror[" << tt->first << "] \t=> [" << tt->second << "]\n" ;
+        // } 
+        // std::cout << "content ===> " << Content << std::endl;
         if (stor.find("GET") != stor.end())
         {
             int dir = 0;
@@ -240,27 +241,34 @@ Server::Server(Parsing *p)
                     int k = 0;
                     for (it = mtmp.begin(); it != mtmp.end(); ++it)
                     {
-                        if (k == 1 || it->first == "upload")
-                        {
-                            // if(it->first == "upload" && mtmp.find("on")->second )
-                            //     k = 1;
-                            // if ( it->first == "upload_location")
-                            // {
-                            //     if ( mtmp.find("/Users/zdnaya/Downloads")->second)
-                            //         std::cout << "Saved uploaded files in [/Users/zdnaya/Downloads]\n";
-                            //     else
-                            //     {
-                            //         std::cout << "\033[3;47;35m Save the upload\033[0m\t\n";
-                            //     }
-                            // }
-                        }
+                        // if (k == 1 || mtmp.find("upload") != mtmp.end())
+                        // {
+                        //     if( mtmp.find("upload") != mtmp.end()  && it->second )
+                        //         k = 1;
+                        //     if (  mtmp.find("upload_location") != mtmp.end())
+                        //     {
+                        //         if ( it->second == std::string::npos)
+                        //             std::cout << "Saved uploaded files in [/Users/zdnaya/Downloads]\n";
+                        //         else
+                        //         {
+                        //             std::cout << "\033[3;47;35m Save the upload\033[0m\t\n";
+                        //         }
+                        //     }
+                        // }
                     }
                 }
-                else
+                else if (stor.find("POST")->second != path)
                 {
                     body = getBody("webpage/errors/404.html");
                     lenght = body.size();
-                    status = "404 Not Found";
+                    status = "404 not found";
+                }
+                else
+                {
+                    std::cout << "["+Content +"]" << std::endl;
+                    body = getBody("webpage/");
+                    lenght = body.size();
+                    status = "200 Ok";
                 }
             }
             else
