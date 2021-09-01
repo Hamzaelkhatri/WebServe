@@ -13,7 +13,17 @@
 #include "../includes/server.hpp"
 #include <string>
 #include <dirent.h>
-
+     #include <sys/types.h>
+     #include <sys/uio.h>
+     #include <unistd.h>
+int check_index(std::string str)
+{
+    int ret = open(str.c_str(), O_RDONLY);
+    if (ret == -1)
+        return (0);
+    close(ret);
+    return (1);
+}
 int check_dir(std::string dir, std::string str)
 {
     DIR *dirp;
@@ -29,31 +39,41 @@ int check_dir(std::string dir, std::string str)
         if (dp->d_type == DT_DIR)
         {
             i++;
-            std::string tmp = dir + "" + dp->d_name;
+            std::string tmp = dir + "" + dp->d_name + "/";
             std::cout << tmp << "  " << str << "\n";
             if (tmp.find(str) != std::string::npos)
-                return (1);
+            {
+                if (check_index(tmp + "/index.html"))
+                    return (1);
+                else
+                    return (0);
+            }
         }
-        else if(dp->d_type == DT_REG)
+        else if (dp->d_type == DT_REG && str.find(".") != std::string::npos)
         {
             std::string tmp = dir + "" + dp->d_name;
-            std::cout << tmp << "  " << str << "\n";
+            std::cout << tmp << " || " << str << "\n";
             if (tmp.find(str) != std::string::npos)
                 return (2);
         }
     }
     closedir(dirp);
-    if(str.find(".") == std::string::npos)
+    if (str.find(".") == std::string::npos)
     {
         dirp = opendir(str.c_str());
         if (dirp == NULL)
             return (0);
+        closedir(dirp);
     }
     else
-        return (0);
+    {
+        int ret = open(str.c_str(), O_RDONLY);
+        if (ret == -1)
+            return (0);
+        close(ret);
+    }
     return (2);
 }
-
 
 std::string getBody(std::string path)
 {
@@ -92,9 +112,9 @@ Server::Server(Parsing *p)
     }
     ///Set Socket
     //int setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_length);
-    //it helps in reuse of address and port 
+    //it helps in reuse of address and port
     int option = 1;
-    if (setsockopt(server_fd, SOL_SOCKET,  SO_REUSEPORT, &option, sizeof(option)))
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEPORT, &option, sizeof(option)))
     {
         perror("setsockopt");
         exit(EXIT_FAILURE);
@@ -147,25 +167,26 @@ Server::Server(Parsing *p)
             std::cerr << "acceptance failed" << std::endl;
             exit(EXIT_FAILURE);
         }
-        char buffer[30000] = {0};
-        valrecv = recv(new_socket, buffer, 30000, 0);
-
+        char buffer[10000] = {0};
+        // valrecv = recv(new_socket, buffer, 10000, 0);
+        read(new_socket,buffer,10000);
+        std::string someString(buffer);
         std::string tmp;
         std::string body = "";
-        std::string someString(buffer);
         //  show the request
-        // std::cout << someString << std::endl;
+        std::cout << someString << std::endl;
         std::stringstream out;
         // out << someString;
         int len = nbr_lines(someString);
         std::string line1;
         std::string status = "200 OK";
         std::string tmp2;
+        std::string Content;
         int t = 0;
         int i = 0;
         int lenght = 0;
-        while (i < len ) 
-        {       
+        while (i < len)
+        {
             line1 = Those_lines(someString, i, len);
             if (line1.find_first_of(":") != std::string::npos && t == 1)
             {
@@ -173,7 +194,7 @@ Server::Server(Parsing *p)
                 tmp2 = line1.substr(line1.find_first_of(":") + 1);
                 stor[tmp] = tmp2;
             }
-            else if ( t == 0)
+            else if (t == 0)
             {
                 tmp = line1.substr(0, line1.find_first_of(" "));
                 tmp2 = line1.substr(line1.find_first_of(" ") + 1);
@@ -183,15 +204,10 @@ Server::Server(Parsing *p)
             else
             {
                 t++;
-
-                std::cout <<  "\t Content " << line1 << std::endl;
+                Content += line1;
+                // std::cout <<  "\t Content " << line1 << std::endl;
             }
             i++;
-        }
-        std::map< std::string, std::string>::iterator tt;
-        for(tt  = stor.begin(); tt != stor.end(); tt++)
-        {
-            std::cout << "stror[" << tt->first << "] \t=> [" << tt->second << "]\n" ;
         }
         if (stor.find("GET") != stor.end())
         {
@@ -205,14 +221,14 @@ Server::Server(Parsing *p)
                 body = getBody(stor.find("GET")->second + "/index.html");
                 lenght = body.size();
             }
-            else if ((dir =check_dir(path, stor.find("GET")->second)))
+            else if ((dir = check_dir(path, stor.find("GET")->second)))
             {
-                if(dir == 1)
+                if (dir == 1)
                 {
                     body = getBody(stor.find("GET")->second + "/index.html");
                     lenght = body.size();
                 }
-                else 
+                else
                 {
                     body = getBody(stor.find("GET")->second);
                     lenght = body.size();
@@ -224,6 +240,7 @@ Server::Server(Parsing *p)
                 lenght = body.size();
                 status = "404 Not Found";
             }
+            // std::cout << dir << std::endl;
         }
         else if (stor.find("POST") != stor.end())
         {
@@ -232,36 +249,35 @@ Server::Server(Parsing *p)
             std::multimap<std::string, std::string>::iterator it;
             if (mtmp.find("http_methods")->second.find("POST") != std::string::npos)
             {
-                std::string path = "webpage" + mtmp.find("location")->second;
-                if (stor.find("POST")->second == path)
-                {
-                    body = getBody(stor.find("POST")->second + "/index.html");
-                    lenght = body.size();
-                    int k = 0;
-                    for (it = mtmp.begin(); it != mtmp.end(); ++it)
+                    std::string path = "webpage" + mtmp.find("location")->second;
+                    int dir = 0;
+                    std::multimap<int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
+                    std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
+                    // std::cout << stor.find("GET")->second.substr(0,stor.find("GET")->second.find_last_not_of("/") << std::endl;
+                    if (stor.find("POST")->second == path)
                     {
-                        if (k == 1 || it->first == "upload")
+                        body = getBody(stor.find("POST")->second + "/index.html");
+                        lenght = body.size();
+                    }
+                    else if ((dir = check_dir(path, stor.find("POST")->second)))
+                    {
+                        if (dir == 1)
                         {
-                            // if(it->first == "upload" && mtmp.find("on")->second )
-                            //     k = 1;
-                            // if ( it->first == "upload_location")
-                            // {
-                            //     if ( mtmp.find("/Users/zdnaya/Downloads")->second)
-                            //         std::cout << "Saved uploaded files in [/Users/zdnaya/Downloads]\n";
-                            //     else
-                            //     {
-                            //         std::cout << "\033[3;47;35m Save the upload\033[0m\t\n";
-                            //     }
-                            // }
+                            body = getBody(stor.find("POST")->second + "/index.html");
+                            lenght = body.size();
+                        }
+                        else
+                        {
+                            body = getBody(stor.find("POST")->second);
+                            lenght = body.size();
                         }
                     }
-                }
-                else
-                {
-                    body = getBody("webpage/errors/404.html");
-                    lenght = body.size();
-                    status = "404 Not Found";
-                }
+                    else
+                    {
+                        body = getBody("webpage/errors/404.html");
+                        lenght = body.size();
+                        status = "404 Not Found";
+                    }
             }
             else
             {
