@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/31 20:01:21 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/01 13:43:11 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,10 +90,19 @@ Server::Server(Parsing *p)
         std::cerr << "socket failed" << std::endl;
         exit(EXIT_FAILURE);
     }
+    ///Set Socket
+    //int setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_length);
+    //it helps in reuse of address and port 
+    int option = 1;
+    if (setsockopt(server_fd, SOL_SOCKET,  SO_REUSEPORT, &option, sizeof(option)))
+    {
+        perror("setsockopt");
+        exit(EXIT_FAILURE);
+    }
     // bind an IP add and a port to a  socket
     //   p->GetServerMap().find()
-    std::map<int, std::multimap<std::string, std::string>> tmp = p->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> loc = p->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> > tmp = p->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > loc = p->Getloc_map();
     std::multimap<std::string, std::string> mtmp = tmp[1];
 
     add.sin_port = htons(std::stoi(mtmp.find("listen")->second));
@@ -144,37 +153,50 @@ Server::Server(Parsing *p)
         std::string tmp;
         std::string body = "";
         std::string someString(buffer);
-
-
         //  show the request
         // std::cout << someString << std::endl;
-        //
         std::stringstream out;
-        out << someString;
+        // out << someString;
+        int len = nbr_lines(someString);
         std::string line1;
         std::string status = "200 OK";
         std::string tmp2;
-        int lenght = 0;
+        int t = 0;
         int i = 0;
-        while (std::getline(out, line1))
-        {
-            if (line1.find_first_of(":") != std::string::npos)
+        int lenght = 0;
+        while (i < len ) 
+        {       
+            line1 = Those_lines(someString, i, len);
+            if (line1.find_first_of(":") != std::string::npos && t == 1)
             {
                 tmp = line1.substr(0, line1.find_first_of(":"));
                 tmp2 = line1.substr(line1.find_first_of(":") + 1);
                 stor[tmp] = tmp2;
             }
-            else
+            else if ( t == 0)
             {
                 tmp = line1.substr(0, line1.find_first_of(" "));
                 tmp2 = line1.substr(line1.find_first_of(" ") + 1);
                 stor[tmp] = "webpage" + tmp2.substr(0, tmp2.find_first_of(" "));
+                t++;
             }
+            else
+            {
+                t++;
+
+                std::cout <<  "\t Content " << line1 << std::endl;
+            }
+            i++;
+        }
+        std::map< std::string, std::string>::iterator tt;
+        for(tt  = stor.begin(); tt != stor.end(); tt++)
+        {
+            std::cout << "stror[" << tt->first << "] \t=> [" << tt->second << "]\n" ;
         }
         if (stor.find("GET") != stor.end())
         {
             int dir = 0;
-            std::multimap<int, std::multimap<std::string, std::string>> tmp = p->Getloc_map();
+            std::multimap<int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
             std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
             std::string path = "webpage" + mtmp.find("location")->second;
             // std::cout << stor.find("GET")->second.substr(0,stor.find("GET")->second.find_last_not_of("/") << std::endl;
@@ -205,7 +227,7 @@ Server::Server(Parsing *p)
         }
         else if (stor.find("POST") != stor.end())
         {
-            std::multimap<int, std::multimap<std::string, std::string>> tmp = p->Getloc_map();
+            std::multimap<int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
             std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
             std::multimap<std::string, std::string>::iterator it;
             if (mtmp.find("http_methods")->second.find("POST") != std::string::npos)
@@ -251,6 +273,7 @@ Server::Server(Parsing *p)
         std::string header = "HTTP/1.1 " + status + "\nContent-Type: text/html\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
         write(new_socket, header.c_str(), strlen(header.c_str()));
         close(new_socket);
+        stor.clear();
     }
     close(server_fd);
 }
