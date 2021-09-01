@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/01 13:43:11 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/01 15:42:15 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ int check_dir(std::string dir, std::string str)
         if (dp->d_type == DT_DIR)
         {
             i++;
-            std::string tmp = dir + "" + dp->d_name + "/";
-            std::cout << tmp << "  " << str << "\n";
+            std::string tmp = dir + "" + dp->d_name;
+            // std::cout << tmp << "  " << str << "\n";
             if (tmp.find(str) != std::string::npos)
             {
                 if (check_index(tmp + "/index.html"))
@@ -52,7 +52,7 @@ int check_dir(std::string dir, std::string str)
         else if (dp->d_type == DT_REG && str.find(".") != std::string::npos)
         {
             std::string tmp = dir + "" + dp->d_name;
-            std::cout << tmp << " || " << str << "\n";
+            // std::cout << tmp << " || " << str << "\n";
             if (tmp.find(str) != std::string::npos)
                 return (2);
         }
@@ -205,7 +205,6 @@ Server::Server(Parsing *p)
             {
                 t++;
                 Content += line1;
-                // std::cout <<  "\t Content " << line1 << std::endl;
             }
             i++;
         }
