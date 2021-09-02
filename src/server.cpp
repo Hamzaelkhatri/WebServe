@@ -92,6 +92,16 @@ std::string getBody(std::string path)
     return body;
 }
 
+void SaveFile(std::string path, std::string body)
+{
+    std::ofstream file(path);
+    if (file.is_open())
+    {
+        file << body;
+        file.close();
+    }
+}
+
 Server::Server(Parsing *p)
 {
     std::map<std::string, std::string> stor;
@@ -167,21 +177,28 @@ Server::Server(Parsing *p)
             std::cerr << "acceptance failed" << std::endl;
             exit(EXIT_FAILURE);
         }
-        char buffer[10000] = {0};
-        // valrecv = recv(new_socket, buffer, 10000, 0);
-        read(new_socket,buffer,10000);
-        std::string someString(buffer);
+        
+        // std::cout << "POST [" <<  << "] " << inet_ntoa(client.sin_addr) << ":" << ntohs(client.sin_port) << std::endl;
+        unsigned char *buffer = new unsigned char[8000000];
+        // recv(new_socket, buffer, 6954707, 0);
+        std::string someString ="";
+        while ((valrecv= read(new_socket, buffer, 8000000)) > 0)
+        {
+            someString.append((char *)buffer);
+            std::cout <<"["<< buffer <<"]"<< std::endl;
+            fcntl(new_socket,  F_SETFL, O_NONBLOCK);
+        }
         std::string tmp;
         std::string body = "";
         //  show the request
-        std::cout << someString << std::endl;
+        // std::cout << someString << std::endl;
         std::stringstream out;
         // out << someString;
         int len = nbr_lines(someString);
         std::string line1;
         std::string status = "200 OK";
         std::string tmp2;
-        std::string Content;
+       std::vector<std::string> Content;
         int t = 0;
         int i = 0;
         int lenght = 0;
@@ -204,10 +221,22 @@ Server::Server(Parsing *p)
             else
             {
                 t++;
-                Content += line1;
+                Content.push_back(line1);
             }
             i++;
         }
+        std::string File_Content = "";
+        i = 0;
+        while (Content.size() > i)
+        {
+            // if(Content.at(i).find(Content.at(0)) == std::string::npos)
+            {
+                std::cout << Content.at(i) << std::endl;
+                File_Content += Content.at(i) + "\n";
+            }
+            i++;
+        }
+        SaveFile("/home/hamza/Desktop/WebServe/txt.c", someString);
         if (stor.find("GET") != stor.end())
         {
             int dir = 0;
