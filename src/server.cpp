@@ -13,9 +13,9 @@
 #include "../includes/server.hpp"
 #include <string>
 #include <dirent.h>
-     #include <sys/types.h>
-     #include <sys/uio.h>
-     #include <unistd.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
 int check_index(std::string str)
 {
     int ret = open(str.c_str(), O_RDONLY);
@@ -102,9 +102,10 @@ void SaveFile(std::string path, std::string body)
     }
 }
 
-Server::Server(Parsing *p)
+Server::Server(Parsing *p,char *envp[])
 {
     std::map<std::string, std::string> stor;
+    cgi *c;
     std::memset((char *)&this->add, 0, sizeof(this->add));
     int server_fd;  // socket descriptor, an integer!
     int new_socket; // conection establish btw client & server
@@ -131,8 +132,8 @@ Server::Server(Parsing *p)
     }
     // bind an IP add and a port to a  socket
     //   p->GetServerMap().find()
-    std::map<int, std::multimap<std::string, std::string> > tmp = p->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string> > loc = p->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>> tmp = p->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> loc = p->Getloc_map();
     std::multimap<std::string, std::string> mtmp = tmp[1];
 
     add.sin_port = htons(std::stoi(mtmp.find("listen")->second));
@@ -145,6 +146,7 @@ Server::Server(Parsing *p)
     memset(add.sin_zero, '\0', sizeof add.sin_zero); // why help to pad from sockaddr_in to sockaddr
 
     // Forcefully attaching socket to the PORT
+
     if (bind(server_fd, (struct sockaddr *)&add, sizeof(add)) < 0)
     {
         perror("Bind");
@@ -177,16 +179,16 @@ Server::Server(Parsing *p)
             std::cerr << "acceptance failed" << std::endl;
             exit(EXIT_FAILURE);
         }
-        
+
         // std::cout << "POST [" <<  << "] " << inet_ntoa(client.sin_addr) << ":" << ntohs(client.sin_port) << std::endl;
         unsigned char *buffer = new unsigned char[8000000];
         // recv(new_socket, buffer, 6954707, 0);
-        std::string someString ="";
-        while ((valrecv= read(new_socket, buffer, 8000000)) > 0)
+        std::string someString = "";
+        while ((valrecv = read(new_socket, buffer, 8000000)) > 0)
         {
             someString.append((char *)buffer);
-            std::cout <<"["<< buffer <<"]"<< std::endl;
-            fcntl(new_socket,  F_SETFL, O_NONBLOCK);
+            std::cout << "[" << buffer << "]" << std::endl;
+            fcntl(new_socket, F_SETFL, O_NONBLOCK);
         }
         std::string tmp;
         std::string body = "";
@@ -198,7 +200,7 @@ Server::Server(Parsing *p)
         std::string line1;
         std::string status = "200 OK";
         std::string tmp2;
-       std::vector<std::string> Content;
+        std::vector<std::string> Content;
         int t = 0;
         int i = 0;
         int lenght = 0;
@@ -225,87 +227,101 @@ Server::Server(Parsing *p)
             }
             i++;
         }
-        std::string File_Content = "";
+        // std::string File_Content = "";
         i = 0;
-        while (Content.size() > i)
-        {
-            // if(Content.at(i).find(Content.at(0)) == std::string::npos)
-            {
-                std::cout << Content.at(i) << std::endl;
-                File_Content += Content.at(i) + "\n";
-            }
-            i++;
-        }
-        SaveFile("/home/hamza/Desktop/WebServe/txt.c", someString);
+        // while (Content.size() > i)
+        // {
+        //     // if(Content.at(i).find(Content.at(0)) == std::string::npos)
+        //     {
+        //         std::cout << Content.at(i) << std::endl;
+        //         File_Content += Content.at(i) + "\n";
+        //     }
+        //     i++;
+        // }
+        // SaveFile("/home/hamza/Desktop/WebServe/txt.c", someString);
         if (stor.find("GET") != stor.end())
         {
             int dir = 0;
-            std::multimap<int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
+            std::multimap<int, std::multimap<std::string, std::string>> tmp = p->Getloc_map();
             std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
             std::string path = "webpage" + mtmp.find("location")->second;
             // std::cout << stor.find("GET")->second.substr(0,stor.find("GET")->second.find_last_not_of("/") << std::endl;
-            if (stor.find("GET")->second == path)
+            if (stor.find("GET")->second.find(".php") == std::string::npos)
             {
-                body = getBody(stor.find("GET")->second + "/index.html");
-                lenght = body.size();
-            }
-            else if ((dir = check_dir(path, stor.find("GET")->second)))
-            {
-                if (dir == 1)
+                if (stor.find("GET")->second == path)
                 {
                     body = getBody(stor.find("GET")->second + "/index.html");
                     lenght = body.size();
                 }
+                else if ((dir = check_dir(path, stor.find("GET")->second)))
+                {
+                    if (dir == 1)
+                    {
+                        body = getBody(stor.find("GET")->second + "/index.html");
+                        lenght = body.size();
+                    }
+                    else
+                    {
+                        body = getBody(stor.find("GET")->second);
+                        lenght = body.size();
+                    }
+                }
                 else
                 {
-                    body = getBody(stor.find("GET")->second);
+                    body = getBody("webpage/errors/404.html");
                     lenght = body.size();
+                    status = "404 Not Found";
                 }
             }
             else
             {
-                body = getBody("webpage/errors/404.html");
+                char *argv[3];
+                std::string str("/usr/bin/php-cgi");
+                argv[0] = (char *)str.c_str();
+                argv[1] = (char *)stor.find("GET")->second.c_str();
+                argv[2] = NULL;
+                body = c->CGI(argv, envp);
                 lenght = body.size();
-                status = "404 Not Found";
+                std::cout << body << std::endl;
             }
             // std::cout << dir << std::endl;
         }
         else if (stor.find("POST") != stor.end())
         {
-            std::multimap<int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
+            std::multimap<int, std::multimap<std::string, std::string>> tmp = p->Getloc_map();
             std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
             std::multimap<std::string, std::string>::iterator it;
             if (mtmp.find("http_methods")->second.find("POST") != std::string::npos)
             {
-                    std::string path = "webpage" + mtmp.find("location")->second;
-                    int dir = 0;
-                    std::multimap<int, std::multimap<std::string, std::string> > tmp = p->Getloc_map();
-                    std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
-                    // std::cout << stor.find("GET")->second.substr(0,stor.find("GET")->second.find_last_not_of("/") << std::endl;
-                    if (stor.find("POST")->second == path)
+                std::string path = "webpage" + mtmp.find("location")->second;
+                int dir = 0;
+                std::multimap<int, std::multimap<std::string, std::string>> tmp = p->Getloc_map();
+                std::multimap<std::string, std::string> mtmp = tmp.find(1)->second;
+                // std::cout << stor.find("GET")->second.substr(0,stor.find("GET")->second.find_last_not_of("/") << std::endl;
+                if (stor.find("POST")->second == path)
+                {
+                    body = getBody(stor.find("POST")->second + "/index.html");
+                    lenght = body.size();
+                }
+                else if ((dir = check_dir(path, stor.find("POST")->second)))
+                {
+                    if (dir == 1)
                     {
                         body = getBody(stor.find("POST")->second + "/index.html");
                         lenght = body.size();
                     }
-                    else if ((dir = check_dir(path, stor.find("POST")->second)))
-                    {
-                        if (dir == 1)
-                        {
-                            body = getBody(stor.find("POST")->second + "/index.html");
-                            lenght = body.size();
-                        }
-                        else
-                        {
-                            body = getBody(stor.find("POST")->second);
-                            lenght = body.size();
-                        }
-                    }
                     else
                     {
-                        body = getBody("webpage/errors/404.html");
+                        body = getBody(stor.find("POST")->second);
                         lenght = body.size();
-                        status = "404 Not Found";
                     }
+                }
+                else
+                {
+                    body = getBody("webpage/errors/404.html");
+                    lenght = body.size();
+                    status = "404 Not Found";
+                }
             }
             else
             {
@@ -314,7 +330,7 @@ Server::Server(Parsing *p)
                 status = "405 Not Allowed";
             }
         }
-        std::string header = "HTTP/1.1 " + status + "\nContent-Type: text/html\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
+        std::string header = "HTTP/1.1 " + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
         write(new_socket, header.c_str(), strlen(header.c_str()));
         close(new_socket);
         stor.clear();

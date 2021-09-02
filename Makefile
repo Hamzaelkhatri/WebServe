@@ -11,6 +11,7 @@ SRC_NAME= main.cpp\
 		  tools.cpp\
 		  server.cpp\
 		  pars.cpp\
+		  cgi.cpp\
 
 OBJ_NAME= $(SRC_NAME:.cpp=.o)
 

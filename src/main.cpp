@@ -13,7 +13,7 @@
 #include "../includes/Webserv.hpp"
 
 
-int main(int ac, char **av)
+int main(int ac, char *av[], char *envp[])
 {
     if (ac != 2)
     {
@@ -48,7 +48,7 @@ int main(int ac, char **av)
         //         std::cout << it->first << " ==> " << it->second << std::endl;
         //     }
         // }
-        Server server(pars);
+        Server server(pars,envp);
     }
     else
         std::cerr << "wrong file \n";

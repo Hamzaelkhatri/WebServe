@@ -24,6 +24,7 @@
 #include <netinet/in.h>
 #include "pars.hpp"
 #include "ErrorHandling.hpp"
+#include "cgi.hpp"
 
 
 class Server
@@ -34,7 +35,7 @@ class Server
         struct sockaddr_in add;
         int sizeof_add;
     public:
-        Server(Parsing *p);
+        Server(Parsing *p,char *envp[]);
         ~Server();
         int creatSocket_fd(void);
         void set_strructAddr(struct sockaddr_in add);
