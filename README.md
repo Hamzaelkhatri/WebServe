@@ -23,5 +23,5 @@
 <a href="https://manpages.courier-mta.org/htmlman2/select.2.html"> select() </a></br>
 <a href="https://stackoverflow.com/questions/8695678/what-is-the-nfds-from-select-used-for">What is the nfds from select() used for</a></br>
 <a href="https://www.youtube.com/watch?v=-5UryUzgbDY"> RFC EXPLAINATION </a>
-
 <a href= "https://developer.mozilla.org/fr/docs/Web/HTTP/Methods/POST"> Post </a></br>
+<a href = "https://www.oreilly.com/openbook/cgi/ch12_04.html" > CGI </a></br>
