@@ -12,6 +12,7 @@ SRC_NAME= main.cpp\
 		  server.cpp\
 		  pars.cpp\
 		  cgi.cpp\
+		  server_tools.cpp\
 
 OBJ_NAME= $(SRC_NAME:.cpp=.o)
 
