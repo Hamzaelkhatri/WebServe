@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/28 17:34:06 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/03 12:07:15 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,22 +27,27 @@
 #include "cgi.hpp"
 
 
-class Server
+class Server 
 {
     private:
-        int socket_fd;
-        int new_socket;
+        int server_fd; // socket descriptor, an integer!
+        int new_socket;// conection establish btw client & server
         struct sockaddr_in add;
         int sizeof_add;
+        int valrecv;  // communication part
+        struct sockaddr_in client; // socklen_t size of adress
+        socklen_t size_client;
+        std::map<std::string, std::string> stor;
+        std::map<int, std::multimap<std::string, std::string> > tmp;
+        std::multimap<int, std::multimap<std::string, std::string> > loc;
+        std::multimap<std::string, std::string> mtmp;
+        
     public:
         Server(Parsing *p,char *envp[]);
         ~Server();
-        int creatSocket_fd(void);
-        void set_strructAddr(struct sockaddr_in add);
-        int get_sizeofAdd(void);
-        void bind_socket(struct sockaddr_in add);
-        void listen_socket(int socket_fd);
-        void accept_socket(int socket_fd,struct sockaddr_in add);
+        void creatSocket_fd(void);
+        void bind_listen(void);
+        void accept_socket();
 };
 
 #endif
