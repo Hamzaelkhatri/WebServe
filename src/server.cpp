@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/03 23:06:52 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/04 12:20:44 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@ Server::Server(Parsing *p,char *envp[])
     {
         std::cout << "\t\t\t Listening " << mtmp.find("listen")->second << std::endl;
         accept_socket();
-        status = "200 OK";
         int t = 0;
         int i = 0;
         lenght = 0;
+        someString = bufferStor();
         while (i < len)
         {
             line1 = Those_lines(someString, i, len);
@@ -51,8 +51,17 @@ Server::Server(Parsing *p,char *envp[])
             }
             i++;
         }
+        std::map<std::string, std::string>::iterator it0;
+        std::map<std::string, std::string>::iterator it;
+        for(it0 = stor.begin(); it0 != stor.end(); ++it0)
+        {
+            // std::cout << "-s---------------------------------\n";
+            std::cout << "[" << it0->first << "]\t\t\t==>\t"  << it0->second << std::endl;
+        }
         // std::string Fie_Content = "";
-        i = 0;
+        i = 0; 
+        for(i = 0 ; i < Content.size() ; i++)
+            std::cout  << Content.at(i) << std::endl;
         // while (Content.size() > i)
         // {
         //     // if(Content.at(i).find(Content.at(0)) == std::string::npos)
@@ -63,8 +72,9 @@ Server::Server(Parsing *p,char *envp[])
         //     i++;
         // }
         // SaveFile("/home/hamza/Desktop/WebServe/txt.c", someString);
+        status = "200 OK";
         if (stor.find("GET") != stor.end())
-           Get_methode();
+           Get_methode(c,envp);
         else if (stor.find("POST") != stor.end())
             Post_methode();
         std::string header = "HTTP/1.1 " + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
@@ -149,7 +159,7 @@ std::string Server::bufferStor()
 }
 
 
-void Server::Get_methode()
+void Server::Get_methode(cgi *c,char *envp[])
 {
   int dir = 0;
   std::multimap<std::string, std::string> mtmp = loc.find(1)->second;
@@ -183,14 +193,14 @@ void Server::Get_methode()
   }
   else
   {
-      // char *argv[3];
-      // std::string str("/usr/bin/php-cgi");
-      // argv[0] = (char *)str.c_str();
-      // argv[1] = (char *)stor.find("GET")->second.c_str();
-      // argv[2] = NULL;
-      // body = c->CGI(argv, envp);
-      // lenght = body.size();
-      // std::cout << body << std::endl;
+      char *argv[3];
+      std::string str("/usr/bin/php-cgi");
+      argv[0] = (char *)str.c_str();
+      argv[1] = (char *)stor.find("GET")->second.c_str();
+      argv[2] = NULL;
+      body = c->CGI(argv, envp);
+      lenght = body.size();
+      std::cout << "Body ==> " << body << std::endl;
   // std::cout << dir << std::endl;
   }
 }

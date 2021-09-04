@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/03 22:51:46 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/04 12:16:17 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ class Server
         int check_dir(std::string dir, std::string str);
         int check_index(std::string str);
         std::string bufferStor();
-        void Get_methode();
+        void Get_methode(cgi *c,char *envp[]);
         void Post_methode();
 };
 
