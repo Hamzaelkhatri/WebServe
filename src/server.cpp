@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
+#include <string>
 
 Server::Server(Parsing *p,char *envp[])
 {
@@ -28,6 +29,7 @@ Server::Server(Parsing *p,char *envp[])
         int i = 0;
         lenght = 0;
         someString = bufferStor();
+        // SaveFile("/Users/helkhatr/Desktop/WebServe/output.txt", someString);
         while (i < len)
         {
             line1 = Those_lines(someString, i, len);
@@ -51,17 +53,18 @@ Server::Server(Parsing *p,char *envp[])
             }
             i++;
         }
-        std::map<std::string, std::string>::iterator it0;
-        std::map<std::string, std::string>::iterator it;
-        for(it0 = stor.begin(); it0 != stor.end(); ++it0)
-        {
-            // std::cout << "-s---------------------------------\n";
-            std::cout << "[" << it0->first << "]\t\t\t==>\t"  << it0->second << std::endl;
-        }
-        // std::string Fie_Content = "";
-        i = 0; 
-        for(i = 0 ; i < Content.size() ; i++)
-            std::cout  << Content.at(i) << std::endl;
+        // std::map<std::string, std::string>::iterator it0;
+        // std::map<std::string, std::string>::iterator it;
+        // for(it0 = stor.begin(); it0 != stor.end(); ++it0)
+        // {
+        //     // std::cout << "-s---------------------------------\n";
+        //     std::cout << "[" << it0->first << "]\t\t\t==>\t"  << it0->second << std::endl;
+        // }
+        // std::string File_Content = "";
+        // i = 0; 
+        // for(i = 0 ; i < Content.size() ; i++)
+        //     std::cout  << Content.at(i) << std::endl;
+        i = 0;
         // while (Content.size() > i)
         // {
         //     // if(Content.at(i).find(Content.at(0)) == std::string::npos)
@@ -71,7 +74,7 @@ Server::Server(Parsing *p,char *envp[])
         //     }
         //     i++;
         // }
-        // SaveFile("/home/hamza/Desktop/WebServe/txt.c", someString);
+       
         status = "200 OK";
         if (stor.find("GET") != stor.end())
            Get_methode(c,envp);
@@ -147,14 +150,21 @@ void Server::accept_socket()
 
 std::string Server::bufferStor()
 {
-    unsigned char *buffer = new unsigned char[8000000];
+    char buffer[800000];
+    std::string myString;
+    char *str;
+    int nDataLength;
+    
     someString = "";
-    while ((valrecv = read(new_socket, buffer, 8000000)) > 0)
+    while ((nDataLength = recv(new_socket, buffer, sizeof(buffer), 0)) > 0) 
     {
-        someString.append((char *)buffer);
+        someString.append(buffer);
+        std::cout << buffer << std::endl;
         fcntl(new_socket, F_SETFL, O_NONBLOCK);
     }
+
     len = nbr_lines(someString);
+    SaveFile("/Users/helkhatr/Desktop/WebServe/output.txt", someString);
     return(someString);
 }
 
@@ -194,14 +204,14 @@ void Server::Get_methode(cgi *c,char *envp[])
   else
   {
       char *argv[3];
-      std::string str("/usr/bin/php-cgi");
+      std::string str("/Users/helkhatr/goinfre/.brew/bin/php-cgi");
       argv[0] = (char *)str.c_str();
       argv[1] = (char *)stor.find("GET")->second.c_str();
       argv[2] = NULL;
       body = c->CGI(argv, envp);
       lenght = body.size();
-      std::cout << "Body ==> " << body << std::endl;
-  // std::cout << dir << std::endl;
+    //   std::cout << "Body ==> " << body << std::endl;
+        // std::cout << dir << std::endl;
   }
 }
 

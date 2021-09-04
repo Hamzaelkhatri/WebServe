@@ -16,11 +16,10 @@
 #include <sys/types.h>
 
 #define die(e)                      \
-    do                              \
     {                               \
         fprintf(stderr, "%s\n", e); \
         exit(EXIT_FAILURE);         \
-    } while (0);
+    }
 
 class cgi
 {
