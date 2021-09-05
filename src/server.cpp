@@ -150,21 +150,30 @@ void Server::accept_socket()
 
 std::string Server::bufferStor()
 {
-    char buffer[800000];
+    char buffer[1000];
     std::string myString;
     char *str;
     int nDataLength;
     
     someString = "";
-    while ((nDataLength = recv(new_socket, buffer, sizeof(buffer), 0)) > 0) 
+    while (1)
     {
-        someString.append(buffer);
-        std::cout << buffer << std::endl;
-        fcntl(new_socket, F_SETFL, O_NONBLOCK);
-    }
+        bzero(buffer, sizeof(buffer));
+        nDataLength = recv(new_socket, buffer, sizeof(buffer), 0);
+        if (nDataLength < 0)
+        {
+            std::cerr << "recv failed" << std::endl;
+            exit(EXIT_FAILURE);
+        }
+        someString += buffer;
+        if(someString.find("\r\n\r\n") != std::string::npos)
+            break;
+        else
+            continue;
 
+    }
     len = nbr_lines(someString);
-    SaveFile("/Users/helkhatr/Desktop/WebServe/output.txt", someString);
+    std::cout << someString << std::endl;
     return(someString);
 }
 
