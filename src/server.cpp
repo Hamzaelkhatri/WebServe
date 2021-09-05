@@ -12,6 +12,8 @@
 
 #include "../includes/server.hpp"
 #include <string>
+#include <regex>
+
 
 Server::Server(Parsing *p,char *envp[])
 {
@@ -32,6 +34,7 @@ Server::Server(Parsing *p,char *envp[])
         // SaveFile("/Users/helkhatr/Desktop/WebServe/output.txt", someString);
         while (i < len)
         {
+            puts("hello :)");
             line1 = Those_lines(someString, i, len);
             if (line1.find_first_of(":") != std::string::npos && t == 1)
             {
@@ -53,6 +56,7 @@ Server::Server(Parsing *p,char *envp[])
             }
             i++;
         }
+
         // std::map<std::string, std::string>::iterator it0;
         // std::map<std::string, std::string>::iterator it;
         // for(it0 = stor.begin(); it0 != stor.end(); ++it0)
@@ -101,8 +105,8 @@ void Server::creatSocket_fd()
     ///Set Socket
     //int setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_length);
     //it helps in reuse of address and port
-    int option = 1;
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEPORT, &option, sizeof(option)))
+    int buffsize = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &buffsize, sizeof(buffsize)))
     {
         perror("setsockopt");
         exit(EXIT_FAILURE);
@@ -148,32 +152,63 @@ void Server::accept_socket()
 
 }
 
+int ContaineOnly(std::string str)
+{
+    std::regex e ("[\\n\\r\\n\\r]+");
+    if (std::regex_match(str, e))
+        return 1;
+    return 0;
+}
+
+int indexOfNewLine(std::string str)
+{
+    int i = 0;
+    while (str[i])
+    {
+        if(str[i]=='\n')
+            return (i);
+        i++;
+    }
+    return ((int)std::string::npos);
+}
+
 std::string Server::bufferStor()
 {
     char buffer[1000];
-    std::string myString;
-    char *str;
-    int nDataLength;
+    int nDataLength = 2;
+    int loop = 0;
+    int n = 0;
     
     someString = "";
+    int sizeOfFile=-1;
     while (1)
     {
+        if(someString.find("\r\n\r\n") != std::string::npos && sizeOfFile < loop)
+        {
+            fcntl(new_socket,F_SETFL,O_NONBLOCK);
+            break;
+        }
         bzero(buffer, sizeof(buffer));
-        nDataLength = recv(new_socket, buffer, sizeof(buffer), 0);
-        if (nDataLength < 0)
+        nDataLength = recv(new_socket, buffer, 999, 0);
+        loop+=nDataLength;
+        if (nDataLength < 0 || nDataLength == 0)
         {
             std::cerr << "recv failed" << std::endl;
             exit(EXIT_FAILURE);
         }
-        someString += buffer;
-        if(someString.find("\r\n\r\n") != std::string::npos)
-            break;
-        else
-            continue;
-
+        if(nDataLength > 2 || n != 0)
+        {
+            someString += buffer;
+            if(someString.find("Content-Length:") != std::string::npos)
+            {
+                int index = someString.find("Content-Length:")+15;
+                sizeOfFile =std::stoi(someString.substr(someString.find("Content-Length:")+15,indexOfNewLine(&someString[index]-1)));
+            }
+            n++;
+        }
+        std::cout << buffer << std::endl << loop << "  "<< sizeOfFile << std::endl;
     }
-    len = nbr_lines(someString);
-    std::cout << someString << std::endl;
+    len = sizeOfFile;
     return(someString);
 }
 
