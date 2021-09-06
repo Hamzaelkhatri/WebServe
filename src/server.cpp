@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/04 12:20:44 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/06 19:43:17 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ Server::Server(Parsing *p,char *envp[])
     tmp = p->GetServerMap();
     mtmp = tmp[1];
     creatSocket_fd();
+    error = 0;
     bind_listen();
     while (1)
     {
@@ -61,13 +62,15 @@ Server::Server(Parsing *p,char *envp[])
             {
                 t++;
                 Content.push_back(line1);
+
             }
             i++;
         }
+        
         // std::cout << someString << std::endl;
         int l = 0;
-        char *d= removeHTTPHeader((char *)someString.c_str(), l);
-        SaveFile("/home/hamza/Desktop/WebServe/output.png", d);
+        // char *d= removeHTTPHeader((char *)someString.c_str(), l);
+        // SaveFile("/home/hamza/Desktop/WebServe/output.png", d);
         // std::map<std::string, std::string>::iterator it0;
         // std::map<std::string, std::string>::iterator it;
         // for(it0 = stor.begin(); it0 != stor.end(); ++it0)
@@ -91,12 +94,23 @@ Server::Server(Parsing *p,char *envp[])
         // }
 
         status = "200 OK";
-        version = "HTTP/1.1";
-        if (stor.find("GET") != stor.end())
-           Get_methode(c,envp);
-        else if (stor.find("POST") != stor.end())
-            Post_methode();
-        std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
+        version = "HTTP/1.1 ";
+        error = 0;
+        std::cout << someString << std::endl;
+        // if(!error)
+        // {
+            if (stor.find("GET") != stor.end())
+                Get_methode(c,envp);
+            else if (stor.find("POST") != stor.end())
+                Post_methode();
+        // }
+        // else
+        // {
+        //     status = "400 Bad Request";
+        //     version = "HTTP/1.1 ";
+        //     body = someString;
+        // }
+        std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
         write(new_socket, header.c_str(), strlen(header.c_str()));
         close(new_socket);
         stor.clear();
@@ -184,12 +198,43 @@ int indexOfNewLine(std::string str)
     return (i-1);
 }
 
+int isAlpha(std::string str)
+{
+    std::regex e ("[a-zA-Z]+");//iudeheideigefytuvngjcigaicgwiagaiohdisgsx
+    if (std::regex_match(str, e))
+        return 1;
+    return 0;
+}
+
+int isCapital(std::string str)
+{
+    std::regex e ("[A-Z]+");
+    if (std::regex_match(str, e))
+        return 1;
+    return 0;
+}
+
+int numberOfWords(std::string str)
+{
+    int i = 0;
+    int count = 0;
+    while (str[i])
+    {
+        if(str[i]==' ')
+            count++;
+        i++;
+    }
+    return (count+1);
+}
+
 std::string Server::bufferStor()
 {
     char buffer[1000];
     int nDataLength = 2;
     int loop = 0;
     int n = 0;
+    int first_line = 0;
+    error = 0;
     
     someString = "";
     int sizeOfFile=-1;
@@ -201,13 +246,23 @@ std::string Server::bufferStor()
         nDataLength = recv(new_socket, (void *)&buffer, 999, 0);
         loop+=nDataLength;
         if (nDataLength < 0 || nDataLength == 0)
-        {
-            std::cerr << "recv failed" << std::endl;
-            exit(EXIT_FAILURE);
-        }
+            break;
         if(nDataLength > 2 || n != 0)
         {
             someString += buffer;
+            if(!first_line)
+            {
+                // std::cout << someString << std::endl;
+                std::string str = someString.substr(0,someString.find_first_of("\r\n"));
+                if(!isCapital(str.substr(0,str.find_first_of(" "))) || someString.find("HTTP/1.1") == std::string::npos || numberOfWords(str) != 3)
+                {
+                    error = 1;
+                    someString ="<html><head><title>400 Bad Request</title></head><body><h1>Bad Request</h1><p>Bad Request</p></body></html>";
+                    len = someString.size();
+                    return(someString);
+                }
+                first_line = 1;
+            }
             if(someString.find("Content-Length:") != std::string::npos)
             {
                 int index = someString.find("Content-Length:")+15;
@@ -215,10 +270,11 @@ std::string Server::bufferStor()
             }
             n++;
         }
-        std::cout << buffer << std::endl << loop << "  "<< sizeOfFile << std::endl;
+        // std::cout << buffer << std::endl << nDataLength << "  "<< sizeOfFile << std::endl;
     }
     len = someString.size();
     return(someString);
+
 }
 
 
@@ -232,25 +288,25 @@ void Server::Get_methode(cgi *c,char *envp[])
       if (stor.find("GET")->second == path)
       {
           body = getBody(stor.find("GET")->second + "/index.html");
-          lenght = body.size();
+          len = body.size();
       }
       else if ((dir = check_dir(path, stor.find("GET")->second)))
       {
           if (dir == 1)
           {
               body = getBody(stor.find("GET")->second + "/index.html");
-              lenght = body.size();
+              len = body.size();
           }
           else
           {
               body = getBody(stor.find("GET")->second);
-              lenght = body.size();
+              len = body.size();
           }
       }
       else
       {
           body = getBody("webpage/errors/404.html");
-          lenght = body.size();
+          len = body.size();
           status = "404 Not Found";
       }
   }
@@ -262,9 +318,7 @@ void Server::Get_methode(cgi *c,char *envp[])
       argv[1] = (char *)stor.find("GET")->second.c_str();
       argv[2] = NULL;
       body = c->CGI(argv, envp);
-      lenght = body.size();
-    //   std::cout << "Body ==> " << body << std::endl;
-        // std::cout << dir << std::endl;
+      len = body.size();
   }
 }
 

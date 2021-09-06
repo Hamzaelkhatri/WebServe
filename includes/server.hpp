@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/04 12:16:17 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/06 18:50:09 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,9 @@
 class Server 
 {
     private:
+        std::string version;
         int lenght;
+        int error;
         std::string status;
         std::string tmp2;
         std::string tmp1;
