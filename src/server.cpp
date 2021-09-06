@@ -14,6 +14,16 @@
 #include <string>
 #include <regex>
 
+char *removeHTTPHeader(char *buffer, int &bodySize) {
+    char *t = strstr(buffer, "\r\n\r\n");
+    t = t + 4;
+
+    for (char* it = buffer; it != t; ++it) 
+        ++bodySize;
+
+    return t;
+}
+
 
 Server::Server(Parsing *p,char *envp[])
 {
@@ -31,11 +41,9 @@ Server::Server(Parsing *p,char *envp[])
         int i = 0;
         lenght = 0;
         someString = bufferStor();
-        // SaveFile("/Users/helkhatr/Desktop/WebServe/output.txt", someString);
-        while (i < len)
+        std::stringstream ss(someString);
+        while (std::getline(ss, line1, '\n'))
         {
-            puts("hello :)");
-            line1 = Those_lines(someString, i, len);
             if (line1.find_first_of(":") != std::string::npos && t == 1)
             {
                 tmp1 = line1.substr(0, line1.find_first_of(":"));
@@ -56,7 +64,10 @@ Server::Server(Parsing *p,char *envp[])
             }
             i++;
         }
-
+        // std::cout << someString << std::endl;
+        int l = 0;
+        char *d= removeHTTPHeader((char *)someString.c_str(), l);
+        SaveFile("/home/hamza/Desktop/WebServe/output.png", d);
         // std::map<std::string, std::string>::iterator it0;
         // std::map<std::string, std::string>::iterator it;
         // for(it0 = stor.begin(); it0 != stor.end(); ++it0)
@@ -78,13 +89,14 @@ Server::Server(Parsing *p,char *envp[])
         //     }
         //     i++;
         // }
-       
+
         status = "200 OK";
+        version = "HTTP/1.1";
         if (stor.find("GET") != stor.end())
            Get_methode(c,envp);
         else if (stor.find("POST") != stor.end())
             Post_methode();
-        std::string header = "HTTP/1.1 " + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
+        std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(lenght) + "\n\n" + body;
         write(new_socket, header.c_str(), strlen(header.c_str()));
         close(new_socket);
         stor.clear();
@@ -169,7 +181,7 @@ int indexOfNewLine(std::string str)
             return (i);
         i++;
     }
-    return ((int)std::string::npos);
+    return (i-1);
 }
 
 std::string Server::bufferStor()
@@ -184,12 +196,9 @@ std::string Server::bufferStor()
     while (1)
     {
         if(someString.find("\r\n\r\n") != std::string::npos && sizeOfFile < loop)
-        {
-            fcntl(new_socket,F_SETFL,O_NONBLOCK);
             break;
-        }
         bzero(buffer, sizeof(buffer));
-        nDataLength = recv(new_socket, buffer, 999, 0);
+        nDataLength = recv(new_socket, (void *)&buffer, 999, 0);
         loop+=nDataLength;
         if (nDataLength < 0 || nDataLength == 0)
         {
@@ -208,7 +217,7 @@ std::string Server::bufferStor()
         }
         std::cout << buffer << std::endl << loop << "  "<< sizeOfFile << std::endl;
     }
-    len = sizeOfFile;
+    len = someString.size();
     return(someString);
 }
 

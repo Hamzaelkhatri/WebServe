@@ -91,10 +91,10 @@ std::string Server::getBody(std::string path)
 
 void Server::SaveFile(std::string path, std::string body)
 {
-    std::ofstream file(path);
+    std::ofstream file(path,std::ofstream::binary | std::ofstream::out);
     if (file.is_open())
     {
-        file << body;
+        file.write(body.c_str(), body.size());
         file.close();
     }
 }
