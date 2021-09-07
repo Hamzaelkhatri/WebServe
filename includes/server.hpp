@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/07 18:41:08 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/07 19:16:03 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ class Server
         int len;
         int max_client;
         int server_fd; // socket descriptor, an integer!
+        int *server_fds;
+        struct sockaddr_in *address;
         int new_socket;// conection establish btw client & server
         int client_fd[2048]; //client that conect to server eiith max of 1024
         int child_fd; //child sockets to set
@@ -82,6 +84,7 @@ class Server
         void Get_methode(cgi *c,char *envp[]);
         void Post_methode();
         char *removeHTTPHeader(char *buffer, int &bodySize);
+        void multi_server(Parsing *p,char*envp[]);
 };
 
 #endif

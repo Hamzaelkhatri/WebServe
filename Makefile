@@ -14,6 +14,7 @@ SRC_NAME= main.cpp\
 		  cgi.cpp\
 		  server_tools.cpp\
 		  socket_steps.cpp\
+		  multi_server.cpp\
 
 
 OBJ_NAME= $(SRC_NAME:.cpp=.o)

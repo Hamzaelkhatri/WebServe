@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 16:56:46 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/07 18:41:50 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/07 19:16:14 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 void Server::creatSocket_fd()
 {
-    std::memset((char *)&this->add, 0, sizeof(this->add));
         // ** CREATE SOCKET**/
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd == 0)
@@ -57,7 +56,7 @@ void Server::bind_listen()
         std::cerr << "Listening failed" << std::endl;
         exit(EXIT_FAILURE);
     }
-    size_add = sizeof(add);
+    sizeof_add = sizeof(add);
 }
 //  for one server
 void Server::accept_socket()

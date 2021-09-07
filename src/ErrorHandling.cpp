@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/07 15:59:48 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/07 18:47:53 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,17 +40,17 @@ void ErrorHandling::set_map(std::map<int, std::string> map)
 
 std::map<int, std::string> ErrorHandling::get_map_s()
 {
-    std::map<int, std::string>::iterator it = this->map_s.begin();
+    // std::map<int, std::string>::iterator it = this->map_s.begin();
     // for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
-    {
-        // if (it->second == "server")
-            // this->nbr_server++;
-        // if (it->second.find("location") != std::string::npos)
-            // this->nbr_location++;
-        // std::cout << "[ " << it->first;
-        // std::cout << " ] \t\t\t ==> [ ";
-        // std::cout << it->second << " ]" << std::endl;
-    }
+    // {
+    //     if (it->second == "server")
+    //         this->nbr_server++;
+    //     if (it->second.find("location") != std::string::npos)
+    //         this->nbr_location++;
+    //     std::cout << "[ " << it->first;
+    //     std::cout << " ] \t\t\t ==> [ ";
+    //     std::cout << it->second << " ]" << std::endl;
+    // }
     return (this->map_s);
 }
 

@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/07 16:08:56 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/07 18:47:37 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ int main(int ac, char *av[], char *envp[])
         //     }
         // }
         //    std::cout << "here\n";
+    
         Server server(pars,envp);
     }
     else
