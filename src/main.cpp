@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/03 11:35:36 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/07 16:08:56 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,28 +24,29 @@ int main(int ac, char *av[], char *envp[])
     {
         ErrorHandling error(av[1]);
         Parsing *pars = new Parsing(av[1]);
-        //std::map< int , std::multimap<std::string, std::string> > tmp = pars->GetServerMap() ;
+        // std::map< int , std::multimap<std::string, std::string> > tmp = pars->GetServerMap() ;
         // std::map<int, std::multimap<std::string, std::string>  >::iterator it0;
         // std::multimap<std::string, std::string>::iterator it;
         // for(it0 = tmp.begin(); it0 != tmp.end(); ++it0)
         // {
-        //     // std::cout << "----------------------------------\n";
+        //     std::cout << "-----------------Server-----------------\n";
         //     std::cout << "for server " << it0->first << std::endl;
         //     for(it = it0->second.begin(); it != it0->second.end(); ++it)
         //     {
         //         std::cout << it->first << " ==> " << it->second << std::endl;
         //     }
         // }
-        // std::multimap< int , std::multimap<std::string, std::string> > tmp = pars->Getloc_map() ;
-        // std::multimap<int, std::multimap<std::string, std::string>  >::iterator it0;
-        // std::multimap<std::string, std::string>::iterator it;
-        // for(it0 = tmp.begin(); it0 != tmp.end(); ++it0)
+        //     std::cout << "----------------------------------\n";
+        // std::multimap< int , std::multimap<std::string, std::string> > tmp1 = pars->Getloc_map() ;
+        // std::multimap<int, std::multimap<std::string, std::string>  >::iterator it2;
+        // std::multimap<std::string, std::string>::iterator it1 ;
+        // for(it2 = tmp1.begin(); it2 != tmp1.end(); ++it2)
         // {
-        //     // std::cout << "----------------------------------\n";
-        //     std::cout << "for server " << it0->first << std::endl;
-        //     for(it = it0->second.begin(); it != it0->second.end(); ++it)
+        // std::cout << "------------------- Location ---------------\n";
+        //     std::cout << "for location " << it2->first << std::endl;
+        //     for(it1 = it2->second.begin(); it1 != it2->second.end(); ++it1)
         //     {
-        //         std::cout << it->first << " ==> " << it->second << std::endl;
+        //         std::cout << it1->first << " ==> " << it1->second << std::endl;
         //     }
         // }
         //    std::cout << "here\n";

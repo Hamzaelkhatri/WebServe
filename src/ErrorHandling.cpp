@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/31 17:45:22 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/07 15:59:48 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,7 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
     std::map<int, std::string>::iterator it = error_mp.begin();
     std::map<int, std::string> res;
     int i = 1;
+       int m = 0;
     while (it != error_mp.end())
     {
         if (is_whitespace(it->second) == true)
@@ -163,33 +164,48 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
             k++;
         if (res[it->first].find("{") != std::string::npos)
             k--;
-    }
-    if (k != 0)
-        error_msg("Error : check The number of brackets");
-    int m = 0;
-    for (it = res.begin(); it != res.end(); ++it)
-    {
-        if ((res[it->first].find("server") != std::string::npos && m == 1) || (res[it->first].find("server") != std::string::npos && res[it->first - 1].find("}") != std::string::npos))
+        if ((res[it->first].find(" server ") != std::string::npos && m == 1) || (res[it->first].find(" server ") != std::string::npos && res[it->first - 1].find("}") != std::string::npos))
         {
             std::map<int, std::string>::iterator it1 = it;
             it1++;
             while (it1 != res.end())
             {
-                if (res[it1->first].find("server") != std::string::npos && res[it1->first + 1].find("{") != std::string::npos)
+                if (res[it1->first].find(" server ") != std::string::npos && res[it1->first + 1].find("{") != std::string::npos && k != 0)
                     error_msg("Error!! not 2 server inside another one");
                 else
                     it1++;
             }
             m++;
         }
-        else if (res[it->first].find("location") != std::string::npos)
+    }
+    if (k != 0)
+        error_msg("Error : check The number of brackets");
+ 
+    for (it = res.begin(); it != res.end(); ++it)
+    {
+        // if ((res[it->first].find("server") != std::string::npos && m == 1) || (res[it->first].find("server") != std::string::npos && res[it->first - 1].find("}") != std::string::npos))
+        // {
+        //     std::map<int, std::string>::iterator it1 = it;
+        //     it1++;
+        //     while (it1 != res.end())
+        //     {
+        //         std::cout << res[it1->first] << std::endl;
+        //         if (res[it1->first].find("server") != std::string::npos && res[it1->first + 1].find("{") != std::string::npos )
+        //             error_msg("Error!! not 2 server inside another one");
+        //         else
+        //             it1++;
+        //     }
+        //     m++;
+        // }
+        // else 
+        if (res[it->first].find(" location ") != std::string::npos)
         {
             std::map<int, std::string>::iterator it1 = it;
             it1++;
 
             while (it1 != res.end())
             {
-                if (k != 0 && (res[it->first].find("server") != std::string::npos || res[it->first].find("location") != std::string::npos))
+                if (k != 0 && (res[it->first].find(" server ") != std::string::npos || res[it->first].find("location") != std::string::npos))
                     error_msg("Error!!");
                 else
                     it1++;

@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/07 15:42:05 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/07 18:41:08 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,11 @@
 #include <netdb.h> // definitions for network database operations
 #include <sys/socket.h> // have data of socket ... lenght 32bits
 #include <sys/types.h>
+#include <netinet/in.h>
 #include <iostream>
 #include <cstring>
 #include <fcntl.h>
 #include <sstream>
-#include <netinet/in.h>
 #include "pars.hpp"
 #include "ErrorHandling.hpp"
 #include "cgi.hpp"
@@ -30,7 +30,9 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
-
+#include <string>
+#include <regex>
+#include <arpa/inet.h> 
 
 class Server 
 {
@@ -38,6 +40,7 @@ class Server
          
     //set of socket descriptors
         fd_set readfds;
+        int nfds;
         std::string version;
         int lenght;
         int error;
@@ -49,8 +52,12 @@ class Server
         std::string path;
         std::string someString;
         int len;
+        int max_client;
         int server_fd; // socket descriptor, an integer!
         int new_socket;// conection establish btw client & server
+        int client_fd[2048]; //client that conect to server eiith max of 1024
+        int child_fd; //child sockets to set
+        int ready; //result of select()
         struct sockaddr_in add;
         int sizeof_add;
         int valrecv;  // communication part
@@ -74,6 +81,7 @@ class Server
         std::string bufferStor();
         void Get_methode(cgi *c,char *envp[]);
         void Post_methode();
+        char *removeHTTPHeader(char *buffer, int &bodySize);
 };
 
 #endif

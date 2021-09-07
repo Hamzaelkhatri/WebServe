@@ -3,14 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   server_tools.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/03 21:46:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/03 22:33:50 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/07 16:58:40 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
+
+
+char * Server::removeHTTPHeader(char *buffer, int &bodySize)
+ {
+    char *t = strstr(buffer, "\r\n\r\n");
+    t = t + 4;
+
+    for (char* it = buffer; it != t; ++it) 
+        ++bodySize;
+
+    return t;
+}
+
 
 int Server::check_index(std::string str)
 {
