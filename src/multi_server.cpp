@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 18:49:10 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/07 19:30:39 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/07 19:49:04 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ int calcul_liten(std::map< int , std::multimap<std::string, std::string> > tmp)
 }
 void Server::multi_server(Parsing *p,char *envp[])
 {
+    int h = calcul_liten(p->GetServerMap());
     std::map< int , std::multimap<std::string, std::string> > tmp = p->GetServerMap() ;
     // int listen[calcul_liten(p->GetServerMap())];
     /***** creatSocket_fd *********************************/
@@ -57,27 +58,35 @@ void Server::multi_server(Parsing *p,char *envp[])
             perror("setsockopt");
             exit(EXIT_FAILURE);
         }
-        std::memset((char *)this->address[i], 0, sizeof(this->address));
+        std::memset((char *)&this->address[i], 0, sizeof(&this->address));
         // std::cout <<  i <<  " ==> The |" << server_fds[i] << "| is creted" << std::endl;
 
     }
     /*************************************************************************************/
     std::map<int, std::multimap<std::string, std::string>  >::iterator it0 = tmp.begin();
     std::multimap<std::string, std::string>::iterator it;
-    for(it0 = tmp.begin(); it0 != tmp.end(); ++it0;)
+    int i = 0;
+    //  while(i < h)
     {
-        for(it = it0->second.begin(); it != it0->second.end(); ++it)
+    
+        for(it0 = tmp.begin(); it0 != tmp.end(); ++it0)
         {
-            if(it->first == "listen")
+            it = it0->second.begin();
+            while( it != it0->second.end() && i < h)
             {
-                add.sin_port = htons(std::stoi(mtmp.find("listen")->second));
-                add.sin_family = AF_INET;
-                if (mtmp.find("server_addr")->second.c_str() != NULL)
-                    add.sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());
-                else
-                    add.sin_addr.s_addr = INADDR_ANY;
-                memset(add.sin_zero, '\0', sizeof add.sin_zero); // why help to pad from sockaddr_in to sockaddr
-                std::cout<< " listen to port " << it->second<< std::endl;
+                if(it->first == "listen" )
+                {
+                    std::cout << "\t\t\t Listening " << it->second << std::endl;
+                    address[i].sin_port = htons(std::stoi(it->second));
+                    address[i].sin_family = AF_INET;
+                    if (it->second == "server_addr" )
+                        address[i].sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());
+                    else
+                        address[i].sin_addr.s_addr = INADDR_ANY;
+                    memset(address[i].sin_zero, '\0', sizeof address[i].sin_zero); // why help to pad from sockaddr_in to sockaddr
+                    i++;
+                }
+                ++it;
             }
         }
     }
