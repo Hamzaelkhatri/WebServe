@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/06 19:43:17 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/07 15:37:09 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,54 +62,19 @@ Server::Server(Parsing *p,char *envp[])
             {
                 t++;
                 Content.push_back(line1);
-
             }
             i++;
         }
-        
-        // std::cout << someString << std::endl;
         int l = 0;
-        // char *d= removeHTTPHeader((char *)someString.c_str(), l);
-        // SaveFile("/home/hamza/Desktop/WebServe/output.png", d);
-        // std::map<std::string, std::string>::iterator it0;
-        // std::map<std::string, std::string>::iterator it;
-        // for(it0 = stor.begin(); it0 != stor.end(); ++it0)
-        // {
-        //     // std::cout << "-s---------------------------------\n";
-        //     std::cout << "[" << it0->first << "]\t\t\t==>\t"  << it0->second << std::endl;
-        // }
-        // std::string File_Content = "";
-        // i = 0; 
-        // for(i = 0 ; i < Content.size() ; i++)
-        //     std::cout  << Content.at(i) << std::endl;
         i = 0;
-        // while (Content.size() > i)
-        // {
-        //     // if(Content.at(i).find(Content.at(0)) == std::string::npos)
-        //     {
-        //         std::cout << Content.at(i) << std::endl;
-        //         File_Content += Content.at(i) + "\n";
-        //     }
-        //     i++;
-        // }
-
         status = "200 OK";
         version = "HTTP/1.1 ";
         error = 0;
         std::cout << someString << std::endl;
-        // if(!error)
-        // {
             if (stor.find("GET") != stor.end())
                 Get_methode(c,envp);
             else if (stor.find("POST") != stor.end())
                 Post_methode();
-        // }
-        // else
-        // {
-        //     status = "400 Bad Request";
-        //     version = "HTTP/1.1 ";
-        //     body = someString;
-        // }
         std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
         write(new_socket, header.c_str(), strlen(header.c_str()));
         close(new_socket);

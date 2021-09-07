@@ -11,7 +11,6 @@
  
 #define TRUE   1
 #define FALSE  0
-#define PORT 8888
 
 int main(int argc , char *argv[])
 {
@@ -19,7 +18,7 @@ int main(int argc , char *argv[])
     int master_socket , addrlen , new_socket , client_socket[30] , max_clients = 30 , activity, i , valread , sd;
 	int max_sd;
     struct sockaddr_in address;
-     
+    int PORT = atoi(argv[1]);
     char buffer[1025];  //data buffer of 1K
      
     //set of socket descriptors
