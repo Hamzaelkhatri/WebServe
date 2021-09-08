@@ -102,12 +102,12 @@ std::string Server::getBody(std::string path)
     return body;
 }
 
-void Server::SaveFile(std::string path, std::string body)
+void Server::SaveFile(std::string path, std::string body,int size)
 {
-    std::ofstream file(path,std::ofstream::binary | std::ofstream::out);
+    std::ofstream file(path, std::ios::out | std::ios::binary);
     if (file.is_open())
     {
-        file.write(body.c_str(), body.size());
+        file.write(body.c_str(), size);
         file.close();
     }
 }

@@ -58,7 +58,7 @@ void Server::multi_server(Parsing *p,char *envp[])
             perror("setsockopt");
             exit(EXIT_FAILURE);
         }
-        std::memset((char *)&this->address[i], 0, sizeof(&this->address));
+        // std::memset((char *)&this->address[i], 0, sizeof(&this->address));
         // std::cout <<  i <<  " ==> The |" << server_fds[i] << "| is creted" << std::endl;
 
     }

@@ -12,20 +12,23 @@
 
 #include "../includes/cgi.hpp"
 
-std::string cgi::CGI(char *argv[], char *envp[])
+std::string cgi::CGI(char *av[], char *envp[])
 {
     int fd[2];
     pid_t pid;
     char foo[4096];
     std::string str = "";
+
+    std::string page = av[1];
+    std::string fullpath = "/home/hamza/Desktop/WebServe/webpage" + page;
     setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);//version Of Gate away interface
     setenv("SERVER_PROTOCOL", "HTTP/1.1", 1);//version of http , hyper text protocole
-    setenv("PATH_INFO", "/Users/helkhatr/Desktop/WebServe/webpage/cgi/home.php", 1);
+    setenv("PATH_INFO", "/home/hamza/Desktop/WebServe/webpage/home.php", 1);
     setenv("SERVER_PORT", "8011", 1);// PORT OF SERVER
     setenv("REQUEST_METHOD", "GET", 1);// METHODE HTTP
     setenv("REMOTE_ADDR", "127.0.0.1", 1);//
     setenv("SERVER_NAME", "localhost", 1);//
-    setenv("SCRIPT_FILENAME", "/Users/helkhatr/Desktop/WebServe/webpage/cgi/home.php", 1);
+    setenv("SCRIPT_FILENAME", "/home/hamza/Desktop/WebServe/webpage/home.php", 1);
     setenv("SCRIPT_NAME", "home.php", 1);//name of file
     setenv("REDIRECT_STATUS", "200", 1);//status of cnx
     if (pipe(fd) == -1) // cat hel.txt | cat -e  FD[1] ---> FD[0] 0 1 2 3
@@ -38,8 +41,8 @@ std::string cgi::CGI(char *argv[], char *envp[])
         dup2(fd[1], STDOUT_FILENO);// 1
         close(fd[0]);
         // close(fd[1]);
-        chdir("/home/hamza/Desktop/WebServe/webpage/cgi/");
-        execve(argv[0], argv, envp);
+        chdir("/home/hamza/Desktop/WebServe/webpage/cgi");
+        execve(av[0], av, envp);
         perror("execve");
         exit(0);
     }

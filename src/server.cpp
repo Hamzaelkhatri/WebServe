@@ -14,61 +14,61 @@
 
 Server::Server(Parsing *p,char *envp[])
 {
-    multi_server(p,envp);
-    // cgi *c;
-    // loc = p->Getloc_map();
-    // tmp = p->GetServerMap();
-    // mtmp = tmp[1];
-    // creatSocket_fd();
-    // error = 0;
-    // bind_listen();
-    // while (1)
-    // {
-    //     std::cout << "\t\t\t Listening " << mtmp.find("listen")->second << std::endl;
-    //     accept_socket();
-    //     int t = 0;
-    //     int i = 0;
-    //     lenght = 0;
-    //     someString = bufferStor();
-    //     std::stringstream ss(someString);
-    //     while (std::getline(ss, line1, '\n'))
-    //     {
-    //         if (line1.find_first_of(":") != std::string::npos && t == 1)
-    //         {
-    //             tmp1 = line1.substr(0, line1.find_first_of(":"));
-    //             tmp2 = line1.substr(line1.find_first_of(":") + 1);
-    //             stor[tmp1] = tmp2;
-    //         }
-    //         else if (t == 0)
-    //         {
-    //             tmp1 = line1.substr(0, line1.find_first_of(" "));
-    //             tmp2 = line1.substr(line1.find_first_of(" ") + 1);
-    //             stor[tmp1] = "webpage" + tmp2.substr(0, tmp2.find_first_of(" "));
-    //             t++;
-    //         }
-    //         else
-    //         {
-    //             t++;
-    //             Content.push_back(line1);
-    //         }
-    //         i++;
-    //     }
-    //     int l = 0;
-    //     i = 0;
-    //     status = "200 OK";
-    //     version = "HTTP/1.1 ";
-    //     error = 0;
-    //     std::cout << someString << std::endl;
-    //         if (stor.find("GET") != stor.end())
-    //             Get_methode(c,envp);
-    //         else if (stor.find("POST") != stor.end())
-    //             Post_methode();
-    //     std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
-    //     write(new_socket, header.c_str(), strlen(header.c_str()));
-    //     close(new_socket);
-    //     stor.clear();
-    // }
-    // close(server_fd);
+    // multi_server(p,envp);
+    cgi *c;
+    loc = p->Getloc_map();
+    tmp = p->GetServerMap();
+    mtmp = tmp[1];
+    creatSocket_fd();
+    error = 0;
+    bind_listen();
+    while (1)
+    {
+        std::cout << "\t\t\t Listening " << mtmp.find("listen")->second << std::endl;
+        accept_socket();
+        int t = 0;
+        int i = 0;
+        lenght = 0;
+        someString = bufferStor();
+        std::stringstream ss(someString);
+        while (std::getline(ss, line1, '\n'))
+        {
+            if (line1.find_first_of(":") != std::string::npos && t == 1)
+            {
+                tmp1 = line1.substr(0, line1.find_first_of(":"));
+                tmp2 = line1.substr(line1.find_first_of(":") + 1);
+                stor[tmp1] = tmp2;
+            }
+            else if (t == 0)
+            {
+                tmp1 = line1.substr(0, line1.find_first_of(" "));
+                tmp2 = line1.substr(line1.find_first_of(" ") + 1);
+                stor[tmp1] = "webpage" + tmp2.substr(0, tmp2.find_first_of(" "));
+                t++;
+            }
+            else
+            {
+                t++;
+                Content.push_back(line1);
+            }
+            i++;
+        }
+        int l = 0;
+        i = 0;
+        status = "200 OK";
+        version = "HTTP/1.1 ";
+        error = 0;
+        std::cout << someString << std::endl;
+            if (stor.find("GET") != stor.end())
+                Get_methode(c,envp);
+            else if (stor.find("POST") != stor.end())
+                Post_methode();
+        std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
+        write(new_socket, header.c_str(), strlen(header.c_str()));
+        close(new_socket);
+        stor.clear();
+    }
+    close(server_fd);
 }
 
 
@@ -122,6 +122,19 @@ int numberOfWords(std::string str)
     return (count+1);
 }
 
+int getNumberOfline(std::string str)
+{
+    int i = 0;
+    int count = 0;
+    while (str[i])
+    {
+        if(str[i]=='\n')
+            count++;
+        i++;
+    }
+    return (count+1);
+}
+
 std::string Server::bufferStor()
 {
     char buffer[1000];
@@ -165,9 +178,22 @@ std::string Server::bufferStor()
             }
             n++;
         }
+        std::cout << buffer << std::endl;
         // std::cout << buffer << std::endl << nDataLength << "  "<< sizeOfFile << std::endl;
     }
     len = someString.size();
+    if(sizeOfFile != -1)
+    {
+        body = someString.substr(someString.find("\r\n\r\n")+4,someString.size());
+        // if(body.size() != sizeOfFile)
+        {
+            body = body.substr(body.find("\r\n\r\n")+4,body.size());
+            body = body.substr(0,body.find("\r\n"));
+            SaveFile("/home/hamza/Desktop/WebServe/webpage/upload/output.txt", body,body.size());
+            exit(0);
+        }
+        // someString = someString.substr(0,someString.find("\r\n\r\n")+4);
+    }
     return(someString);
 
 }
@@ -208,11 +234,12 @@ void Server::Get_methode(cgi *c,char *envp[])
   else
   {
       char *argv[3];
-      std::string str("/Users/helkhatr/goinfre/.brew/bin/php-cgi");
+      std::string str("/usr/bin/php-cgi");
       argv[0] = (char *)str.c_str();
       argv[1] = (char *)stor.find("GET")->second.c_str();
       argv[2] = NULL;
       body = c->CGI(argv, envp);
+      body = body.substr(body.find("\r\n\r\n")+4,body.size());
       len = body.size();
   }
 }
