@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/07 19:16:03 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/08 14:37:54 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ class Server
         void bind_listen(void);
         void accept_socket();
         std::string getBody(std::string path);
-        void SaveFile(std::string path, std::string body);
+        void SaveFile(std::string path, std::string body,int size);
         int check_dir(std::string dir, std::string str);
         int check_index(std::string str);
         std::string bufferStor();
