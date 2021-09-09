@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 18:49:10 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/09 13:04:10 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/09 13:39:39 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,8 +130,13 @@ void Server::multi_server(Parsing *p,char *envp[])
         char *s = inet_ntoa(address[i].sin_addr);
         if (bind(server_fds[i], (struct sockaddr *)(&address[i]), sizeof(address[i])) < 0)
             perror("Bind");
-        std::cout << i ;
-        std::cout <<  " \t:\t" <<  s << std::endl;
+        if (listen(server_fds[i], 10) < 0)
+        {
+            perror("listen");
+            exit(EXIT_FAILURE);
+        }
+        // std::cout << i ;
+        // std::cout <<  " \t:\t" <<  s << std::endl;
         i++;
     }
     // while( i < h)
