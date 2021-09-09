@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 18:49:10 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/08 16:10:07 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/09 12:11:51 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,29 +60,73 @@ void Server::multi_server(Parsing *p,char *envp[])
             exit(EXIT_FAILURE);
         }
         std::memset((char *)&this->address[i], 0, sizeof(&this->address));
-        std::cout <<  i <<  " ==> The |" << server_fds[i] << "| is creted" << std::endl;
+        // std::cout <<  i <<  " ==> The |" << server_fds[i] << "| is creted" << std::endl;
     }
     /*************************************************************************************************/
     std::map<int, std::multimap<std::string, std::string>  >::iterator it0 = tmp.begin();
     std::multimap<std::string, std::string>::iterator it;
+    std::map<int, std::string>mini;
+    int j =0;
+    int k = 0;
     for(it0 = tmp.begin(); it0 != tmp.end(); ++it0)
     {
+        j++;
+        k = 0;
         for (it = it0->second.begin(); it != it0->second.end() ; it++ )
         {
-            if(it->first == "listen" )
-            {
-                // std::cout << "\t\t\t Listening " << it->second << std::endl;
-                address[i].sin_port = htons(std::stoi(it->second));
-            }
-            if (it->second == "server_addr" )
-                address[i].sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());
-            else
-                address[i].sin_addr.s_addr = INADDR_ANY;
-            address[i].sin_family = AF_INET;
-            memset(address[i].sin_zero, '\0', sizeof address[i].sin_zero); // why help to pad from sockaddr_in to sockaddr
-            char *s = inet_ntoa(address[i].sin_addr);
-            std::cout << "host  " << address[i].sin_port << "\t:\t" <<  s << std::endl;
+            if (it->first== "server_addr")
+                {
+                    k++;
+                    mini[j] = it->second;
+                }
+            // address[i].sin_family = AF_INET;
+            // memset(address[i].sin_zero, '\0', sizeof address[i].sin_zero); // why help to pad from sockaddr_in to sockaddr
+            // char *s = inet_ntoa(address[i].sin_addr);
+            // std::cout << "host  " << address[i].sin_port << "\t:\t" <<  s << std::endl;
+        }
+        if( k == 0 )
+        {
+            mini[j] = "INADDR_ANY";
         }
      }
+    // for(std::map<int, std::string>::iterator o = mini.begin(); o != mini.end() ; o++)
+    //     std::cout << o->first << "\t\t" <<  o->second << std::endl;
+        i = 0;
+        std::map<int, std::string>::iterator o = mini.begin();
+        it0 = tmp.begin();
+    while( it0 != tmp.end() && o != mini.end())
+    {
     
+            for (it = it0->second.begin(); it != it0->second.end() ; it++ )
+            {
+                if( it->first.find("listen") != std::string::npos )
+                {
+                    // std::cout << i << std::endl;
+                    std::string str = it->second;
+                    // std::cout << str << std::endl;
+                    while( i < h && str != "NULL")
+                    {
+                            address[i].sin_port =  htons(std::stoi(str));
+                            address[i].sin_family = AF_INET;
+                            if ( o->second == "INADDR_ANY" )
+                                address[i].sin_addr.s_addr = INADDR_ANY;
+                            else
+                                address[i].sin_addr.s_addr = inet_addr(o->second.c_str());
+                            memset(address[i].sin_zero, '\0', sizeof address[i].sin_zero); // why help to pad from sockaddr_in to sockaddr
+                            // char *s = inet_ntoa(address[i].sin_addr);
+                            // std::cout << str ;
+                            // std::cout <<  "\t:\t" <<  s << std::endl;
+                            str = "NULL";
+                            i++;
+                    }
+                }
+            }
+        it0++;
+        o++;
+     }
+     i = 0;
+    // while( i < h)
+    // {
+    //     i++;
+    // }
 }
