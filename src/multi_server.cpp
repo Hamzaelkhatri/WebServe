@@ -152,20 +152,18 @@ void Server::multi_server(Parsing *p,char *envp[])
         while(i < h )
         {
             FD_SET(server_fds[i], &readfds);
-            nfds += server_fds[i];
+            nfds = server_fds[i];
             i++;
         }
-        // for ( i = 0 ; i < 10 ; i++) 
-        // {
-		// 	sd = client_fds[i];
-		// 	if(sd > 0)
-		// 	    FD_SET( sd , &readfds);
-        //     if(sd > nfds)
-		// 		nfds = sd;
-        // }
-        // nfds = 10 + h;
-        // printf("%i",nfds);
-        if (select (h , &readfds, NULL, NULL, NULL) < 0)
+        for ( i = 0 ; i < 10 ; i++) 
+        {
+			sd = client_fds[i];
+			if(sd > 0)
+			    FD_SET( sd , &readfds);
+            if(sd > nfds)
+				nfds = sd;
+        }
+        if (select (nfds+1 , &readfds, NULL, NULL, NULL) < 0)
         {
           perror ("select");
           exit (EXIT_FAILURE);
@@ -178,49 +176,20 @@ void Server::multi_server(Parsing *p,char *envp[])
             {
                 int addrlen = sizeof(address[i]);
                 new_socket = accept(server_fds[i], (struct sockaddr *)&address[i], (socklen_t*)&addrlen);
-                if ( new_socket <0)
+                if ( new_socket < 0)
                 {
                     perror("accept");
                     exit(EXIT_FAILURE);
                 }
-                child_fd = new_socket;
-                // }
+                someString = bufferStor();
+                std::cout << someString;
                 break;
             }
-            // FD_CLR(server_fds[i],&readfds);
+            FD_CLR(server_fds[i],&readfds);
             i++;
         }
-            if (FD_ISSET( child_fd, &readfds)) 
-            {
-                //Check if it was for closing , and also read the incoming message
-                // if ((valread = read( sd , buffer, 1024)) == 0)
-                // {
-                //     //Somebody disconnected , get his details and print
-                //     getpeername(sd , (struct sockaddr*)&tmp , (socklen_t*)&tmp);
-                //     printf("Host disconnected , ip %s , port %d \n" , inet_ntoa(tmp.sin_addr) , ntohs(tmp.sin_port));
-                     
-                //     //Close the socket and mark as 0 in list for reuse
-                // }
-                 
-                // //Echo back the message that came in
-                // else
-                // {
-                //     //set the string terminating NULL byte on the end of the data read
-                //     buffer[valread] = '\0';
-                //     send(sd , buffer , strlen(buffer) , 0 );
-                // }
-                puts("here");
-                // someString = bufferStor();
-                // std::cout << someString ;
-                // close( sd );
-                // close(client_fds[i]);
-                break;
-            }
-            // else
-                            // puts(" not here");
-        }
-        close(new_socket);
-    // }
+    close(new_socket);
+    }
     i = 0;
     while( i < h)
             close(server_fds[++i]);
