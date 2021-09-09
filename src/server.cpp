@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/08 12:22:38 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/09 15:50:08 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 Server::Server(Parsing *p,char *envp[])
 {
+    cgi *c;
+    loc = p->Getloc_map();
+    tmp = p->GetServerMap();
     multi_server(p,envp);
-    // cgi *c;
-    // loc = p->Getloc_map();
-    // tmp = p->GetServerMap();
     // mtmp = tmp[1];
     // creatSocket_fd();
     // error = 0;
@@ -145,6 +145,7 @@ std::string Server::bufferStor()
     error = 0;
     
     someString = "";
+    std::cout << "here" << std::endl;
     int sizeOfFile=-1;
     while (1)
     {
@@ -190,7 +191,6 @@ std::string Server::bufferStor()
             body = body.substr(body.find("\r\n\r\n")+4,body.size());
             body = body.substr(0,body.find("\r\n"));
             SaveFile("/home/hamza/Desktop/WebServe/webpage/upload/output.txt", body,body.size());
-            exit(0);
         }
         // someString = someString.substr(0,someString.find("\r\n\r\n")+4);
     }

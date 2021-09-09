@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/08 14:37:54 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/09 14:25:23 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ class Server
     private:
          
     //set of socket descriptors
+    int activity;
         fd_set readfds;
         int nfds;
         std::string version;
@@ -55,9 +56,10 @@ class Server
         int max_client;
         int server_fd; // socket descriptor, an integer!
         int *server_fds;
+        int *max_fds;
         struct sockaddr_in *address;
         int new_socket;// conection establish btw client & server
-        int client_fd[2048]; //client that conect to server eiith max of 1024
+        int client_fds[2048]; //client that conect to server eiith max of 1024
         int child_fd; //child sockets to set
         int ready; //result of select()
         struct sockaddr_in add;

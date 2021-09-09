@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 18:49:10 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/09 13:39:39 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/09 17:15:16 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,17 +130,98 @@ void Server::multi_server(Parsing *p,char *envp[])
         char *s = inet_ntoa(address[i].sin_addr);
         if (bind(server_fds[i], (struct sockaddr *)(&address[i]), sizeof(address[i])) < 0)
             perror("Bind");
-        if (listen(server_fds[i], 10) < 0)
+        if (listen(server_fds[i], 100) < 0)
         {
             perror("listen");
             exit(EXIT_FAILURE);
         }
-        // std::cout << i ;
-        // std::cout <<  " \t:\t" <<  s << std::endl;
         i++;
     }
-    // while( i < h)
-    // {
-    //     i++;
+        i = 0;
+        for (i = 0; i < 10; i++) 
+        {
+            client_fds[i] = 0;
+        }
+    int sd = 0;
+    int nfd[10];
+    while(1)
+    {
+        i = 0;
+        FD_ZERO(&readfds);
+        std::cout << "\t\t\t ---waiting for connection--- " << std::endl;
+        while(i < h )
+        {
+            FD_SET(server_fds[i], &readfds);
+            nfds += server_fds[i];
+            i++;
+        }
+        // for ( i = 0 ; i < 10 ; i++) 
+        // {
+		// 	sd = client_fds[i];
+		// 	if(sd > 0)
+		// 	    FD_SET( sd , &readfds);
+        //     if(sd > nfds)
+		// 		nfds = sd;
+        // }
+        // nfds = 10 + h;
+        // printf("%i",nfds);
+        if (select (h , &readfds, NULL, NULL, NULL) < 0)
+        {
+          perror ("select");
+          exit (EXIT_FAILURE);
+        }
+        struct sockaddr_in tmp;
+        i = 0;
+        while(i < h )
+        {
+            if (FD_ISSET(server_fds[i], &readfds))
+            {
+                int addrlen = sizeof(address[i]);
+                new_socket = accept(server_fds[i], (struct sockaddr *)&address[i], (socklen_t*)&addrlen);
+                if ( new_socket <0)
+                {
+                    perror("accept");
+                    exit(EXIT_FAILURE);
+                }
+                child_fd = new_socket;
+                // }
+                break;
+            }
+            // FD_CLR(server_fds[i],&readfds);
+            i++;
+        }
+            if (FD_ISSET( child_fd, &readfds)) 
+            {
+                //Check if it was for closing , and also read the incoming message
+                // if ((valread = read( sd , buffer, 1024)) == 0)
+                // {
+                //     //Somebody disconnected , get his details and print
+                //     getpeername(sd , (struct sockaddr*)&tmp , (socklen_t*)&tmp);
+                //     printf("Host disconnected , ip %s , port %d \n" , inet_ntoa(tmp.sin_addr) , ntohs(tmp.sin_port));
+                     
+                //     //Close the socket and mark as 0 in list for reuse
+                // }
+                 
+                // //Echo back the message that came in
+                // else
+                // {
+                //     //set the string terminating NULL byte on the end of the data read
+                //     buffer[valread] = '\0';
+                //     send(sd , buffer , strlen(buffer) , 0 );
+                // }
+                puts("here");
+                // someString = bufferStor();
+                // std::cout << someString ;
+                // close( sd );
+                // close(client_fds[i]);
+                break;
+            }
+            // else
+                            // puts(" not here");
+        }
+        close(new_socket);
     // }
+    i = 0;
+    while( i < h)
+            close(server_fds[++i]);
 }
