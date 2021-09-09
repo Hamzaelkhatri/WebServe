@@ -145,14 +145,13 @@ std::string Server::bufferStor()
     error = 0;
     
     someString = "";
-    std::cout << "here" << std::endl;
     int sizeOfFile=-1;
-    while (1)
+    while ((nDataLength = recv(sd, (void *)&buffer, 999, 0)) > 0)
     {
         if(someString.find("\r\n\r\n") != std::string::npos && sizeOfFile < loop)
             break;
         bzero(buffer, sizeof(buffer));
-        nDataLength = recv(new_socket, (void *)&buffer, 999, 0);
+        nDataLength = recv(sd, (void *)&buffer, 999, 0);
         loop+=nDataLength;
         if (nDataLength < 0 || nDataLength == 0)
             break;
@@ -234,7 +233,7 @@ void Server::Get_methode(cgi *c,char *envp[])
   else
   {
       char *argv[3];
-      std::string str("/usr/bin/php-cgi");
+      std::string str("/Users/helkhatr/goinfre/.brew/bin/php-cgi");
       argv[0] = (char *)str.c_str();
       argv[1] = (char *)stor.find("GET")->second.c_str();
       argv[2] = NULL;

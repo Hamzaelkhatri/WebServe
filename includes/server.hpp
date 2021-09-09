@@ -51,6 +51,7 @@ class Server
         std::string body;
         std::string line1;
         std::string path;
+        int sd;
         std::string someString;
         int len;
         int max_client;
