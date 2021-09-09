@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 18:49:10 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/09 12:11:51 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/09 13:04:10 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,9 +113,7 @@ void Server::multi_server(Parsing *p,char *envp[])
                             else
                                 address[i].sin_addr.s_addr = inet_addr(o->second.c_str());
                             memset(address[i].sin_zero, '\0', sizeof address[i].sin_zero); // why help to pad from sockaddr_in to sockaddr
-                            // char *s = inet_ntoa(address[i].sin_addr);
-                            // std::cout << str ;
-                            // std::cout <<  "\t:\t" <<  s << std::endl;
+                           
                             str = "NULL";
                             i++;
                     }
@@ -125,6 +123,17 @@ void Server::multi_server(Parsing *p,char *envp[])
         o++;
      }
      i = 0;
+
+     /**********************Bind**************************************/
+    while(i < h)
+    {
+        char *s = inet_ntoa(address[i].sin_addr);
+        if (bind(server_fds[i], (struct sockaddr *)(&address[i]), sizeof(address[i])) < 0)
+            perror("Bind");
+        std::cout << i ;
+        std::cout <<  " \t:\t" <<  s << std::endl;
+        i++;
+    }
     // while( i < h)
     // {
     //     i++;
