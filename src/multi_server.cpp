@@ -6,16 +6,16 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 18:49:10 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/09 17:15:16 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/10 13:31:48 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
-int calcul_liten(std::map<int, std::multimap<std::string, std::string>> tmp)
+int calcul_liten(std::map<int, std::multimap<std::string, std::string> > tmp)
 {
     int i = 0;
-    std::map<int, std::multimap<std::string, std::string>>::iterator it0;
+    std::map<int, std::multimap<std::string, std::string> >::iterator it0;
     std::multimap<std::string, std::string>::iterator it;
     for (it0 = tmp.begin(); it0 != tmp.end(); ++it0)
     {
@@ -49,7 +49,7 @@ void Server::multi_server(Parsing *p, char *envp[])
             exit(EXIT_FAILURE);
         }
     }
-    std::map<int, std::multimap<std::string, std::string>> tmp = p->GetServerMap();
+    std::map<int, std::multimap<std::string, std::string> > tmp = p->GetServerMap();
     for (i = 0; i < h; i++)
     {
         int buffsize = 1;
@@ -62,7 +62,7 @@ void Server::multi_server(Parsing *p, char *envp[])
         // std::cout <<  i <<  " ==> The |" << server_fds[i] << "| is creted" << std::endl;
     }
     /*************************************************************************************************/
-    std::map<int, std::multimap<std::string, std::string>>::iterator it0 = tmp.begin();
+    std::map<int, std::multimap<std::string, std::string> >::iterator it0 = tmp.begin();
     std::multimap<std::string, std::string>::iterator it;
     std::map<int, std::string> mini;
     int j = 0;
@@ -128,7 +128,7 @@ void Server::multi_server(Parsing *p, char *envp[])
         char *s = inet_ntoa(address[i].sin_addr);
         if (bind(server_fds[i], (struct sockaddr *)(&address[i]), sizeof(address[i])) < 0)
             perror("Bind");
-        if (listen(server_fds[i], 100) < 0)
+        if (listen(server_fds[i],10) < 0)
         {
             perror("listen");
             exit(EXIT_FAILURE);
@@ -136,11 +136,10 @@ void Server::multi_server(Parsing *p, char *envp[])
         i++;
     }
     i = 0;
-    for (i = 0; i < 10; i++)
+    for (i = 0; i < 20; i++)
     {
         client_fds[i] = 0;
     }
-    int nfd[10];
     while (1)
     {
         i = 0;
@@ -148,11 +147,14 @@ void Server::multi_server(Parsing *p, char *envp[])
         std::cout << "\t\t\t ---waiting for connection--- " << std::endl;
         while (i < h)
         {
-            FD_SET(server_fds[i], &readfds);
             nfds = server_fds[i];
+            FD_SET(server_fds[i], &readfds);
+            if(nfds > server_fds[i])
+                nfds = server_fds[i];
             i++;
         }
-        for (i = 0; i < 10; i++)
+        std::cout << "i m waiting here0\n";
+        for (i = 0; i < 20; i++)
         {
             sd = client_fds[i];
             if (sd > 0)
@@ -163,23 +165,27 @@ void Server::multi_server(Parsing *p, char *envp[])
         timeval tv;
         tv.tv_sec = 5;
         tv.tv_usec = 0;
+                        std::cout << "i m waiting here1\n";
+
         if (select(nfds + 1, &readfds, NULL, NULL, NULL) < 0)
         {
             perror("select");
             exit(EXIT_FAILURE);
         }
+                                std::cout << "i m waiting here1*****\n";
         for (i = 0; i < h; i++)
         {
             if (FD_ISSET(server_fds[i], &readfds))
             {
                 int addrlen = sizeof(address[i]);
+                std::cout << "i m waiting here2\n";
                 int new_sd = accept(server_fds[i], (struct sockaddr *)&address[i], (socklen_t *)&addrlen);
                 if (new_sd < 0)
                 {
                     perror("accept");
                     continue;
                 }
-                for (int j = 0; j < 10; j++)
+                for (int j = 0; j <20; j++)
                 {
                     if (client_fds[j] == 0)
                     {
@@ -190,15 +196,15 @@ void Server::multi_server(Parsing *p, char *envp[])
                 std::cout << "New connection accepted " << new_sd << std::endl;
             }
         }
-        for (i = 0; i < 10; i++)
+        for (i = 0; i <20; i++)
         {
             int t = 0;
             sd = client_fds[i];
             if (FD_ISSET(sd, &readfds))
             {
                 // someString = bufferStor();
-                std::cout << "\033[91mThe client " << sd << "connected"
-                          << "\n\033[0" << std::endl;
+                std::cout << "The client " << sd << "connected"
+                          << "\n" << std::endl;
                 char buffer[1024];
                 memset(buffer, 0, sizeof(buffer));
                 int n = read(sd, buffer, sizeof(buffer));
@@ -259,10 +265,14 @@ void Server::multi_server(Parsing *p, char *envp[])
                 std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
                 write(sd, header.c_str(), strlen(header.c_str()));
             }
+        fcntl(client_fds[i], F_SETFL, O_NONBLOCK);
         }
-        fcntl(sd, F_SETFL, O_NONBLOCK);
+        i = 0;
+        // while (i <20)
+            // FD_CLR(sd, &readfds);
+
     }
-        // close(sd);
+        close(sd);
         while (i < h)
             close(server_fds[++i]);
     i = 0;

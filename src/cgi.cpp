@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/03 12:22:53 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/03 12:22:55 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/10 12:21:28 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ std::string cgi::CGI(char *av[], char *envp[])
     setenv("REQUEST_METHOD", "GET", 1);// METHODE HTTP
     setenv("REMOTE_ADDR", "127.0.0.1", 1);//
     setenv("SERVER_NAME", "localhost", 1);//
-    setenv("SCRIPT_FILENAME", "/home/hamza/Desktop/WebServe/webpage/home.php", 1);
+    // setenv("SCRIPT_FILENAME", "/home/hamza/Desktop/WebServe/webpage/home.php", 1);
     setenv("SCRIPT_NAME", "home.php", 1);//name of file
     setenv("REDIRECT_STATUS", "200", 1);//status of cnx
     if (pipe(fd) == -1) // cat hel.txt | cat -e  FD[1] ---> FD[0] 0 1 2 3
