@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 18:49:10 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/10 13:43:00 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/10 14:12:53 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,7 +165,7 @@ void Server::multi_server(Parsing *p, char *envp[])
         timeval tv;
         tv.tv_sec = 5;
         tv.tv_usec = 0;
-                        std::cout << "i m waiting here1\n";
+        std::cout << "i m waiting here1\n";
 
         if (select(nfds + 1, &readfds, NULL, NULL, NULL) < 0)
         {
@@ -207,7 +207,7 @@ void Server::multi_server(Parsing *p, char *envp[])
                           << "\n" << std::endl;
                 char buffer[1024];
                 memset(buffer, 0, sizeof(buffer));
-                int n = read(sd, buffer, sizeof(buffer));
+                int n = recv(sd, (void *)&buffer, 999, 0);
                 if (n < 0)
                 {
                     perror("read");
@@ -267,10 +267,6 @@ void Server::multi_server(Parsing *p, char *envp[])
             }
         fcntl(client_fds[i], F_SETFL, O_NONBLOCK);
         }
-        i = 0;
-        // while (i <20)
-            // FD_CLR(sd, &readfds);
-
     }
         close(sd);
         while (i < h)

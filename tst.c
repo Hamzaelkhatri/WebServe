@@ -94,7 +94,6 @@ int main(int argc , char *argv[])
             if(sd > max_sd)
 				max_sd = sd;
         }
- 
         //wait for an activity on one of the sockets , timeout is NULL , so wait indefinitely
         activity = select( max_sd + 1 , &readfds , NULL , NULL , NULL);
    
@@ -102,7 +101,6 @@ int main(int argc , char *argv[])
         {
             printf("select error");
         }
-         
         //If something happened on the master socket , then its an incoming connection
         if (FD_ISSET(master_socket, &readfds)) 
         {
@@ -111,18 +109,14 @@ int main(int argc , char *argv[])
                 perror("accept");
                 exit(EXIT_FAILURE);
             }
-         
             //inform user of socket number - used in send and receive commands
             printf("New connection , socket fd is %d , ip is : %s , port : %d \n" , new_socket , inet_ntoa(address.sin_addr) , ntohs(address.sin_port));
-       
             //send new connection greeting message
             if( send(new_socket, message, strlen(message), 0) != strlen(message) ) 
             {
                 perror("send");
             }
-             
             puts("Welcome message sent successfully");
-             
             //add new socket to array of sockets
             for (i = 0; i < max_clients; i++) 
             {
