@@ -1,18 +1,18 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   multi_server.cpp                                   :+:      :+:    :+:   */
+/*   multi_tools.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 18:49:10 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/10 14:12:53 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/10 17:34:02 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
-int calcul_liten(std::map<int, std::multimap<std::string, std::string> > tmp)
+int Server::calcul_liten(std::map<int, std::multimap<std::string, std::string> > tmp)
 {
     int i = 0;
     std::map<int, std::multimap<std::string, std::string> >::iterator it0;
@@ -31,12 +31,12 @@ int calcul_liten(std::map<int, std::multimap<std::string, std::string> > tmp)
     }
     return (i);
 }
+
 void Server::multi_server(Parsing *p, char *envp[])
 {
-    int h = calcul_liten(p->GetServerMap());
-    // std::cout << "h ==> " << h << std::endl;
     int i = 0;
-    address = new struct sockaddr_in[h + 1];
+    h = calcul_liten(p->GetServerMap());
+    // std::cout << "h ==> " << h << std::endl;
     /***** creatSocket_fd *********************************/
     server_fds = new int[h + 1];
     for (i = 0; i < h; i++)
@@ -78,10 +78,6 @@ void Server::multi_server(Parsing *p, char *envp[])
                 k++;
                 mini[j] = it->second;
             }
-            // address[i].sin_family = AF_INET;
-            // memset(address[i].sin_zero, '\0', sizeof address[i].sin_zero); // why help to pad from sockaddr_in to sockaddr
-            // char *s = inet_ntoa(address[i].sin_addr);
-            // std::cout << "host  " << address[i].sin_port << "\t:\t" <<  s << std::endl;
         }
         if (k == 0)
         {
@@ -93,6 +89,7 @@ void Server::multi_server(Parsing *p, char *envp[])
     i = 0;
     std::map<int, std::string>::iterator o = mini.begin();
     it0 = tmp.begin();
+    address = new struct sockaddr_in[h + 1];
     while (it0 != tmp.end() && o != mini.end())
     {
 
@@ -135,8 +132,7 @@ void Server::multi_server(Parsing *p, char *envp[])
         }
         i++;
     }
-    i = 0;
-    for (i = 0; i < 20; i++)
+    for (i = 0; i < 1024; i++)
     {
         client_fds[i] = 0;
     }
@@ -154,7 +150,7 @@ void Server::multi_server(Parsing *p, char *envp[])
             i++;
         }
         std::cout << "i m waiting here0\n";
-        for (i = 0; i < 20; i++)
+        for (i = 0; i < 1024; i++)
         {
             sd = client_fds[i];
             if (sd > 0)
@@ -177,9 +173,9 @@ void Server::multi_server(Parsing *p, char *envp[])
         {
             if (FD_ISSET(server_fds[i], &readfds))
             {
-                int addrlen = sizeof(address[i]);
+                int addrlen = sizeof(client_add);
                 std::cout << "i m waiting here2\n";
-                int new_sd = accept(server_fds[i], (struct sockaddr *)&address[i], (socklen_t *)&addrlen);
+                int new_sd = accept(server_fds[i], (struct sockaddr *)&client_add, (socklen_t *)&addrlen);
                 if (new_sd < 0)
                 {
                     perror("accept");
@@ -196,7 +192,7 @@ void Server::multi_server(Parsing *p, char *envp[])
                 std::cout << "New connection accepted " << new_sd << std::endl;
             }
         }
-        for (i = 0; i <20; i++)
+        for (i = 0; i <1024; i++)
         {
             int t = 0;
             sd = client_fds[i];
@@ -205,20 +201,23 @@ void Server::multi_server(Parsing *p, char *envp[])
                 // someString = bufferStor();
                 std::cout << "The client " << sd << "connected"
                           << "\n" << std::endl;
-                char buffer[1024];
+                char buffer[20000];
                 memset(buffer, 0, sizeof(buffer));
-                int n = recv(sd, (void *)&buffer, 999, 0);
+                int n = recv(sd, (void *)&buffer, sizeof(buffer), 0);
                 if (n < 0)
                 {
                     perror("read");
+                    // std::cout << "recv: khikhi" << std::endl;
                     continue;
+                    // break;
                 }
                 if (n == 0)
                 {
                     std::cout << "Client " << sd << " disconnected" << std::endl;
+                    // FD_CLR(sd, &readfds);
                     close(sd);
-                    client_fds[i] = 0;
-                    continue;
+                    // continue;
+                    exit( EXIT_FAILURE);
                 }
                 std::cout << "Received " << n << " bytes from client " << sd << std::endl;
                 std::cout << "Data received: \n"

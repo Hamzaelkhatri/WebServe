@@ -6,282 +6,174 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/10 14:12:51 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/10 18:41:34 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/server.hpp"
+#include "../includes/Webserv.hpp"
 
+
+// void Server::SetAll_FD()
+// {
+//     i = 0;
+//     while (i < h)
+//     {
+//         nfds = server_fds[i];
+//         FD_SET(server_fds[i], &readfds);
+//         if(nfds > server_fds[i])
+//             nfds = server_fds[i];
+//         i++;
+//     }
+//     for (i = 0; i < 1024; i++)
+//     {
+//         sd = client_fds[i];
+//         if (sd > 0)
+//             FD_SET(sd, &readfds);
+//         if (sd > nfds)
+//             nfds = sd;
+//     }
+    
+// }
 Server::Server(Parsing *p,char *envp[])
 {
+    int i ;
     cgi *c;
+    h = calcul_liten(p->GetServerMap());
     loc = p->Getloc_map();
     tmp = p->GetServerMap();
-    multi_server(p,envp);
-    // mtmp = tmp[1];
-    // creatSocket_fd();
-    // error = 0;
-    // bind_listen();
-    // while (1)
-    // {
-    //     std::cout << "\t\t\t Listening " << mtmp.find("listen")->second << std::endl;
-    //     accept_socket();
-    //     int t = 0;
-    //     int i = 0;
-    //     lenght = 0;
-    //     someString = bufferStor();
-    //     std::stringstream ss(someString);
-    //     while (std::getline(ss, line1, '\n'))
-    //     {
-    //         if (line1.find_first_of(":") != std::string::npos && t == 1)
-    //         {
-    //             tmp1 = line1.substr(0, line1.find_first_of(":"));
-    //             tmp2 = line1.substr(line1.find_first_of(":") + 1);
-    //             stor[tmp1] = tmp2;
-    //         }
-    //         else if (t == 0)
-    //         {
-    //             tmp1 = line1.substr(0, line1.find_first_of(" "));
-    //             tmp2 = line1.substr(line1.find_first_of(" ") + 1);
-    //             stor[tmp1] = "webpage" + tmp2.substr(0, tmp2.find_first_of(" "));
-    //             t++;
-    //         }
-    //         else
-    //         {
-    //             t++;
-    //             Content.push_back(line1);
-    //         }
-    //         i++;
-    //     }
-    //     int l = 0;
-    //     i = 0;
-    //     status = "200 OK";
-    //     version = "HTTP/1.1 ";
-    //     error = 0;
-    //     std::cout << someString << std::endl;
-    //         if (stor.find("GET") != stor.end())
-    //             Get_methode(c,envp);
-    //         else if (stor.find("POST") != stor.end())
-    //             Post_methode();
-    //     std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
-    //     write(new_socket, header.c_str(), strlen(header.c_str()));
-    //     close(new_socket);
-    //     stor.clear();
-    // }
-    // close(server_fd);
-}
-
-
-
-int ContaineOnly(std::string str)
-{
-    std::regex e ("[\\n\\r\\n\\r]+");
-    if (std::regex_match(str, e))
-        return 1;
-    return 0;
-}
-
-int indexOfNewLine(std::string str)
-{
-    int i = 0;
-    while (str[i])
-    {
-        if(str[i]=='\n')
-            return (i);
-        i++;
-    }
-    return (i-1);
-}
-
-int isAlpha(std::string str)
-{
-    std::regex e ("[a-zA-Z]+");//iudeheideigefytuvngjcigaicgwiagaiohdisgsx
-    if (std::regex_match(str, e))
-        return 1;
-    return 0;
-}
-
-int isCapital(std::string str)
-{
-    std::regex e ("[A-Z]+");
-    if (std::regex_match(str, e))
-        return 1;
-    return 0;
-}
-
-int numberOfWords(std::string str)
-{
-    int i = 0;
-    int count = 0;
-    while (str[i])
-    {
-        if(str[i]==' ')
-            count++;
-        i++;
-    }
-    return (count+1);
-}
-
-int getNumberOfline(std::string str)
-{
-    int i = 0;
-    int count = 0;
-    while (str[i])
-    {
-        if(str[i]=='\n')
-            count++;
-        i++;
-    }
-    return (count+1);
-}
-
-std::string Server::bufferStor()
-{
-    char buffer[1000];
-    int nDataLength = 2;
-    int loop = 0;
-    int n = 0;
-    int first_line = 0;
+    std::map<int, std::multimap<std::string, std::string> > tmp = p->GetServerMap();
+    mtmp = tmp[1];
+    creatSocket_fd();
     error = 0;
-    
-    someString = "";
-    int sizeOfFile=-1;
-    while ((nDataLength = recv(sd, (void *)&buffer, 999, 0)) > 0)
+    bind_listen();
+    while (1)
     {
-        if(someString.find("\r\n\r\n") != std::string::npos && sizeOfFile < loop)
-            break;
-        bzero(buffer, sizeof(buffer));
-        nDataLength = recv(sd, (void *)&buffer, 999, 0);
-        loop+=nDataLength;
-        if (nDataLength < 0 || nDataLength == 0)
-            break;
-        if(nDataLength > 2 || n != 0)
-        {
-            someString += buffer;
-            if(!first_line)
+            i = 0;
+            FD_ZERO(&readfds);
+            std::cout << "\t\t\t ---waiting for connection--- " << std::endl;
+            while (i < h)
             {
-                // std::cout << someString << std::endl;
-                std::string str = someString.substr(0,someString.find_first_of("\r\n"));
-                if(!isCapital(str.substr(0,str.find_first_of(" "))) || someString.find("HTTP/1.1") == std::string::npos || numberOfWords(str) != 3)
+                nfds = server_fds[i];
+                FD_SET(server_fds[i], &readfds);
+                if(nfds > server_fds[i])
+                    nfds = server_fds[i];
+                i++;
+            }
+            for (i = 0; i < 1024; i++)
+            {
+                sd = client_fds[i];
+                if (sd > 0)
+                    FD_SET(sd, &readfds);
+                if (sd > nfds)
+                    nfds = sd;
+            }
+            timeval tv;
+            tv.tv_sec = 5;
+            tv.tv_usec = 0;
+            if (select(nfds + 1, &readfds, NULL, NULL,&tv) < 0)
+            {
+                perror("select");
+                exit(EXIT_FAILURE);
+            }
+            for (i = 0; i < h; i++)
+            {
+                if (FD_ISSET(server_fds[i], &readfds))
                 {
-                    error = 1;
-                    someString ="<html><head><title>400 Bad Request</title></head><body><h1>Bad Request</h1><p>Bad Request</p></body></html>";
-                    len = someString.size();
-                    return(someString);
+                    int addrlen = sizeof(client_add);
+                    std::cout << "i m waiting here2\n";
+                    int new_sd = accept(server_fds[i], (struct sockaddr *)&client_add, (socklen_t *)&addrlen);
+                    if (new_sd < 0)
+                    {
+                        perror("accept");
+                        continue;
+                    }
+                    for (int j = 0; j <20; j++)
+                    {
+                        if (client_fds[j] == 0)
+                        {
+                            client_fds[j] = new_sd;
+                            FD_SET(new_sd, &readfds);
+                            break;
+                        }
+                    }
+                    fcntl(new_sd, F_SETFL, fcntl(new_sd,F_GETFL) | O_NONBLOCK); // fi chaaaak
+                    std::cout << "New connection accepted " << new_sd << std::endl;
                 }
-                first_line = 1;
             }
-            if(someString.find("Content-Length:") != std::string::npos)
+            for (i = 0; i <1024; i++)
             {
-                int index = someString.find("Content-Length:")+15;
-                sizeOfFile =std::stoi(someString.substr(someString.find("Content-Length:")+15,indexOfNewLine(&someString[index]-1)));
-            }
-            n++;
-        }
-        std::cout << buffer << std::endl;
-        // std::cout << buffer << std::endl << nDataLength << "  "<< sizeOfFile << std::endl;
-    }
-    len = someString.size();
-    if(sizeOfFile != -1)
-    {
-        body = someString.substr(someString.find("\r\n\r\n")+4,someString.size());
-        // if(body.size() != sizeOfFile)
-        {
-            body = body.substr(body.find("\r\n\r\n")+4,body.size());
-            body = body.substr(0,body.find("\r\n"));
-            SaveFile("/home/hamza/Desktop/WebServe/webpage/upload/output.txt", body,body.size());
-        }
-        // someString = someString.substr(0,someString.find("\r\n\r\n")+4);
-    }
-    return(someString);
-
-}
-
-
-void Server::Get_methode(cgi *c,char *envp[])
-{
-  int dir = 0;
-  std::multimap<std::string, std::string> mtmp = loc.find(1)->second;
-  path = "webpage" + mtmp.find("location")->second;
-  if (stor.find("GET")->second.find(".php") == std::string::npos)
-  {
-      if (stor.find("GET")->second == path)
-      {
-          body = getBody(stor.find("GET")->second + "/index.html");
-          len = body.size();
-      }
-      else if ((dir = check_dir(path, stor.find("GET")->second)))
-      {
-          if (dir == 1)
-          {
-              body = getBody(stor.find("GET")->second + "/index.html");
-              len = body.size();
-          }
-          else
-          {
-              body = getBody(stor.find("GET")->second);
-              len = body.size();
-          }
-      }
-      else
-      {
-          body = getBody("webpage/errors/404.html");
-          len = body.size();
-          status = "404 Not Found";
-      }
-  }
-  else
-  {
-      char *argv[3];
-      std::string str("/Users/helkhatr/goinfre/.brew/bin/php-cgi");
-      argv[0] = (char *)str.c_str();
-      argv[1] = (char *)stor.find("GET")->second.c_str();
-      argv[2] = NULL;
-      body = c->CGI(argv, envp);
-      body = body.substr(body.find("\r\n\r\n")+4,body.size());
-      len = body.size();
-  }
-}
-
-void Server::Post_methode()
-{
-
-    std::multimap<std::string, std::string> mtmp = loc.find(1)->second;
-    path = "webpage" + mtmp.find("location")->second;
-    if (mtmp.find("http_methods")->second.find("POST") != std::string::npos)
-    {
-        int dir = 0;
-        if (stor.find("POST")->second == path)
-        {
-            body = getBody(stor.find("POST")->second + "/index.html");
-            lenght = body.size();
-        }
-        else if ((dir = check_dir(path, stor.find("POST")->second)))
-        {
-            if (dir == 1)
-            {
-                body = getBody(stor.find("POST")->second + "/index.html");
-                lenght = body.size();
-            }
-            else
-            {
-                body = getBody(stor.find("POST")->second);
-                lenght = body.size();
+                int t = 0;
+                sd = client_fds[i];
+                if (FD_ISSET(sd, &readfds))
+                {
+                    std::cout << "The client " << sd << "connected"
+                              << "\n" << std::endl;
+                    char buffer[20000];
+                    memset(buffer, 0, sizeof(buffer));
+                    int n = recv(sd, (void *)&buffer, sizeof(buffer), 0);
+                    if (n < 0)
+                    {
+                        perror("recev()"); // This is  to handlelater and see what is wrong
+                        continue;
+                    }
+                    if (n == 0)
+                    {
+                        std::cout << "Client " << sd << " disconnected" << std::endl;
+                        close(sd);
+                        continue; // This is  to handlelater and see what is wrong 
+                        // exit( EXIT_FAILURE);
+                    }
+                    std::cout << "Received " << n << " bytes from client " << sd << std::endl;
+                    std::cout << "Data received: \n" << buffer << std::endl;
+                    std::string str = buffer;
+                    someString = buffer;
+                    std::stringstream ss(someString);
+                    while (std::getline(ss, line1, '\n'))
+                    {
+                        if (line1.find_first_of(":") != std::string::npos && t == 1)
+                        {
+                            tmp1 = line1.substr(0, line1.find_first_of(":"));
+                            tmp2 = line1.substr(line1.find_first_of(":") + 1);
+                            stor[tmp1] = tmp2;
+                        }
+                        else if (t == 0)
+                        {
+                            tmp1 = line1.substr(0, line1.find_first_of(" "));
+                            tmp2 = line1.substr(line1.find_first_of(" ") + 1);
+                            stor[tmp1] = "webpage" + tmp2.substr(0, tmp2.find_first_of(" "));
+                            t++;
+                        }
+                        else
+                        {
+                            t++;
+                            Content.push_back(line1);
+                        }
+                        i++;
+                    }
+                    cgi *c;
+                    loc = p->Getloc_map();
+                    tmp = p->GetServerMap();
+    
+                    int l = 0;
+                    i = 0;
+                    status = "200 OK";
+                    version = "HTTP/1.1 ";
+                    error = 0;
+                    std::cout << someString << std::endl;
+                    if (stor.find("GET") != stor.end())
+                        Get_methode(c, envp);
+                    else if (stor.find("POST") != stor.end())
+                        Post_methode();
+                    std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
+                    write(sd, header.c_str(), strlen(header.c_str()));
+                }
+                fcntl(client_fds[i], F_SETFL, O_NONBLOCK);
             }
         }
-        else
-        {
-            body = getBody("webpage/errors/404.html");
-            lenght = body.size();
-            status = "404 Not Found";
-        }
-    }
-    else
-    {
-        body = getBody("webpage/errors/405.html");
-        lenght = body.size();
-        status = "405 Not Allowed";
-    }
+            close(sd);
+        i = 0;
+            while (i < h)
+                close(server_fds[++i]);
 }
 
 Server::~Server()

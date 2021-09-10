@@ -1,104 +1,73 @@
 
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h>
+// #include "../includes/server.hpp"
 
-#define PORT    5555
-#define MAXMSG  512
+// void Server::creatSocket_fd()
+// {
+//         // ** CREATE SOCKET**/
+//     server_fd = socket(AF_INET, SOCK_STREAM, 0);
+//     if (server_fd == 0)
+//     {
+//         std::cerr << "socket failed" << std::endl;
+//         exit(EXIT_FAILURE);
+//     }
+//     ///Set Socket
+//     //int setsockopt(int socket, int level, int option_name, const void *option_value, socklen_t option_length);
+//     //it helps in reuse of address and port
+//     int buffsize = 1;
+//     if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &buffsize, sizeof(buffsize)))
+//     {
+//         perror("setsockopt");
+//         exit(EXIT_FAILURE);
+//     }
+//     // bind an IP add and a port to a  socket
+//     //   p->GetServerMap().find()
+// }
 
-int
-read_from_client (int filedes)
-{
-  char buffer[MAXMSG];
-  int nbytes;
+// void Server::bind_listen()
+// {
+//     add.sin_port = htons(std::stoi(mtmp.find("listen")->second));
+//     add.sin_family = AF_INET;
+//     if (mtmp.find("server_addr")->second.c_str() != NULL)
+//         add.sin_addr.s_addr = inet_addr(mtmp.find("server_addr")->second.c_str());
+//     else
+//         add.sin_addr.s_addr = INADDR_ANY;
+//     memset(add.sin_zero, '\0', sizeof add.sin_zero); // why help to pad from sockaddr_in to sockaddr
+//     // Forcefully attaching socket to the PORT
+//     if (bind(server_fd, (struct sockaddr *)&add, sizeof(add)) < 0)
+//     {
+//         perror("Bind");
+//         std::cerr << "Bind failed" << std::endl;
+//         exit(EXIT_FAILURE);
+//     }
+//     // wait for an incoming connection
+//     if (listen(server_fd, SOMAXCONN)) // SOMAXCONN is the maximum number of pending connections that can be queued up before connections are refused.
+//     {
+//         std::cerr << "Listening failed" << std::endl;
+//         exit(EXIT_FAILURE);
+//     }
+//     sizeof_add = sizeof(add);
+// }
+// //  for one server
+// void Server::accept_socket()
+// {
+//     size_client = sizeof(client); 
+//     if ((new_socket = accept(server_fd, (struct sockaddr *)&client,
+//                              &size_client)) < 0)
+//     {
+//         std::cerr << "acceptance failed" << std::endl;
+//         exit(EXIT_FAILURE);
+//     }
 
-  nbytes = read (filedes, buffer, MAXMSG);
-  if (nbytes < 0)
-    {
-      /* Read error. */
-      perror ("read");
-      exit (EXIT_FAILURE);
-    }
-  else if (nbytes == 0)
-    /* End-of-file. */
-    return -1;
-  else
-    {
-      /* Data read. */
-      fprintf (stderr, "Server: got message: `%s'\n", buffer);
-      return 0;
-    }
-}
+// }
 
-int
-main (void)
-{
-  extern int make_socket (uint16_t port);
-  int sock;
-  fd_set active_fd_set, read_fd_set;
-  int i;
-  struct sockaddr_in clientname;
-  size_t size;
+// // void Server::accept_socket()
+// // {
+// //     // initialize the bit set before calling FD_SET() to set a socket as a member. ==>clear set
+// //     FD_ZERO(&readfds);
+// //     // add socket_fd to the set 
+// //     FD_SET(server_fd, &readfds);
+// //     nfds = server_fd;
 
-  /* Create the socket and set it up to accept connections. */
-  sock = make_socket (PORT);
-  if (listen (sock, 1) < 0)
-    {
-      perror ("listen");
-      exit (EXIT_FAILURE);
-    }
+    
 
-  /* Initialize the set of active sockets. */
-  FD_ZERO (&active_fd_set);
-  FD_SET (sock, &active_fd_set);
-
-  while (1)
-    {
-      /* Block until input arrives on one or more active sockets. */
-      read_fd_set = active_fd_set;
-      if (select (FD_SETSIZE, &read_fd_set, NULL, NULL, NULL) < 0)
-        {
-          perror ("select");
-          exit (EXIT_FAILURE);
-        }
-
-      /* Service all the sockets with input pending. */
-      for (i = 0; i < FD_SETSIZE; ++i)
-        if (FD_ISSET (i, &read_fd_set))
-          {
-            if (i == sock)
-              {
-                /* Connection request on original socket. */
-                int new;
-                size = sizeof (clientname);
-                new = accept (sock,
-                              (struct sockaddr *) &clientname,
-                              &size);
-                if (new < 0)
-                  {
-                    perror ("accept");
-                    exit (EXIT_FAILURE);
-                  }
-                fprintf (stderr,
-                         "Server: connect from host %s, port %hd.\n",
-                         inet_ntoa (clientname.sin_addr),
-                         ntohs (clientname.sin_port));
-                FD_SET (new, &active_fd_set);
-              }
-            else
-              {
-                /* Data arriving on an already-connected socket. */
-                if (read_from_client (i) < 0)
-                  {
-                    close (i);
-                    FD_CLR (i, &active_fd_set);
-                  }
-              }
-          }
-    }
-}
+// // }

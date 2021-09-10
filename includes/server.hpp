@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/09 14:25:23 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/10 18:40:52 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class Server
          
     //set of socket descriptors
     int activity;
+    int h;
         fd_set readfds;
         int nfds;
         std::string version;
@@ -59,6 +60,7 @@ class Server
         int *server_fds;
         int *max_fds;
         struct sockaddr_in *address;
+                struct sockaddr_in client_add;
         int new_socket;// conection establish btw client & server
         int client_fds[2048]; //client that conect to server eiith max of 1024
         int child_fd; //child sockets to set
@@ -87,7 +89,10 @@ class Server
         void Get_methode(cgi *c,char *envp[]);
         void Post_methode();
         char *removeHTTPHeader(char *buffer, int &bodySize);
+        // void multi_server(Parsing *p,char*envp[]);
+        int calcul_liten(std::map<int, std::multimap<std::string, std::string> > tmp);
         void multi_server(Parsing *p,char*envp[]);
+        void SetAll_FD();
 };
 
 #endif

@@ -6,12 +6,11 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/03 21:46:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/08 12:19:31 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/10 18:02:00 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
-
 
 char * Server::removeHTTPHeader(char *buffer, int &bodySize)
  {
