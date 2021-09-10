@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/10 19:00:36 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/10 19:22:45 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ Server::Server(Parsing *p,char *envp[])
         i = 0;
         FD_ZERO(&readfds);
         std::cout << "\t\t\t ---waiting for connection--- " << std::endl;
-        int i = 0;
         SetAll_FD();
         timeval tv;
         tv.tv_sec = 5;
@@ -96,19 +95,21 @@ Server::Server(Parsing *p,char *envp[])
                           << "\n" << std::endl;
                 char buffer[20000];
                 memset(buffer, 0, sizeof(buffer));
-                int n = recv(sd, (void *)&buffer, sizeof(buffer), 0);
-                if (n < 0)
+                int n ;
+                // if (n < 0)
+                // {
+                //     perror("recev()"); // This is  to handlelater and see what is wrong
+                //     continue;
+                // }
+                // if (n == 0)
+                // {
+                //     std::cout << "Client " << sd << " disconnected" << std::endl;
+                //     close(sd);
+                //     continue; // This is  to handlelater and see what is wrong 
+                //     // exit( EXIT_FAILURE);
+                // }
+                while((n = recv(sd, (void *)&buffer, sizeof(buffer), 0)) >0)
                 {
-                    perror("recev()"); // This is  to handlelater and see what is wrong
-                    continue;
-                }
-                if (n == 0)
-                {
-                    std::cout << "Client " << sd << " disconnected" << std::endl;
-                    close(sd);
-                    continue; // This is  to handlelater and see what is wrong 
-                    // exit( EXIT_FAILURE);
-                }
                 std::cout << "Received " << n << " bytes from client " << sd << std::endl;
                 std::cout << "Data received: \n" << buffer << std::endl;
                 std::string str = buffer;
@@ -151,6 +152,7 @@ Server::Server(Parsing *p,char *envp[])
                     Post_methode();
                 std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
                 write(sd, header.c_str(), strlen(header.c_str()));
+                }
             }
             fcntl(client_fds[i], F_SETFL, O_NONBLOCK);
         }
