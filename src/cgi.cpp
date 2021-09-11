@@ -40,7 +40,6 @@ std::string cgi::CGI(char *av[], char *envp[])
     {
         dup2(fd[1], STDOUT_FILENO);// 1
         close(fd[0]);
-        // close(fd[1]);
         chdir("/home/hamza/Desktop/WebServe/webpage/cgi");
         execve(av[0], av, envp);
         perror("execve");
@@ -48,7 +47,6 @@ std::string cgi::CGI(char *av[], char *envp[])
     }
     else
     {
-
         close(fd[1]);
         int nbytes;
         while ((nbytes = read(fd[0], foo, sizeof(foo))))
@@ -57,6 +55,3 @@ std::string cgi::CGI(char *av[], char *envp[])
     }
     return (str);
 }
-
-/*
-*/

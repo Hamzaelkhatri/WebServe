@@ -96,7 +96,8 @@ void Server::bind_listen()
     /**********************Bind**************************************/
     while (i < h)
     {
-        char *s = inet_ntoa(address[i].sin_addr);
+        fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
+        // char *s = inet_ntoa(address[i].sin_addr);
         if (bind(server_fds[i], (struct sockaddr *)(&address[i]), sizeof(address[i])) < 0)
             perror("Bind");
         if (listen(server_fds[i],10) < 0)
@@ -106,19 +107,19 @@ void Server::bind_listen()
         }
         i++;
     }
-        for (i = 0; i < 1024; i++)
+        for (i = 0; i < 1000; i++)
     {
         client_fds[i] = 0;
     }
 }
 void Server::accept_socket()
 {
-    size_client = sizeof(client); 
-    if ((new_socket = accept(server_fd, (struct sockaddr *)&client,
-                             &size_client)) < 0)
-    {
-        std::cerr << "acceptance failed" << std::endl;
-        exit(EXIT_FAILURE);
-    }
+    // size_client = sizeof(client); 
+    // if ((new_socket = accept(server_fd, (struct sockaddr *)&client,
+    //                          &size_client)) < 0)
+    // {
+    //     std::cerr << "acceptance failed" << std::endl;
+    //     exit(EXIT_FAILURE);
+    // }
 
 }

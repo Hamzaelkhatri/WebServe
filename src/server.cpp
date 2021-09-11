@@ -12,26 +12,32 @@
 
 #include "../includes/Webserv.hpp"
 
-
 void Server::SetAll_FD()
 {
-    int i = 0;
+        int i = 0;
+    int count = 0;
+
     while (i < h)
     {
         nfds = server_fds[i];
         FD_SET(server_fds[i], &readfds);
+        if(FD_ISSET(server_fds[i], &readfds))
+            count++;
         if(nfds > server_fds[i])
             nfds = server_fds[i];
         i++;
     }
-    for (i = 0; i < 1024; i++)
+    for (i = 0; i < 1000; i++)
     {
         sd = client_fds[i];
         if (sd > 0)
             FD_SET(sd, &readfds);
+        if(FD_ISSET( client_fds[i], &readfds))
+            count++;
         if (sd > nfds)
             nfds = sd;
     }
+    std::cout << "count "  << count << std::endl;
 }
 
 Server::Server(Parsing *p,char *envp[])
@@ -46,6 +52,7 @@ Server::Server(Parsing *p,char *envp[])
     creatSocket_fd();
     error = 0;
     bind_listen();
+
     while (1)
     {
         i = 0;
@@ -72,46 +79,37 @@ Server::Server(Parsing *p,char *envp[])
                     perror("accept");
                     continue;
                 }
-                for (int j = 0; j <20; j++)
+                for (int j = 0; j < 1000; j++)
                 {
                     if (client_fds[j] == 0)
                     {
                         client_fds[j] = new_sd;
-                        FD_SET(new_sd, &readfds);
+                        FD_SET(client_fds[j], &readfds);
                         break;
                     }
                 }
-                fcntl(new_sd, F_SETFL, fcntl(new_sd,F_GETFL) | O_NONBLOCK); // fi chaaaak
                 std::cout << "New connection accepted " << new_sd << std::endl;
             }
         }
-        for (i = 0; i < 1024; i++)
+        int n ;
+        for (i = 0; i < 1000; i++)
         {
             int t = 0;
             sd = client_fds[i];
+                fcntl(sd, F_SETFL, O_NONBLOCK);
             if (FD_ISSET(sd, &readfds))
             {
-                std::cout << "The client " << sd << "connected"
-                          << "\n" << std::endl;
-                char buffer[20000];
-                memset(buffer, 0, sizeof(buffer));
-                int n ;
-                // if (n < 0)
-                // {
-                //     perror("recev()"); // This is  to handlelater and see what is wrong
-                //     continue;
-                // }
-                // if (n == 0)
-                // {
-                //     std::cout << "Client " << sd << " disconnected" << std::endl;
-                //     close(sd);
-                //     continue; // This is  to handlelater and see what is wrong 
-                //     // exit( EXIT_FAILURE);
-                // }
-                while((n = recv(sd, (void *)&buffer, sizeof(buffer), 0)) >0)
+                std::cout << "The client " << sd << " connected"  << std::endl;
+                char buffer[1000];
+                bzero(buffer, 1000);
+                n = recv(sd, (void *)&buffer, sizeof(buffer), 0);
+                if (n < 0)
+                    continue;
+                if (n == 0)
                 {
-                std::cout << "Received " << n << " bytes from client " << sd << std::endl;
-                std::cout << "Data received: \n" << buffer << std::endl;
+                    std::cout << "Client " << sd << " disconnected" << std::endl;
+                    continue;
+                }
                 std::string str = buffer;
                 someString = buffer;
                 std::stringstream ss(someString);
@@ -137,30 +135,20 @@ Server::Server(Parsing *p,char *envp[])
                     }
                     i++;
                 }
-                cgi *c;
-                loc = p->Getloc_map();
-                tmp = p->GetServerMap();
-                int l = 0;
                 i = 0;
                 status = "200 OK";
                 version = "HTTP/1.1 ";
                 error = 0;
-                std::cout << someString << std::endl;
                 if (stor.find("GET") != stor.end())
                     Get_methode(c, envp);
                 else if (stor.find("POST") != stor.end())
                     Post_methode();
                 std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
                 write(sd, header.c_str(), strlen(header.c_str()));
-                }
             }
-            fcntl(client_fds[i], F_SETFL, O_NONBLOCK);
         }
     }
-    close(sd);
     i = 0;
-    while (i < h)
-        close(server_fds[++i]);
 }
 
 Server::~Server()
