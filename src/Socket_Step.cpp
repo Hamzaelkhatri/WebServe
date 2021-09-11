@@ -100,7 +100,7 @@ void Server::bind_listen()
         // char *s = inet_ntoa(address[i].sin_addr);
         if (bind(server_fds[i], (struct sockaddr *)(&address[i]), sizeof(address[i])) < 0)
             perror("Bind");
-        if (listen(server_fds[i],10) < 0)
+        if (listen(server_fds[i],1000) < 0)
         {
             perror("listen");
             exit(EXIT_FAILURE);
