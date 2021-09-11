@@ -21,8 +21,8 @@ void Server::SetAll_FD()
     {
         nfds = server_fds[i];
         FD_SET(server_fds[i], &readfds);
-        if(FD_ISSET(server_fds[i], &readfds))
-            count++;
+        // if(FD_ISSET(server_fds[i], &readfds))
+        //     count++;
         if(nfds > server_fds[i])
             nfds = server_fds[i];
         i++;
@@ -32,12 +32,11 @@ void Server::SetAll_FD()
         sd = client_fds[i];
         if (sd > 0)
             FD_SET(sd, &readfds);
-        if(FD_ISSET( client_fds[i], &readfds))
-            count++;
+        // if(FD_ISSET( client_fds[i], &readfds))
+        //     count++;
         if (sd > nfds)
             nfds = sd;
     }
-    std::cout << "count "  << count << std::endl;
 }
 
 Server::Server(Parsing *p,char *envp[])
@@ -72,7 +71,6 @@ Server::Server(Parsing *p,char *envp[])
             if (FD_ISSET(server_fds[i], &readfds))
             {
                 int addrlen = sizeof(client_add);
-                std::cout << "i m waiting here2\n";
                 int new_sd = accept(server_fds[i], (struct sockaddr *)&client_add, (socklen_t *)&addrlen);
                 if (new_sd < 0)
                 {
@@ -84,11 +82,11 @@ Server::Server(Parsing *p,char *envp[])
                     if (client_fds[j] == 0)
                     {
                         client_fds[j] = new_sd;
-                        FD_SET(client_fds[j], &readfds);
+                        FD_SET(new_sd, &readfds);
                         break;
                     }
                 }
-                std::cout << "New connection accepted " << new_sd << std::endl;
+                // std::cout << "New connection accepted " << new_sd << std::endl;
             }
         }
         int n ;
@@ -96,10 +94,10 @@ Server::Server(Parsing *p,char *envp[])
         {
             int t = 0;
             sd = client_fds[i];
-                fcntl(sd, F_SETFL, O_NONBLOCK);
             if (FD_ISSET(sd, &readfds))
             {
-                std::cout << "The client " << sd << " connected"  << std::endl;
+                fcntl(sd, F_SETFL, O_NONBLOCK);
+                // std::cout << "The client " << sd << " connected"  << std::endl;
                 char buffer[1000];
                 bzero(buffer, 1000);
                 n = recv(sd, (void *)&buffer, sizeof(buffer), 0);
@@ -107,7 +105,8 @@ Server::Server(Parsing *p,char *envp[])
                     continue;
                 if (n == 0)
                 {
-                    std::cout << "Client " << sd << " disconnected" << std::endl;
+                    // FD_CLR(sd, &readfds);
+                    // std::cout << "The client " << sd << " disconnected" << std::endl;
                     continue;
                 }
                 std::string str = buffer;
@@ -148,7 +147,10 @@ Server::Server(Parsing *p,char *envp[])
             }
         }
     }
+    close(sd);
     i = 0;
+    while(i < h)
+        close(server_fds[i++]);
 }
 
 Server::~Server()
