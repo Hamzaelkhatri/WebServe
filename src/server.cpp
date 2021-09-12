@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/12 23:03:56 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/12 23:12:20 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,7 +110,7 @@ Server::Server(Parsing *p,char *envp[])
                 {
                     close (sd);
                     FD_CLR (sd, &readfds);
-                    std::cout << "Client Desconnected" <<  inet_ntoa(client.sin_addr) << std::endl;
+                    std::cout << "Client Desconnected " <<  inet_ntoa(client.sin_addr)<<  ":" << ntohs(client.sin_port)  << std::endl;
                 }
                 status = "200 OK";
                 version = "HTTP/1.1 ";
