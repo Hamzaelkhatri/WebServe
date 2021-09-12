@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/12 23:12:20 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/12 23:14:46 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@ int  Server::_Accept_client(int sock)
 
 int Server::_Get_request(int csock)
 {
-    char buf[BUFSIZ + 1];
+    char buf[BUFFER_SIZE + 1];
     int n;
     int i = 0;
-    while ((n = recv(csock, buf, BUFSIZ, 0)) > 0)
+    while ((n = recv(csock, buf, BUFFER_SIZE, 0)) > 0)
     {
         buf[n] = '\0';
         if (i == 0)
@@ -96,10 +96,10 @@ Server::Server(Parsing *p,char *envp[])
             sd = clients[i];
             if(FD_ISSET(sd, &readfds))
             {
-                char buffer[BUFSIZ + 1];
+                char buffer[BUFFER_SIZE + 1];
                 int n;
-                bzero(buffer, BUFSIZ + 1);
-                n = recv(sd, buffer, BUFSIZ, 0);
+                bzero(buffer, BUFFER_SIZE + 1);
+                n = recv(sd, buffer, BUFFER_SIZE, 0);
                 if (n == 0)
                 {
                     i++;
