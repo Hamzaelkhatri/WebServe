@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/12 16:45:09 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/12 11:10:15 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,55 +33,67 @@
 #include <string>
 #include <regex>
 #include <arpa/inet.h> 
-#include "socket.hpp"
-#include "pars.hpp"
-#include <string.h>
 
-#define BUFSIZ  1024
-
-class Socket;
-class Server  : public Socket 
+class Server 
 {
     private:
-    std::string status;
+         
+    //set of socket descriptors
+    int activity;
+    int h;
+        fd_set readfds;
+        int nfds;
+        std::string version;
+        int lenght;
+        int error;
+        std::string status;
         std::string tmp2;
         std::string tmp1;
         std::string body;
         std::string line1;
         std::string path;
         int sd;
-        int len;
         std::string someString;
+        int len;
+        int max_client;
+        int server_fd; // socket descriptor, an integer!
+        std::vector<int> server_fds;
+        std::vector<struct sockaddr_in>  address;
+        struct sockaddr_in tmp_add;
+
+        struct sockaddr_in client_add;
+        int new_socket;// conection establish btw client & server
+        int client_fds[2048]; //client that conect to server eiith max of 1024
+        int child_fd; //child sockets to set
+        int ready; //result of select()
+        struct sockaddr_in add;
+        int sizeof_add;
+        int valrecv;  // communication part
+        struct sockaddr_in client; // socklen_t size of adress
+        socklen_t size_client;
         std::map<std::string, std::string> stor;
+        std::map<int, std::multimap<std::string, std::string> > tmp;
+        std::multimap<int, std::multimap<std::string, std::string> > loc;
+        std::multimap<std::string, std::string> mtmp;
         std::vector<std::string> Content;
-         std::multimap<int, std::multimap<std::string, std::string> > loc;
-
-        int lenght;
-        //
-        Socket *sock;
-        //select attrubutes
-        char * request;
-        fd_set readfds;
-        fd_set writefds;
-        fd_set exceptfds;
-        int maxfd;
-        int nfds;
-        int csock;
-        std::vector<int> clients;
-        struct sockaddr_in client;
-
     public:
-        Server( Parsing *pars,char *envp[]);
-        int _Accept_client(int sock);
-        int _Get_request(int csock);
+        Server(Parsing *p,char *envp[]);
         ~Server();
+        void creatSocket_fd(void);
+        void bind_listen(void);
+        void accept_socket();
+        std::string getBody(std::string path);
+        void SaveFile(std::string path, std::string body,int size);
+        int check_dir(std::string dir, std::string str);
+        int check_index(std::string str);
+        std::string bufferStor();
         void Get_methode(cgi *c,char *envp[]);
         void Post_methode();
-       
-        std::string getBody(std::string path);
-        int check_dir(std::string dir, std::string str);
-
-int check_index(std::string str);
+        char *removeHTTPHeader(char *buffer, int &bodySize);
+        // void multi_server(Parsing *p,char*envp[]);
+        int calcul_liten(std::map<int, std::multimap<std::string, std::string> > tmp);
+        void multi_server(Parsing *p,char*envp[]);
+        void SetAll_FD();
 };
 
 #endif

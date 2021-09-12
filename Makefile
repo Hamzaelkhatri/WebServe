@@ -13,9 +13,12 @@ SRC_NAME= main.cpp\
 		  pars.cpp\
 		  cgi.cpp\
 		  server_tools.cpp\
-		  Socket_Step.cpp\
+		  socket.cpp\
 		  multi_tools.cpp\
 		  methods.cpp\
+		  socket_tools.cpp\
+		  get_sockets.cpp\
+		  set_socket.cpp\
 
 
 OBJ_NAME= $(SRC_NAME:.cpp=.o)

@@ -6,153 +6,119 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/11 18:35:47 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/12 17:36:52 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Webserv.hpp"
 
-void Server::SetAll_FD()
+int  Server::_Accept_client(int sock)
 {
-        int i = 0;
-    int count = 0;
-
-    while (i < h)
-    {
-        nfds = server_fds[i];
-        FD_SET(server_fds[i], &readfds);
-        // if(FD_ISSET(server_fds[i], &readfds))
-        //     count++;
-        if(nfds > server_fds[i])
-            nfds = server_fds[i];
-        i++;
-    }
-    for (i = 0; i < 1024; i++)
-    {
-        sd = client_fds[i];
-        if (sd > 0)
-            FD_SET(sd, &readfds);
-        // if(FD_ISSET( client_fds[i], &readfds))
-        //     count++;
-        if (sd > nfds)
-            nfds = sd;
-    }
+    socklen_t client_len = sizeof(client);
+    csock = accept(sock, (struct sockaddr *)&client, &client_len);
+    return (csock);
 }
+
+int Server::_Get_request(int csock)
+{
+    char buf[BUFSIZ + 1];
+    int n;
+    int i = 0;
+    while ((n = recv(csock, buf, BUFSIZ, 0)) > 0)
+    {
+        buf[n] = '\0';
+        if (i == 0)
+        {
+            std::strcpy(this->request, buf);
+            i++;
+        }
+        else
+        {
+            std::strcat(this->request, buf);
+        }
+    }
+    std::cout << buf << std::endl;
+    return (n);
+}
+
 
 Server::Server(Parsing *p,char *envp[])
 {
-    int i ;
-    h = calcul_liten(p->GetServerMap());
-    cgi *c;
-    loc = p->Getloc_map();
-    tmp = p->GetServerMap();
-    std::map<int, std::multimap<std::string, std::string> > tmp = p->GetServerMap();
-    mtmp = tmp[1];
-    creatSocket_fd();
-    error = 0;
-    bind_listen();
-
+    std::string version;
+    this->sock = new Socket(p);
+    maxfd = -1;
+    csock = -1;
+    int j = 0;
     while (1)
     {
-        i = 0;
         FD_ZERO(&readfds);
-        std::cout << "\t\t\t ---waiting for connection--- "  << std::endl;
-        SetAll_FD();
-        timeval tv;
-        tv.tv_sec = 5;
-        tv.tv_usec = 0;
-        if (select(nfds + 1, &readfds, NULL, NULL,NULL) < 0)
+        int i = 0;
+        while( i < this->sock->_Get_h() )
+        {
+            maxfd = this->sock->_Get_server_fds()[i];
+            FD_SET(this->sock->_Get_server_fds()[i], &readfds);
+            if(this->sock->_Get_server_fds()[i] > maxfd) 
+                maxfd = this->sock->_Get_server_fds()[i];
+            i++;
+        }   
+        if(select(maxfd + 1, &readfds, NULL, NULL, NULL) == -1)
         {
             perror("select");
-            exit(EXIT_FAILURE);
-        }      
-        for (i = 0; i < h; i++)
+            exit(EXIT_FAILURE);            
+        }
+        i = 0;
+        j = 0;
+        while( i < this->sock->_Get_h())
         {
-            if (FD_ISSET(server_fds[i], &readfds))
+            if(FD_ISSET(this->sock->_Get_server_fds()[i], &readfds))
             {
-                int addrlen = sizeof(client_add);
-                int new_sd = accept(server_fds[i], (struct sockaddr *)&client_add, (socklen_t *)&addrlen);
-                if (new_sd < 0)
+                if(_Accept_client(this->sock->_Get_server_fds()[i]) == -1)
                 {
                     perror("accept");
-                    continue;
+                    exit(EXIT_FAILURE);
                 }
-                for (int j = 0; j < 1024; j++)
-                {
-                    if (client_fds[j] == 0)
-                    {
-                        client_fds[j] = new_sd;
-                        FD_SET(new_sd, &readfds);
-                        break;
-                    }
-                }
-                // std::cout << "New connection accepted " << new_sd << std::endl;
+                char *ip = inet_ntoa(client.sin_addr);
+                printf("New connection from %s\n", ip);
+                clients.push_back(csock);
             }
+            i++;
         }
-        int n ;
-        for (i = 0; i < 1024; i++)
+        for(i = 0; i < clients.size(); i++)
+            FD_SET(clients[i], &readfds);
+        i = 0;
+        while( i < clients.size())
         {
-            int t = 0;
-            sd = client_fds[i];
-            if (FD_ISSET(sd, &readfds))
+            sd = clients[i];
+            if(FD_ISSET(sd, &readfds))
             {
-                fcntl(sd, F_SETFL, O_NONBLOCK);
-                // std::cout << "The client " << sd << " connected"  << std::endl;
-                char buffer[1024];
-                bzero(buffer, 1024);
-                n = recv(sd, (void *)&buffer, sizeof(buffer), 0);
-                if (n < 0)
-                    continue;
+                char buffer[BUFSIZ + 1];
+                int n;
+                n = recv(sd, buffer, BUFSIZ, 0);
                 if (n == 0)
                 {
-                    // FD_CLR(sd, &readfds);
-                    // std::cout << "The client " << sd << " disconnected" << std::endl;
+                    i++;
+                    std::cout << "Client Desconnected" <<  inet_ntoa(client.sin_addr) << std::endl;
+                    close(sd);
                     continue;
                 }
-                std::string str = buffer;
-                someString = buffer;
-                std::stringstream ss(someString);
-                while (std::getline(ss, line1, '\n'))
+                if( n == -1)
                 {
-                    if (line1.find_first_of(":") != std::string::npos && t == 1)
-                    {
-                        tmp1 = line1.substr(0, line1.find_first_of(":"));
-                        tmp2 = line1.substr(line1.find_first_of(":") + 1);
-                        stor[tmp1] = tmp2;
-                    }
-                    else if (t == 0)
-                    {
-                        tmp1 = line1.substr(0, line1.find_first_of(" "));
-                        tmp2 = line1.substr(line1.find_first_of(" ") + 1);
-                        stor[tmp1] = "webpage" + tmp2.substr(0, tmp2.find_first_of(" "));
-                        t++;
-                    }
-                    else
-                    {
-                        t++;
-                        Content.push_back(line1);
-                    }
                     i++;
+                    continue;
                 }
                 i = 0;
                 status = "200 OK";
                 version = "HTTP/1.1 ";
-                error = 0;
-                if (stor.find("GET") != stor.end())
-                    Get_methode(c, envp);
-                else if (stor.find("POST") != stor.end())
-                    Post_methode();
-                std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
+                std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: 12\n\n" + "HELO WORLD";
                 write(sd, header.c_str(), strlen(header.c_str()));
+                close(sd);
             }
+            fcntl(sd, F_SETFL, O_NONBLOCK);
+            i++;
         }
     }
-    close(sd);
-    i = 0;
-    while(i < h)
-        close(server_fds[i++]);
 }
-
 Server::~Server()
 {
+    delete this->sock;
 }

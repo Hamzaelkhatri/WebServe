@@ -6,16 +6,33 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/10 18:03:12 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/12 16:43:57 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/Webserv.hpp"
+#include "../includes/server.hpp"
 
+std::string Server::getBody(std::string path)
+{
+    std::string body;
+    std::ifstream file(path);
+    if (file.is_open())
+    {
+        std::string line;
+        while (getline(file, line))
+        {
+            body += line;
+            body += "\n";
+        }
+        file.close();
+    }
+    return body;
+}
 
 void Server::Get_methode(cgi *c,char *envp[])
 {
   int dir = 0;
+
   std::multimap<std::string, std::string> mtmp = loc.find(1)->second;
   path = "webpage" + mtmp.find("location")->second;
   if (stor.find("GET")->second.find(".php") == std::string::npos)

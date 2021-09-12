@@ -5,8 +5,7 @@
 #include "tools.hpp"
 #include "server.hpp"
 #include "pars.hpp"
-
-
+#include "socket.hpp"
 
 
 #endif

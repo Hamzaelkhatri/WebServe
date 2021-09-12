@@ -6,34 +6,34 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 18:49:10 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/10 17:34:02 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/12 15:39:42 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
-int Server::calcul_liten(std::map<int, std::multimap<std::string, std::string> > tmp)
-{
-    int i = 0;
-    std::map<int, std::multimap<std::string, std::string> >::iterator it0;
-    std::multimap<std::string, std::string>::iterator it;
-    for (it0 = tmp.begin(); it0 != tmp.end(); ++it0)
-    {
-        for (it = it0->second.begin(); it != it0->second.end(); ++it)
-        {
-            if (it->first == "listen")
-            {
-                // listen[i] = std::stoi(it->second);
-                // std::cout<< " listen to port " << it->second<< std::endl;
-                i++;
-            }
-        }
-    }
-    return (i);
-}
+// int Server::calcul_liten(std::map<int, std::multimap<std::string, std::string> > tmp)
+// {
+//     int i = 0;
+//     std::map<int, std::multimap<std::string, std::string> >::iterator it0;
+//     std::multimap<std::string, std::string>::iterator it;
+//     for (it0 = tmp.begin(); it0 != tmp.end(); ++it0)
+//     {
+//         for (it = it0->second.begin(); it != it0->second.end(); ++it)
+//         {
+//             if (it->first == "listen")
+//             {
+//                 // listen[i] = std::stoi(it->second);
+//                 // std::cout<< " listen to port " << it->second<< std::endl;
+//                 i++;
+//             }
+//         }
+//     }
+//     return (i);
+// }
 
-void Server::multi_server(Parsing *p, char *envp[])
-{
+// void Server::multi_server(Parsing *p, char *envp[])
+// {
 //     int i = 0;
 //     h = calcul_liten(p->GetServerMap());
 //     // std::cout << "h ==> " << h << std::endl;
@@ -270,4 +270,5 @@ void Server::multi_server(Parsing *p, char *envp[])
 //         while (i < h)
 //             close(server_fds[++i]);
 //     i = 0;
-}
+// }
+// 

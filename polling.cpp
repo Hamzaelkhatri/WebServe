@@ -17,7 +17,7 @@
 #include <arpa/inet.h> 
 #include <poll.h>
 
-#define SERVER_PORT  5000
+#define SERVER_PORT  12345
 
 #define TRUE             1
 #define FALSE            0

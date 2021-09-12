@@ -6,22 +6,22 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/03 21:46:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/10 18:02:00 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/12 16:44:58 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
 
-char * Server::removeHTTPHeader(char *buffer, int &bodySize)
- {
-    char *t = strstr(buffer, "\r\n\r\n");
-    t = t + 4;
+// char * removeHTTPHeader(char *buffer, int &bodySize)
+//  {
+//     char *t = strstr(buffer, "\r\n\r\n");
+//     t = t + 4;
 
-    for (char* it = buffer; it != t; ++it) 
-        ++bodySize;
+//     for (char* it = buffer; it != t; ++it) 
+//         ++bodySize;
 
-    return t;
-}
+//     return t;
+// }
 
 
 int Server::check_index(std::string str)
@@ -84,30 +84,30 @@ int Server::check_dir(std::string dir, std::string str)
     return (2);
 }
 
-std::string Server::getBody(std::string path)
-{
-    std::string body;
-    std::ifstream file(path);
-    if (file.is_open())
-    {
-        std::string line;
-        while (getline(file, line))
-        {
-            body += line;
-            body += "\n";
-        }
-        file.close();
-    }
-    return body;
-}
+// std::string Server::getBody(std::string path)
+// {
+//     std::string body;
+//     std::ifstream file(path);
+//     if (file.is_open())
+//     {
+//         std::string line;
+//         while (getline(file, line))
+//         {
+//             body += line;
+//             body += "\n";
+//         }
+//         file.close();
+//     }
+//     return body;
+// }
 
-void Server::SaveFile(std::string path, std::string body,int size)
-{
-    std::ofstream file(path, std::ios::out | std::ios::binary);
-    if (file.is_open())
-    {
-        file.write(body.c_str(), size);
-        file.close();
-    }
-}
+// void Server::SaveFile(std::string path, std::string body,int size)
+// {
+//     std::ofstream file(path, std::ios::out | std::ios::binary);
+//     if (file.is_open())
+//     {
+//         file.write(body.c_str(), size);
+//         file.close();
+//     }
+// }
 
