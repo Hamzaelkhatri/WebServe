@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/12 17:36:52 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/12 18:43:10 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,11 +80,17 @@ Server::Server(Parsing *p,char *envp[])
                 char *ip = inet_ntoa(client.sin_addr);
                 printf("New connection from %s\n", ip);
                 clients.push_back(csock);
+                break;
             }
             i++;
         }
         for(i = 0; i < clients.size(); i++)
-            FD_SET(clients[i], &readfds);
+            {
+                maxfd = clients[i];
+                FD_SET(clients[i], &readfds);
+                if(clients[i] > maxfd)
+                    maxfd = clients[i];
+            }
         i = 0;
         while( i < clients.size())
         {
@@ -93,6 +99,7 @@ Server::Server(Parsing *p,char *envp[])
             {
                 char buffer[BUFSIZ + 1];
                 int n;
+                bzero(buffer, BUFSIZ + 1);
                 n = recv(sd, buffer, BUFSIZ, 0);
                 if (n == 0)
                 {
@@ -106,7 +113,8 @@ Server::Server(Parsing *p,char *envp[])
                     i++;
                     continue;
                 }
-                i = 0;
+                std::cout << "sd = " << sd << std::endl;
+
                 status = "200 OK";
                 version = "HTTP/1.1 ";
                 std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: 12\n\n" + "HELO WORLD";
