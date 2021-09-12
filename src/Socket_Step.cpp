@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 16:56:46 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/10 17:38:03 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/11 18:35:31 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,14 +100,14 @@ void Server::bind_listen()
         // char *s = inet_ntoa(address[i].sin_addr);
         if (bind(server_fds[i], (struct sockaddr *)(&address[i]), sizeof(address[i])) < 0)
             perror("Bind");
-        if (listen(server_fds[i],1000) < 0)
+        if (listen(server_fds[i],1024) < 0)
         {
             perror("listen");
             exit(EXIT_FAILURE);
         }
         i++;
     }
-        for (i = 0; i < 1000; i++)
+        for (i = 0; i < 1024; i++)
     {
         client_fds[i] = 0;
     }

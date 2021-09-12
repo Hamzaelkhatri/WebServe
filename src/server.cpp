@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/10 19:22:45 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/11 18:35:47 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void Server::SetAll_FD()
             nfds = server_fds[i];
         i++;
     }
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 1024; i++)
     {
         sd = client_fds[i];
         if (sd > 0)
@@ -56,12 +56,12 @@ Server::Server(Parsing *p,char *envp[])
     {
         i = 0;
         FD_ZERO(&readfds);
-        std::cout << "\t\t\t ---waiting for connection--- " << std::endl;
+        std::cout << "\t\t\t ---waiting for connection--- "  << std::endl;
         SetAll_FD();
         timeval tv;
         tv.tv_sec = 5;
         tv.tv_usec = 0;
-        if (select(nfds + 1, &readfds, NULL, NULL,&tv) < 0)
+        if (select(nfds + 1, &readfds, NULL, NULL,NULL) < 0)
         {
             perror("select");
             exit(EXIT_FAILURE);
@@ -77,7 +77,7 @@ Server::Server(Parsing *p,char *envp[])
                     perror("accept");
                     continue;
                 }
-                for (int j = 0; j < 1000; j++)
+                for (int j = 0; j < 1024; j++)
                 {
                     if (client_fds[j] == 0)
                     {
@@ -90,7 +90,7 @@ Server::Server(Parsing *p,char *envp[])
             }
         }
         int n ;
-        for (i = 0; i < 1000; i++)
+        for (i = 0; i < 1024; i++)
         {
             int t = 0;
             sd = client_fds[i];
@@ -98,8 +98,8 @@ Server::Server(Parsing *p,char *envp[])
             {
                 fcntl(sd, F_SETFL, O_NONBLOCK);
                 // std::cout << "The client " << sd << " connected"  << std::endl;
-                char buffer[1000];
-                bzero(buffer, 1000);
+                char buffer[1024];
+                bzero(buffer, 1024);
                 n = recv(sd, (void *)&buffer, sizeof(buffer), 0);
                 if (n < 0)
                     continue;
