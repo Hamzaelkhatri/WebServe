@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/12 18:43:10 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/12 23:01:40 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,8 @@ Server::Server(Parsing *p,char *envp[])
             perror("select");
             exit(EXIT_FAILURE);            
         }
-        i = 0;
         j = 0;
-        while( i < this->sock->_Get_h())
+        for( i = 0; i < this->sock->_Get_h();i++)
         {
             if(FD_ISSET(this->sock->_Get_server_fds()[i], &readfds))
             {
@@ -78,7 +77,7 @@ Server::Server(Parsing *p,char *envp[])
                     exit(EXIT_FAILURE);
                 }
                 char *ip = inet_ntoa(client.sin_addr);
-                printf("New connection from %s\n", ip);
+                std::cout << "New connection from\t" << ip << ":" << ntohs(client.sin_port) << std::endl;
                 clients.push_back(csock);
                 break;
             }
@@ -104,14 +103,14 @@ Server::Server(Parsing *p,char *envp[])
                 if (n == 0)
                 {
                     i++;
-                    std::cout << "Client Desconnected" <<  inet_ntoa(client.sin_addr) << std::endl;
                     close(sd);
                     continue;
                 }
-                if( n == -1)
+                if( n < 0)
                 {
-                    i++;
-                    continue;
+                    close (sd);
+                    FD_CLR (sd, &readfds);
+                    std::cout << "Client Desconnected" <<  inet_ntoa(client.sin_addr) << std::endl;
                 }
                 std::cout << "sd = " << sd << std::endl;
 
