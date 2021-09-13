@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/13 22:59:19 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/13 23:35:56 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ Server::Server(Parsing *p,char *envp[])
         selected = select(maxfd + 1, &readfds, &writefds, NULL, NULL);
         for (i = 0; i <= maxfd && selected > 0 ; i++)
         {
+            fcntl(i, F_SETFL, O_NONBLOCK);
             if(FD_ISSET(i, &readfds))
             {
                 cnx = -1;
@@ -87,6 +88,7 @@ Server::Server(Parsing *p,char *envp[])
                             if (cnx > maxfd)
                                 maxfd = cnx;
                             std::cout <<  cnx <<  "\t  =  New connection" << std::endl;
+                            break;
                         
                         }
                         else
@@ -98,31 +100,34 @@ Server::Server(Parsing *p,char *envp[])
                     else
                     { 
                         bzero(buffer, 2048);
-                        rc = recv(i, buffer, sizeof(buffer), 0);
+                        rc = recv(csock, buffer, sizeof(buffer), 0);
                         if (rc < 0)
                         {
-                            fcntl(i, F_SETFL, O_NONBLOCK);
-                            continue;
+                            // continue;
+                            break;
                         }
                         else if (rc == 0)
                         {
-                            close(i);
-                            FD_CLR(i, &readfds);
-                            FD_CLR(i, &writefds);
-                            std::cout <<  i <<  "\t  =   Diconnected" << std::endl;
+                            close(csock);
+                            FD_CLR(csock, &readfds);
+                            FD_CLR(csock, &writefds);
+                            std::cout <<  csock <<  "\t  =   Diconnected" << std::endl;
+                            // j++;
+                            // continue;
                             break;
+                            
                         }
-                        else
-                        {
-                            std::cout << "Received: " << buffer << std::endl;
-                            if(FD_ISSET(i, &writefds))
+                        // else
+                        // {
+                            std::cout << "Received: \n" << buffer << std::endl;
+                            if(FD_ISSET(csock, &writefds))
                             {
                                 status = "200 OK";
                                 version = "HTTP/1.1 ";
                                 std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length:20\n\n hello World!";
-                                write(i, header.c_str(), strlen(header.c_str()));
+                                write(csock, header.c_str(), strlen(header.c_str()));
                             }
-                        }
+                        // }
                       
                     }
                 }
