@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/12 23:14:24 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/13 22:17:31 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,9 @@ class Server  : public Socket
         int lenght;
         
         //
+        int selected;
         Socket *sock;
+        fd_set masterfds;
         //select attrubutes
         char * request;
         fd_set readfds;
@@ -66,10 +68,12 @@ class Server  : public Socket
         fd_set exceptfds;
         int maxfd;
         int nfds;
+        int cnx;
         int csock;
         std::vector<int> clients;
         struct sockaddr_in client;
-
+        std::vector<int> MasterSockets;
+    
     public:
         Server( Parsing *pars,char *envp[]);
         int _Accept_client(int sock);

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   server_9dima.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/12 14:34:51 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/13 22:49:16 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,13 +248,13 @@ Server::Server(Parsing *p,char *envp[])
                     i++;
                 }
                 i = 0;
-                status = "200 OK";
-                version = "HTTP/1.1 ";
                 error = 0;
                 if (stor.find("GET") != stor.end())
                     Get_methode(c, envp);
                 else if (stor.find("POST") != stor.end())
                     Post_methode();
+                status = "200 OK";
+                version = "HTTP/1.1 ";
                 std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(len) + "\n\n" + body;
                 write(sd, header.c_str(), strlen(header.c_str()));
             }
