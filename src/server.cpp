@@ -102,9 +102,9 @@ Server::Server(Parsing *p,char *envp[])
         while( i < clients.size())
         {
             sd = clients[i];
+            fcntl(sd, F_SETFL, O_NONBLOCK);
             if(FD_ISSET(sd, &readfds))
             {
-                fcntl(sd, F_SETFL, O_NONBLOCK);
                 char buffer[BUFFER_SIZE + 1];
                 int n;
                 bzero(buffer, BUFFER_SIZE + 1);
@@ -120,19 +120,20 @@ Server::Server(Parsing *p,char *envp[])
                 {
                     close (sd);
                     FD_CLR (sd, &readfds);
-                    std::cout << "Client Desconnected " <<  map[sd]  << std::endl;
+                    if(map[sd] != "")
+                        std::cout << "Client Desconnected " <<  map[sd]  << std::endl;
                 }
               
             }
               if(FD_ISSET(sd, &writefds))
-                {
+                {             
+
                 status = "200 OK";
                 version = "HTTP/1.1 ";
                     
                 std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: 12\n\n" + "HELO WORLD";
                 write(sd, header.c_str(), strlen(header.c_str()));
                 FD_CLR(sd, &writefds);
-                close(sd);
                 }
             
             i++;
