@@ -43,7 +43,7 @@ class Socket;
 class Server  : public Socket 
 {
     private:
-    std::string status;
+        std::string status;
         std::string tmp2;
         std::string tmp1;
         std::string body;
@@ -54,9 +54,9 @@ class Server  : public Socket
         std::string someString;
         std::map<std::string, std::string> stor;
         std::vector<std::string> Content;
-         std::multimap<int, std::multimap<std::string, std::string> > loc;
-
+        std::multimap<int, std::multimap<std::string, std::string> > loc;
         int lenght;
+        
         //
         Socket *sock;
         //select attrubutes

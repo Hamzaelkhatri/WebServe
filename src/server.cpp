@@ -52,22 +52,25 @@ Server::Server(Parsing *p,char *envp[])
     while (1)
     {
         FD_ZERO(&readfds);
+        FD_ZERO(&writefds);
         int i = 0;
         while( i < this->sock->_Get_h() )
         {
             maxfd = this->sock->_Get_server_fds()[i];
             FD_SET(this->sock->_Get_server_fds()[i], &readfds);
+            FD_SET(this->sock->_Get_server_fds()[i], &writefds);
             if(this->sock->_Get_server_fds()[i] > maxfd) 
                 maxfd = this->sock->_Get_server_fds()[i];
             i++;
         }
-         if(select(maxfd + 1, &readfds, NULL, NULL, NULL) == -1)
+         if(select(maxfd + 1, &readfds, &writefds, NULL, NULL) == -1)
         {
             perror("select");
             exit(EXIT_FAILURE);            
         }
       
         j = 0;
+        std::map<int, std::string> map;
         for( i = 0; i < this->sock->_Get_h();i++)
         {
             if(FD_ISSET(this->sock->_Get_server_fds()[i], &readfds))
@@ -78,18 +81,21 @@ Server::Server(Parsing *p,char *envp[])
                     exit(EXIT_FAILURE);
                 }
                 char *ip = inet_ntoa(client.sin_addr);
+                map[csock] = ip;
+                map[csock] += ":";
+                map[csock] += std::to_string(ntohs(client.sin_port));
                 std::cout << "New connection from\t" << ip << ":" << ntohs(client.sin_port) << std::endl;
                 clients.push_back(csock);
-                // break;
             }
         }
         for(i = 0; i < clients.size(); i++)
             {
-                fcntl(clients[i], F_SETFL, O_NONBLOCK);
                 maxfd = clients[i];
                 FD_SET(clients[i], &readfds);
+                FD_SET(clients[i], &writefds);
                 if(clients[i] > maxfd)
                     maxfd = clients[i];
+                fcntl(clients[i], F_SETFL, O_NONBLOCK);
             }
        
         i = 0;
@@ -98,7 +104,7 @@ Server::Server(Parsing *p,char *envp[])
             sd = clients[i];
             if(FD_ISSET(sd, &readfds))
             {
-            fcntl(sd, F_SETFL, O_NONBLOCK);
+                fcntl(sd, F_SETFL, O_NONBLOCK);
                 char buffer[BUFFER_SIZE + 1];
                 int n;
                 bzero(buffer, BUFFER_SIZE + 1);
@@ -107,20 +113,28 @@ Server::Server(Parsing *p,char *envp[])
                 {
                     i++;
                     close(sd);
+                    clients.erase(clients.begin() + i);
                     continue;
                 }
                 if( n < 0)
                 {
                     close (sd);
                     FD_CLR (sd, &readfds);
-                    std::cout << "Client Desconnected " <<  inet_ntoa(client.sin_addr)<<  ":" << ntohs(client.sin_port)  << std::endl;
+                    std::cout << "Client Desconnected " <<  map[sd]  << std::endl;
                 }
+              
+            }
+              if(FD_ISSET(sd, &writefds))
+                {
                 status = "200 OK";
                 version = "HTTP/1.1 ";
+                    
                 std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: 12\n\n" + "HELO WORLD";
                 write(sd, header.c_str(), strlen(header.c_str()));
+                FD_CLR(sd, &writefds);
                 close(sd);
-            }
+                }
+            
             i++;
         }
     }
