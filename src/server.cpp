@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/12 23:14:46 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/13 10:14:14 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,13 @@ Server::Server(Parsing *p,char *envp[])
             if(this->sock->_Get_server_fds()[i] > maxfd) 
                 maxfd = this->sock->_Get_server_fds()[i];
             i++;
-        }   
-        if(select(maxfd + 1, &readfds, NULL, NULL, NULL) == -1)
+        }
+         if(select(maxfd + 1, &readfds, NULL, NULL, NULL) == -1)
         {
             perror("select");
             exit(EXIT_FAILURE);            
         }
+      
         j = 0;
         for( i = 0; i < this->sock->_Get_h();i++)
         {
@@ -79,23 +80,25 @@ Server::Server(Parsing *p,char *envp[])
                 char *ip = inet_ntoa(client.sin_addr);
                 std::cout << "New connection from\t" << ip << ":" << ntohs(client.sin_port) << std::endl;
                 clients.push_back(csock);
-                break;
+                // break;
             }
-            i++;
         }
         for(i = 0; i < clients.size(); i++)
             {
+                fcntl(clients[i], F_SETFL, O_NONBLOCK);
                 maxfd = clients[i];
                 FD_SET(clients[i], &readfds);
                 if(clients[i] > maxfd)
                     maxfd = clients[i];
             }
+       
         i = 0;
         while( i < clients.size())
         {
             sd = clients[i];
             if(FD_ISSET(sd, &readfds))
             {
+            fcntl(sd, F_SETFL, O_NONBLOCK);
                 char buffer[BUFFER_SIZE + 1];
                 int n;
                 bzero(buffer, BUFFER_SIZE + 1);
@@ -118,7 +121,6 @@ Server::Server(Parsing *p,char *envp[])
                 write(sd, header.c_str(), strlen(header.c_str()));
                 close(sd);
             }
-            fcntl(sd, F_SETFL, O_NONBLOCK);
             i++;
         }
     }
