@@ -152,8 +152,11 @@ Server::Server(Parsing *p,char *envp[])
                                 {
                                     status = "200 OK";
                                     version = "HTTP/1.1 ";
-                                    std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length:20\r\n\r\n hello World!";
-                                    write(sock_fd, header.c_str(), strlen(header.c_str()));
+                                    std::string HellWorldPage = "<html><head><title>Hello World</title></head><body><h1>Hello World</h1></body></html>";
+                                    std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: "+std::to_string(HellWorldPage.size())+"\n\n"+HellWorldPage;
+                                    // write(sock_fd, header.c_str(), strlen(header.c_str()));
+                                    int s = send(sock_fd, header.c_str(), strlen(header.c_str()), 0);
+                                    std::cout << "Sent: \n" << header << std::endl;
                                 }
                             }
                         }
