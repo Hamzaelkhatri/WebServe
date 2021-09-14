@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/14 14:42:51 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/14 14:49:37 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,10 +136,9 @@ Server::Server(Parsing *p,char *envp[])
                     else
                     {
                         bzero(buffer, 1024);
-                        while ((rc = recv(sock_fd, buffer, 1024, 0) > 0))
+                        rc = recv(sock_fd, buffer, 1024, 0);
+                        if(rc > 0)
                         {
-                            if(rc > 0)
-                            {
                             std::map<int, std::string>::iterator it = _clients.find(sock_fd);
                             buffer[rc] = '\0';
                             if (it != _clients.end())
@@ -159,16 +158,15 @@ Server::Server(Parsing *p,char *envp[])
                             }
                         }
                        else
-                        {
-                            std::cout << sock_fd <<  "\t  =   Disconnected" << std::endl;
-                            close(sock_fd);
-                            FD_CLR(sock_fd, &masterfds);
-                            FD_CLR(sock_fd, &writefds);    
-                        }
+                    {
+                        std::cout << sock_fd <<  "\t  =   Diconnected" << std::endl;
+                        close(sock_fd);
+                        FD_CLR(sock_fd, &masterfds);
+                        FD_CLR(sock_fd, &writefds)  ; 
+                    }
                     }
                 } 
             }
-        }
     }
 }
 
