@@ -37,7 +37,7 @@
 #include "pars.hpp"
 #include <string.h>
 
-#define BUFFER_SIZE   1024
+#define BUFFER_SIZE   65507
 
 class Socket;
 class Server  : public Socket 

@@ -88,7 +88,10 @@ Server::Server(Parsing *p,char *envp[])
     maxfd = 0;
     int j = 0;
     int rc= 0;
-    char   buffer[1024];
+    char   buffer[BUFFER_SIZE+1];
+    cgi *c;
+    loc = p->Getloc_map();
+
     FD_ZERO(&masterfds);
     MasterSockets = this->sock->_Get_server_fds();
     int i = 0;
@@ -130,13 +133,12 @@ Server::Server(Parsing *p,char *envp[])
                     }
                     if (newCnx)
                     {
-                            // fcntl(i, F_SETFL, O_NONBLOCK);
                         _Accept_client(sock_fd);
                     }
                     else
                     {
-                        bzero(buffer, 1024);
-                        rc = recv(sock_fd, buffer, 1024, 0);
+                        bzero(buffer, BUFFER_SIZE);
+                        rc = recv(sock_fd, buffer, BUFFER_SIZE, 0);
                         if(rc > 0)
                         {
                             std::map<int, std::string>::iterator it = _clients.find(sock_fd);
@@ -144,28 +146,66 @@ Server::Server(Parsing *p,char *envp[])
                             if (it != _clients.end())
                             {
                                 it->second += buffer;
+                                std::cout << buffer << std::endl;
                             }
                             if (checkRequest(it->second) == true)
                             {
-                                std::cout << "Received: \n" << buffer << std::endl;
+                                // std::cout << "Received: \n" << buffer << std::endl;
+                                            someString = buffer;
                                 if(FD_ISSET(sock_fd, &writefds))
                                 {
+                                    // status = "200 OK";
+                                    // version = "HTTP/1.1 ";
+                                    // std::string HellWorldPage = "<html><head><title>Hello World</title></head><body><h1>Hello World</h1></body></html>";
+                                    // std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: "+std::to_string(HellWorldPage.size())+"\n\n"+HellWorldPage;
+                                    // int s = send(sock_fd, header.c_str(), strlen(header.c_str()), 0);
+                                    // std::cout << "Sent: \n" << header << std::endl;
+                                    std::stringstream ss(someString);
+                                    int t = 0;
+                                    while (std::getline(ss, line1, '\n'))
+                                    {
+                                        if (line1.find_first_of(":") != std::string::npos && t == 1)
+                                        {
+                                            tmp1 = line1.substr(0, line1.find_first_of(":"));
+                                            tmp2 = line1.substr(line1.find_first_of(":") + 1);
+                                            stor[tmp1] = tmp2;
+                                        }
+                                        else if (t == 0)
+                                        {
+                                            tmp1 = line1.substr(0, line1.find_first_of(" "));
+                                            tmp2 = line1.substr(line1.find_first_of(" ") + 1);
+                                            stor[tmp1] = "webpage" + tmp2.substr(0, tmp2.find_first_of(" "));
+                                            t++;
+                                        }
+                                        else
+                                        {
+                                            t++;
+                                            Content.push_back(line1);
+                                        }
+                                        i++;
+                                    }
+                                    if (stor.find("GET") != stor.end())
+                                            Get_methode(c, envp);
+                                     else if (stor.find("POST") != stor.end())
+                                            Post_methode();
                                     status = "200 OK";
                                     version = "HTTP/1.1 ";
-                                    std::string HellWorldPage = "<html><head><title>Hello World</title></head><body><h1>Hello World</h1></body></html>";
-                                    std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: "+std::to_string(HellWorldPage.size())+"\n\n"+HellWorldPage;
-                                    // write(sock_fd, header.c_str(), strlen(header.c_str()));
-                                    int s = send(sock_fd, header.c_str(), strlen(header.c_str()), 0);
-                                    std::cout << "Sent: \n" << header << std::endl;
+                                    std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(body.length()) + "\n\n" + body;
+                                    write(sock_fd, header.c_str(), strlen(header.c_str()));
                                 }
                             }
                         }
                        else
                     {
-                        std::cout << sock_fd <<  "\t  =   Diconnected" << std::endl;
-                        close(sock_fd);
-                        FD_CLR(sock_fd, &masterfds);
-                        FD_CLR(sock_fd, &writefds)  ; 
+                        if(rc == 0)
+                        {
+                            std::cout << sock_fd <<  "\t  =   Diconnected" << std::endl;
+                            close(sock_fd);
+                            FD_CLR(sock_fd, &masterfds);
+                            FD_CLR(sock_fd, &writefds);
+                        }
+                        else
+                            continue;
                     }
                     }
                 } 
