@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/12 14:16:50 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/12 15:41:20 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/14 14:29:32 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void Socket::set_socket()
             std::cerr << "socket failed" << std::endl;
             exit(EXIT_FAILURE);
         }
+        fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
         int buffsize = 1;
         if (setsockopt(server_fds[i], SOL_SOCKET, SO_REUSEADDR, &buffsize, sizeof(buffsize)) == -1 )
         {
@@ -79,14 +80,14 @@ void Socket::_Set_Binding()
             close(server_fds[i]);
             exit(EXIT_FAILURE);
         }
-        fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
-        if(listen(server_fds[i], 2000) == -1)
+        // fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
+        if(listen(server_fds[i], 2048) == -1)
         {
             perror("listen() failed");
             close(server_fds[i]);
             exit(EXIT_FAILURE);
         }
-        fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
+        // fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
         // std::cout << "listening on port " << ntohs(address[i].sin_port) << "" std::endl;
     }
 }

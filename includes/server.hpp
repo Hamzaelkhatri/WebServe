@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/13 22:17:31 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/14 11:29:12 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,7 @@ class Server  : public Socket
         std::vector<int> clients;
         struct sockaddr_in client;
         std::vector<int> MasterSockets;
+        std::map<int, std::string> _clients;
     
     public:
         Server( Parsing *pars,char *envp[]);
