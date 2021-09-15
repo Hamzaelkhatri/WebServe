@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/12 16:43:57 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/15 10:49:30 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,4 +114,10 @@ void Server::Post_methode()
         lenght = body.size();
         status = "405 Not Allowed";
     }
+}
+
+
+void Server::Delete_methode()
+{
+    
 }

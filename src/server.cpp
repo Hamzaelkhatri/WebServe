@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/14 14:49:37 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/15 10:49:32 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,14 @@ int  Server::_Accept_client(int sock)
     socklen_t client_len = sizeof(client);
     int addrlen = sizeof(client);
     csock = accept(sock, (struct sockaddr *)&client, (socklen_t *)&addrlen);
-    // if(csock)
     if(csock !=  -1)
     {
-    fcntl(csock, F_SETFL, O_NONBLOCK);
+        fcntl(csock, F_SETFL, O_NONBLOCK);
         FD_SET(csock, &masterfds);
         FD_SET(csock, &writefds);
         if (csock > maxfd)
             maxfd = csock;
         std::cout <<  csock <<  "\t  =  New connection" << std::endl;
-        // break;
     }
     else
     {
@@ -75,7 +73,6 @@ bool checkRequest(std::string &req)
     return true;
 }
 
-// void ParseRequest
 
 Server::Server(Parsing *p,char *envp[])
 {
@@ -100,12 +97,10 @@ Server::Server(Parsing *p,char *envp[])
     }
     FD_ZERO(&writefds);
     memcpy(&writefds, &masterfds, sizeof(masterfds));
-    // writefds = masterfds;
     while (1)
     {
         FD_ZERO(&readfds);
         memcpy(&readfds, &masterfds, sizeof(masterfds));
-        // readfds = masterfds;
         struct timeval _tv = {30, 0};
         selected = select(maxfd + 1, &readfds, &writefds, NULL, &_tv);
         if (selected < 0)
@@ -169,9 +164,11 @@ Server::Server(Parsing *p,char *envp[])
                                         i++;
                                     }
                                     if (stor.find("GET") != stor.end())
-                                            Get_methode(c, envp);
-                                     else if (stor.find("POST") != stor.end())
-                                            Post_methode();
+                                        Get_methode(c, envp);
+                                    else if (stor.find("POST") != stor.end())
+                                        Post_methode();
+                                    else if (stor.fibdex("DELETE") != stor.end())
+                                        Delete_methode();
                                     status = "200 OK";
                                     version = "HTTP/1.1 ";
                                     std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(body.length()) + "\n\n" + body;
