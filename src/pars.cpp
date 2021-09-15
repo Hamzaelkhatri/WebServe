@@ -53,6 +53,7 @@ Parsing::Parsing(char *av)
     int l = 0;
     int serverIndex = 0;
     int d = 0;
+    int locIndex = 0;
     while (i < len )
     {
         // while(std::strcmp(Those_lines(result, i, len).c_str(), "") == 0 )
@@ -65,6 +66,7 @@ Parsing::Parsing(char *av)
                     i++;
             while(Those_lines(result, i, len) !=  "server"   && i < len && Those_lines(result, i, len).find("location") == std::string::npos)
             {
+                locIndex = 0;
                   while(std::strcmp(Those_lines(result, i, len).c_str(), "{") == 0 ||  std::strcmp(Those_lines(result, i, len).c_str(), "}") == 0)
                     i++;
                 if(Those_lines(result, i, len) != "" &&  Those_lines(result, i, len).find("location") == std::string::npos )
@@ -92,8 +94,10 @@ Parsing::Parsing(char *av)
             this->_server_map[serverIndex] = tmp ;
             this->server_map.clear();      
             }
+            
                   if (Those_lines(result, i, len).find("location") != std::string::npos)
                 {
+                    locIndex++;
                     while (Those_lines(result, i, len).find("}") == std::string::npos)
                     {
                         if (Those_lines(result, i, len) != "" && Those_lines(result, i, len) != "}" && Those_lines(result, i, len) != "{")
@@ -110,7 +114,7 @@ Parsing::Parsing(char *av)
                                     str = str + " " + ptr[k];
                                 k++;
                             }
-                            this->loc_map.insert(std::pair<std::string, std::string>(key, str));
+                            this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex)+" "+key, str));
                         }
                         i++;
                     }
@@ -122,31 +126,6 @@ Parsing::Parsing(char *av)
             }
             i++;
     }
-    // std::map<int, std::multimap<std::string, std::string>  >::iterator it0;
-    
-    // std::multimap<std::string, std::string>::iterator it;
-    // for(it0 = _server_map.begin(); it0 != _server_map.end(); ++it0)
-    // {
-    //     // std::cout << "----------------------------------\n";
-    //     std::cout << "for server " << it0->first << std::endl;
-    //     for(it = it0->second.begin(); it != it0->second.end(); ++it)
-    //     {
-    //         std::cout << it->first << " ==> " << it->second << std::endl;
-    //     }
-    // }
-    
-    // std::cout << "----------------------------------\n";
-    //     std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
-        
-    //  std::multimap<std::string, std::string>::iterator it1;
-    //  for(it2 = _loc_map.begin(); it2 != _loc_map.end(); ++it2)
-    // {
-    //     std::cout << "for location " << it2->first << std::endl;
-    //     for(it1 = it2->second.begin(); it1 != it2->second.end(); ++it1)
-    //     {
-    //         std::cout << it1->first << " ==> " << it1->second << std::endl;
-    //     }
-    // }
 }
 
 Parsing::~Parsing()

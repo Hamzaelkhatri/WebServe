@@ -76,6 +76,21 @@ bool checkRequest(std::string &req)
     return true;
 }
 
+std::string _GetFirstLine(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
+{
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<std::string, std::string>::iterator it2;
+
+    for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
+    {
+        if (it2->first.find("location") != std::string::npos)
+        {
+            return (it2->second);
+        }
+    }
+    return (std::string(""));
+}
+
 void Server::_GetDataServers(Parsing *parsing)
 {
     std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
@@ -91,28 +106,25 @@ void Server::_GetDataServers(Parsing *parsing)
 
     int indexOfServer = 1;
     int indexOfLocation = 1;
+    std::string location_tmp = _GetFirstLine(locations.begin());
     for (it = servers.begin(); it != servers.end(); it++)
     {
-        std::cout << YEL << "------------------------------------------------------"  << reset << std::endl;
-        std::cout << BLU << "\t\t\tServer " << indexOfServer << reset << std::endl;
-        std::cout << YEL << "------------------------------------------------------"  << reset << std::endl;
-            indexOfLocation = 1;
+        std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
+        std::cout << BLU << "\t\t\tServer " << RED << indexOfServer << reset << std::endl;
+        std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
+        indexOfLocation = 0;
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {
             if (indexOfServer == it2->first)
             {
+                location_tmp = _GetFirstLine(it2);
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
-                    if (it4->first == "location") // We can change Result to what we need
-                    {
-                        std::cout << RED << "Location " << it4->second << " Number " << indexOfLocation << GRN << " : Ended" << reset << std::endl;
-                        indexOfLocation++;
-                    }
-                    else
-                    {
-                        LocationContent.insert(std::pair<std::string, std::string>(it4->first, it4->second));
-                        std::cout << it4->first << GRN << " ===> "<< reset << it4->second << std::endl;
-                    }
+                    if(indexOfLocation != std::stoi(it4->first.substr(0, it4->first.find(" "))))
+                        std::cout << MAG <<"\t\tlocation ---> " << it4->first.substr(0, it4->first.find(" ")) << RED<< " " << location_tmp << reset << std::endl;
+                    indexOfLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
+                    LocationContent.insert(std::pair<std::string, std::string>(it4->first, it4->second));
+                    std::cout << it4->first.substr(it4->first.find(" ") + 1) << GRN << " ===> "  << reset << it4->second << std::endl;
                 }
             }
         }
@@ -169,7 +181,7 @@ Server::Server(Parsing *p, char *envp[])
                         {
                             std::string str1(inet_ntoa(this->sock->_Get_addr()[j].sin_addr));
                             std::string str0 = ":" + std::to_string(ntohs(this->sock->_Get_addr()[j].sin_port));
-                            std::string str = str1 +   str0  ;
+                            std::string str = str1 + str0;
                             ips.insert(std::pair<int, std::string>(j, str));
                             newCnx = 1;
                             break;
@@ -219,7 +231,7 @@ Server::Server(Parsing *p, char *envp[])
                                     // std::map<int, std::string>::iterator op = ips.begin();
                                     // for(op = ips.begin(); op != ips.end(); op++)
                                     // {std::cout << op->first << " ==> " << op->second << std::endl;}
-                                    witch_server(ips,p);
+                                    witch_server(ips, p);
                                     // std::map< int , std::multimap<std::string, std::string> > tmp = p->GetServerMap();
                                     // std::map< int , std::multimap<std::string, std::string> >::iterator  sp;
                                     // std::multimap<std::string, std::string>::iterator sp2;
@@ -237,7 +249,7 @@ Server::Server(Parsing *p, char *envp[])
                                     //             //         std::cout <<  sp->first << "==>" << sp2->second << std::endl;
                                     //             //         break;
                                     //             //     }
-                                                
+
                                     //         }
                                     //         if(sp2->first == "server_addr")
                                     //         {
