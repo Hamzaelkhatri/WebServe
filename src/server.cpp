@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/15 15:26:17 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/15 17:41:46 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ int  Server::_Accept_client(int sock)
         FD_SET(csock, &writefds);
         if (csock > maxfd)
             maxfd = csock;
+            
         std::cout <<  csock <<  "\t  =  New connection" << std::endl;
     }
     else
@@ -98,6 +99,7 @@ Server::Server(Parsing *p,char *envp[])
     FD_ZERO(&writefds);
     memcpy(&writefds, &masterfds, sizeof(masterfds));
     std::map<int, std::string> ips;
+    int o = 0;
     while (1)
     {
         FD_ZERO(&readfds);
@@ -119,8 +121,12 @@ Server::Server(Parsing *p,char *envp[])
                     {
                         if(sock_fd == MasterSockets[j])
                         {
-                            std::string str= inet_ntoa(this->sock->_Get_addr()[j].sin_addr);
-                            ips[sock_fd] =   str + ":" + std::to_string(ntohs(this->sock->_Get_addr()[j].sin_port));
+                            std::string str1(inet_ntoa(this->sock->_Get_addr()[j].sin_addr));
+                            std::string str0 = ":" + std::to_string(ntohs(this->sock->_Get_addr()[j].sin_port));
+                            std::string str = str1 +   str0  ;
+                            std::cout << j  << " <==> " << str << std::endl;
+                            ips.insert(std::pair<int, std::string>(j, str));
+                            
                             newCnx = 1;
                             break ;
                         }
@@ -131,7 +137,6 @@ Server::Server(Parsing *p,char *envp[])
                     {
                         bzero(buffer, BUFFER_SIZE);
                         rc = recv(sock_fd, buffer, BUFFER_SIZE, 0);
-                        std::cout << "" << ips[sock_fd] << std::endl;
                         if(rc > 0)
                         {
                             std::map<int, std::string>::iterator it = _clients.find(sock_fd);
@@ -167,16 +172,39 @@ Server::Server(Parsing *p,char *envp[])
                                         }
                                         i++;
                                     }
-                                    //  std::cout << "•••••••••••••••••••••••••••••••••••••••••••••••••••••••\n";
-                                 
-                                    // std::cout <<  stor["Host"] << "-->[" <<  ips[j] <<"]" <<"\n";
-                                    // std::cout << "•••••••••••••••••••••••••••••••••••••••••••••••••••••••\n";
-                                    // if (stor.find("GET") != stor.end())
-                                    //     Get_methode(c, envp);
-                                    // else if (stor.find("POST") != stor.end())
-                                    //     Post_methode();
-                                    // else if (stor.fibdex("DELETE") != stor.end())
-                                    //     Delete_methode();
+                                    std::map< int , std::multimap<std::string, std::string> > tmp = p->GetServerMap();
+                                    std::map< int , std::multimap<std::string, std::string> >::iterator  sp;
+                                    std::multimap<std::string, std::string>::iterator sp2;
+                                    // for(sp = tmp.begin(); sp!= tmp.end(); sp++)
+                                    // {
+                                    //     std::cout << sp->first << std::endl;
+                                    //     for(sp2 = sp->second.begin(); sp2 != sp->second.end(); sp2++)
+                                    //     {
+                                    //         if(sp2->first == "listen")
+                                    //         {
+                                    //         std::cout <<   sp2->first <<  "==>"<< sp2->second << std::endl;
+                                    //         std::cout << " Host :" << stor["Host"] << std::endl;
+                                    //             // if(sp2->second.find(stor["Host"]) != std::string::npos)
+                                    //             //     {
+                                    //             //         std::cout <<  sp->first << "==>" << sp2->second << std::endl;
+                                    //             //         break;
+                                    //             //     }
+                                                
+                                    //         }
+                                    //         if(sp2->first == "server_addr")
+                                    //         {
+                                    //             std::cout <<   sp2->first <<  "==>"<< sp2->second << std::endl;
+                                    //             std::cout << " Host :" << stor["Host"] << std::endl;
+                                    //         }
+                                    //     }
+                                    //     std::cout << "" << std::endl;
+                                    // }
+                                    if (stor.find("GET") != stor.end())
+                                        Get_methode(c, envp);
+                                    else if (stor.find("POST") != stor.end())
+                                        Post_methode();
+                                    else if (stor.find("DELETE") != stor.end())
+                                        Delete_methode();
                                     status = "200 OK";
                                     version = "HTTP/1.1 ";
                                     std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(body.length()) + "\n\n" + body;
@@ -184,22 +212,23 @@ Server::Server(Parsing *p,char *envp[])
                                 }
                             }
                         }
-                       else
-                    {
-                        if(rc == 0)
-                        {
-                            std::cout << sock_fd <<  "\t  =   Diconnected" << std::endl;
-                            close(sock_fd);
-                            FD_CLR(sock_fd, &masterfds);
-                            FD_CLR(sock_fd, &writefds);
-                        }
                         else
-                            continue;
-                    }
+                        {
+                            if(rc == 0)
+                            {
+                                std::cout << sock_fd <<  "\t  =   Diconnected" << std::endl;
+                                close(sock_fd);
+                                FD_CLR(sock_fd, &masterfds);
+                                FD_CLR(sock_fd, &writefds);
+                            }
+                            else
+                                continue;
+                        }
                     }
                 } 
             }
     }
+
 }
 
 Server::~Server()
