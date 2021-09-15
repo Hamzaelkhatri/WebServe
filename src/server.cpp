@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/15 10:49:32 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/15 15:26:17 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ bool checkRequest(std::string &req)
             return false;
         }
     }
-    std::cout << req;
+    // std::cout << req;
     return true;
 }
 
@@ -97,6 +97,7 @@ Server::Server(Parsing *p,char *envp[])
     }
     FD_ZERO(&writefds);
     memcpy(&writefds, &masterfds, sizeof(masterfds));
+    std::map<int, std::string> ips;
     while (1)
     {
         FD_ZERO(&readfds);
@@ -118,6 +119,8 @@ Server::Server(Parsing *p,char *envp[])
                     {
                         if(sock_fd == MasterSockets[j])
                         {
+                            std::string str= inet_ntoa(this->sock->_Get_addr()[j].sin_addr);
+                            ips[sock_fd] =   str + ":" + std::to_string(ntohs(this->sock->_Get_addr()[j].sin_port));
                             newCnx = 1;
                             break ;
                         }
@@ -128,6 +131,7 @@ Server::Server(Parsing *p,char *envp[])
                     {
                         bzero(buffer, BUFFER_SIZE);
                         rc = recv(sock_fd, buffer, BUFFER_SIZE, 0);
+                        std::cout << "" << ips[sock_fd] << std::endl;
                         if(rc > 0)
                         {
                             std::map<int, std::string>::iterator it = _clients.find(sock_fd);
@@ -136,7 +140,7 @@ Server::Server(Parsing *p,char *envp[])
                                 it->second += buffer;
                             if (checkRequest(it->second) == true)
                             {
-                                someString = buffer;
+                                someString = it->second;
                                 if(FD_ISSET(sock_fd, &writefds))
                                 {
                                     std::stringstream ss(someString);
@@ -163,12 +167,16 @@ Server::Server(Parsing *p,char *envp[])
                                         }
                                         i++;
                                     }
-                                    if (stor.find("GET") != stor.end())
-                                        Get_methode(c, envp);
-                                    else if (stor.find("POST") != stor.end())
-                                        Post_methode();
-                                    else if (stor.fibdex("DELETE") != stor.end())
-                                        Delete_methode();
+                                    //  std::cout << "•••••••••••••••••••••••••••••••••••••••••••••••••••••••\n";
+                                 
+                                    // std::cout <<  stor["Host"] << "-->[" <<  ips[j] <<"]" <<"\n";
+                                    // std::cout << "•••••••••••••••••••••••••••••••••••••••••••••••••••••••\n";
+                                    // if (stor.find("GET") != stor.end())
+                                    //     Get_methode(c, envp);
+                                    // else if (stor.find("POST") != stor.end())
+                                    //     Post_methode();
+                                    // else if (stor.fibdex("DELETE") != stor.end())
+                                    //     Delete_methode();
                                     status = "200 OK";
                                     version = "HTTP/1.1 ";
                                     std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(body.length()) + "\n\n" + body;
