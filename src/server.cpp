@@ -12,20 +12,20 @@
 
 #include "../includes/Webserv.hpp"
 
-int  Server::_Accept_client(int sock)
+int Server::_Accept_client(int sock)
 {
     socklen_t client_len = sizeof(client);
     int addrlen = sizeof(client);
     csock = accept(sock, (struct sockaddr *)&client, (socklen_t *)&addrlen);
-    if(csock !=  -1)
+    if (csock != -1)
     {
         fcntl(csock, F_SETFL, O_NONBLOCK);
         FD_SET(csock, &masterfds);
         FD_SET(csock, &writefds);
         if (csock > maxfd)
             maxfd = csock;
-            
-        std::cout <<  csock <<  "\t  =  New connection" << std::endl;
+
+        std::cout << csock << "\t  =  New connection" << std::endl;
     }
     else
     {
@@ -42,7 +42,7 @@ int Server::_Get_request(int sock)
     int n;
     int i = 0;
     bzero(buf, BUFFER_SIZE + 1);
-    if((n = recv(sock, buf, BUFFER_SIZE, 0)) > 0)
+    if ((n = recv(sock, buf, BUFFER_SIZE, 0)) > 0)
     {
         if (i == 0)
         {
@@ -63,10 +63,12 @@ bool checkRequest(std::string &req)
     i = req.find("\r\n\r\n");
     if (i == std::string::npos)
         return false;
-    if (req.find("Content-Length") != std::string::npos) {
+    if (req.find("Content-Length") != std::string::npos)
+    {
 
         data = req.substr(i + 4);
-        if (data.find("\r\n\r\n") == std::string::npos) {
+        if (data.find("\r\n\r\n") == std::string::npos)
+        {
             return false;
         }
     }
@@ -74,22 +76,66 @@ bool checkRequest(std::string &req)
     return true;
 }
 
+void Server::_GetDataServers(Parsing *parsing)
+{
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
 
-Server::Server(Parsing *p,char *envp[])
+    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
+
+    //show data servers
+    std::multimap<std::string, std::string>::iterator it3;
+    std::multimap<std::string, std::string>::iterator it4;
+    std::multimap<std::string, std::string> LocationContent;
+
+    int indexOfServer = 1;
+    int indexOfLocation = 1;
+    for (it = servers.begin(); it != servers.end(); it++)
+    {
+        std::cout << YEL << "------------------------------------------------------"  << reset << std::endl;
+        std::cout << BLU << "\t\t\tServer " << indexOfServer << reset << std::endl;
+        std::cout << YEL << "------------------------------------------------------"  << reset << std::endl;
+            indexOfLocation = 1;
+        for (it2 = locations.begin(); it2 != locations.end(); it2++)
+        {
+            if (indexOfServer == it2->first)
+            {
+                for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
+                {
+                    if (it4->first == "location") // We can change Result to what we need
+                    {
+                        std::cout << RED << "Location " << it4->second << " Number " << indexOfLocation << GRN << " : Ended" << reset << std::endl;
+                        indexOfLocation++;
+                    }
+                    else
+                    {
+                        LocationContent.insert(std::pair<std::string, std::string>(it4->first, it4->second));
+                        std::cout << it4->first << GRN << " ===> "<< reset << it4->second << std::endl;
+                    }
+                }
+            }
+        }
+        indexOfServer++;
+    }
+}
+
+Server::Server(Parsing *p, char *envp[])
 {
     std::string version;
     this->sock = new Socket(p);
     maxfd = 0;
     int j = 0;
-    int rc= 0;
-    char   buffer[BUFFER_SIZE+1];
+    int rc = 0;
+    char buffer[BUFFER_SIZE + 1];
     cgi *c;
     loc = p->Getloc_map();
-
+    _GetDataServers(p);
+    exit(EXIT_SUCCESS);
     FD_ZERO(&masterfds);
     MasterSockets = this->sock->_Get_server_fds();
     int i = 0;
-    while(i < this->sock->_Get_h() )
+    while (i < this->sock->_Get_h())
     {
         FD_SET(MasterSockets[i], &masterfds);
         if (MasterSockets[i] > maxfd)
@@ -112,23 +158,17 @@ Server::Server(Parsing *p,char *envp[])
             exit(1);
         }
         else
-            for (int sock_fd = 0; sock_fd <= maxfd ; sock_fd++)
+            for (int sock_fd = 0; sock_fd <= maxfd; sock_fd++)
             {
-                if(FD_ISSET(sock_fd, &readfds))
+                if (FD_ISSET(sock_fd, &readfds))
                 {
                     int newCnx = 0;
-                    for(int j = 0; j < MasterSockets.size() ; j++)
+                    for (int j = 0; j < MasterSockets.size(); j++)
                     {
-                        if(sock_fd == MasterSockets[j])
+                        if (sock_fd == MasterSockets[j])
                         {
-                            std::string str1(inet_ntoa(this->sock->_Get_addr()[j].sin_addr));
-                            std::string str0 = ":" + std::to_string(ntohs(this->sock->_Get_addr()[j].sin_port));
-                            std::string str = str1 +   str0  ;
-                            std::cout << j  << " <==> " << str << std::endl;
-                            ips.insert(std::pair<int, std::string>(j, str));
-                            
                             newCnx = 1;
-                            break ;
+                            break;
                         }
                     }
                     if (newCnx)
@@ -137,7 +177,7 @@ Server::Server(Parsing *p,char *envp[])
                     {
                         bzero(buffer, BUFFER_SIZE);
                         rc = recv(sock_fd, buffer, BUFFER_SIZE, 0);
-                        if(rc > 0)
+                        if (rc > 0)
                         {
                             std::map<int, std::string>::iterator it = _clients.find(sock_fd);
                             buffer[rc] = '\0';
@@ -146,7 +186,7 @@ Server::Server(Parsing *p,char *envp[])
                             if (checkRequest(it->second) == true)
                             {
                                 someString = it->second;
-                                if(FD_ISSET(sock_fd, &writefds))
+                                if (FD_ISSET(sock_fd, &writefds))
                                 {
                                     std::stringstream ss(someString);
                                     int t = 0;
@@ -172,33 +212,9 @@ Server::Server(Parsing *p,char *envp[])
                                         }
                                         i++;
                                     }
-                                    std::map< int , std::multimap<std::string, std::string> > tmp = p->GetServerMap();
-                                    std::map< int , std::multimap<std::string, std::string> >::iterator  sp;
+                                    std::map<int, std::multimap<std::string, std::string>> tmp = p->GetServerMap();
+                                    std::map<int, std::multimap<std::string, std::string>>::iterator sp;
                                     std::multimap<std::string, std::string>::iterator sp2;
-                                    // for(sp = tmp.begin(); sp!= tmp.end(); sp++)
-                                    // {
-                                    //     std::cout << sp->first << std::endl;
-                                    //     for(sp2 = sp->second.begin(); sp2 != sp->second.end(); sp2++)
-                                    //     {
-                                    //         if(sp2->first == "listen")
-                                    //         {
-                                    //         std::cout <<   sp2->first <<  "==>"<< sp2->second << std::endl;
-                                    //         std::cout << " Host :" << stor["Host"] << std::endl;
-                                    //             // if(sp2->second.find(stor["Host"]) != std::string::npos)
-                                    //             //     {
-                                    //             //         std::cout <<  sp->first << "==>" << sp2->second << std::endl;
-                                    //             //         break;
-                                    //             //     }
-                                                
-                                    //         }
-                                    //         if(sp2->first == "server_addr")
-                                    //         {
-                                    //             std::cout <<   sp2->first <<  "==>"<< sp2->second << std::endl;
-                                    //             std::cout << " Host :" << stor["Host"] << std::endl;
-                                    //         }
-                                    //     }
-                                    //     std::cout << "" << std::endl;
-                                    // }
                                     if (stor.find("GET") != stor.end())
                                         Get_methode(c, envp);
                                     else if (stor.find("POST") != stor.end())
@@ -214,9 +230,9 @@ Server::Server(Parsing *p,char *envp[])
                         }
                         else
                         {
-                            if(rc == 0)
+                            if (rc == 0)
                             {
-                                std::cout << sock_fd <<  "\t  =   Diconnected" << std::endl;
+                                std::cout << sock_fd << "\t  =   Diconnected" << std::endl;
                                 close(sock_fd);
                                 FD_CLR(sock_fd, &masterfds);
                                 FD_CLR(sock_fd, &writefds);
@@ -225,10 +241,9 @@ Server::Server(Parsing *p,char *envp[])
                                 continue;
                         }
                     }
-                } 
+                }
             }
     }
-
 }
 
 Server::~Server()
