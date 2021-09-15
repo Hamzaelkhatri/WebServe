@@ -19,6 +19,8 @@ SRC_NAME= main.cpp\
 		  socket_tools.cpp\
 		  get_sockets.cpp\
 		  set_socket.cpp\
+		  request.cpp\
+		  response.cpp\
 
 
 OBJ_NAME= $(SRC_NAME:.cpp=.o)

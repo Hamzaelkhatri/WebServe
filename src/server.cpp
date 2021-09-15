@@ -43,21 +43,16 @@ int Server::_Get_request(int sock)
     int n;
     int i = 0;
     bzero(buf, BUFFER_SIZE + 1);
-    std::cout << "here\n";
     if((n = recv(sock, buf, BUFFER_SIZE, 0)) > 0)
     {
-        // buf[n] = '\0';
         if (i == 0)
         {
             std::strcpy(this->request, buf);
             i++;
         }
         else
-        {
             std::strcat(this->request, buf);
-        }
     }
-    std::cout << this->request << std::endl;
     return (n);
 }
 
@@ -68,9 +63,7 @@ bool checkRequest(std::string &req)
 
     i = req.find("\r\n\r\n");
     if (i == std::string::npos)
-    {
         return false;
-    }
     if (req.find("Content-Length") != std::string::npos) {
 
         data = req.substr(i + 4);
@@ -78,8 +71,11 @@ bool checkRequest(std::string &req)
             return false;
         }
     }
+    std::cout << req;
     return true;
 }
+
+// void ParseRequest
 
 Server::Server(Parsing *p,char *envp[])
 {
@@ -132,9 +128,7 @@ Server::Server(Parsing *p,char *envp[])
                         }
                     }
                     if (newCnx)
-                    {
                         _Accept_client(sock_fd);
-                    }
                     else
                     {
                         bzero(buffer, BUFFER_SIZE);
@@ -144,22 +138,12 @@ Server::Server(Parsing *p,char *envp[])
                             std::map<int, std::string>::iterator it = _clients.find(sock_fd);
                             buffer[rc] = '\0';
                             if (it != _clients.end())
-                            {
                                 it->second += buffer;
-                                std::cout << buffer << std::endl;
-                            }
                             if (checkRequest(it->second) == true)
                             {
-                                // std::cout << "Received: \n" << buffer << std::endl;
-                                            someString = buffer;
+                                someString = buffer;
                                 if(FD_ISSET(sock_fd, &writefds))
                                 {
-                                    // status = "200 OK";
-                                    // version = "HTTP/1.1 ";
-                                    // std::string HellWorldPage = "<html><head><title>Hello World</title></head><body><h1>Hello World</h1></body></html>";
-                                    // std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: "+std::to_string(HellWorldPage.size())+"\n\n"+HellWorldPage;
-                                    // int s = send(sock_fd, header.c_str(), strlen(header.c_str()), 0);
-                                    // std::cout << "Sent: \n" << header << std::endl;
                                     std::stringstream ss(someString);
                                     int t = 0;
                                     while (std::getline(ss, line1, '\n'))
