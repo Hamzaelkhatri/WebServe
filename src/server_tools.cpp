@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/03 21:46:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/15 19:40:43 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/15 19:41:25 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void    Server::witch_server(std::map<int,st::string> ws.Parsing *pars)
 {
     std::multimap <int, std::multimap<std::string, std::string> > _loc_map
     _loc_map = p->Getloc_map();
+    
 }
 
 
