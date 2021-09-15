@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/15 17:41:46 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/15 19:34:17 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,9 +124,7 @@ Server::Server(Parsing *p,char *envp[])
                             std::string str1(inet_ntoa(this->sock->_Get_addr()[j].sin_addr));
                             std::string str0 = ":" + std::to_string(ntohs(this->sock->_Get_addr()[j].sin_port));
                             std::string str = str1 +   str0  ;
-                            std::cout << j  << " <==> " << str << std::endl;
                             ips.insert(std::pair<int, std::string>(j, str));
-                            
                             newCnx = 1;
                             break ;
                         }
@@ -172,9 +170,13 @@ Server::Server(Parsing *p,char *envp[])
                                         }
                                         i++;
                                     }
-                                    std::map< int , std::multimap<std::string, std::string> > tmp = p->GetServerMap();
-                                    std::map< int , std::multimap<std::string, std::string> >::iterator  sp;
-                                    std::multimap<std::string, std::string>::iterator sp2;
+                                    // std::map<int, std::string>::iterator op = ips.begin();
+                                    // for(op = ips.begin(); op != ips.end(); op++)
+                                    // {std::cout << op->first << " ==> " << op->second << std::endl;}
+                                    witch_server(ips,p);
+                                    // std::map< int , std::multimap<std::string, std::string> > tmp = p->GetServerMap();
+                                    // std::map< int , std::multimap<std::string, std::string> >::iterator  sp;
+                                    // std::multimap<std::string, std::string>::iterator sp2;
                                     // for(sp = tmp.begin(); sp!= tmp.end(); sp++)
                                     // {
                                     //     std::cout << sp->first << std::endl;

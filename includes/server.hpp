@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/15 10:52:22 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/15 19:34:21 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,11 +78,12 @@ class Server  : public Socket
         void            Get_methode(cgi *c,char *envp[]);
         void            Post_methode();
         void            Delete_methode();
+        int check_index(std::string str);
         std::string     getBody(std::string path);
         int             check_dir(std::string dir, std::string str);
+        void            witch_server(std::map<int, std::string> ,Parsong *pars);
         ~Server();
 
-int check_index(std::string str);
 };
 
 #endif
