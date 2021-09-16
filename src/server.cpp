@@ -46,15 +46,17 @@ void Server::_GetDataServers(Parsing *parsing)
     */
     std::string Host = stor["Host"].substr(0, stor["Host"].find(":"));
     std::string Port = stor["Host"].substr(stor["Host"].find(":") + 1, stor["Host"].size());
-    std::string Methode = (stor.find("GET") != stor.end() ? "GET" : (stor.find("POST") != stor.end())? "POST" : (stor.find("DELETE") != stor.end())? "DELETE" : "UNKNOWN");
-    std::string Path = stor[Methode];
-    std::cout << "Host: " << Host << std::endl;
-    std::cout << "Port: " << Port << std::endl;
-    std::cout << "Methode: " << Methode << std::endl;
-    std::cout << "Path: " << Path << std::endl;
-    for (std::map<std::string, std::string>::iterator it = stor.begin(); it != stor.end(); ++it)
-            std::cout << it->first << " --> " << it->second << std::endl;
+    std::string Methode = (stor.find("GET") != stor.end() ? "GET" : (stor.find("POST") != stor.end()) ? "POST"
+                                                                : (stor.find("DELETE") != stor.end()) ? "DELETE"
+                                                                                                      : "UNKNOWN");
+    // std::cout << "Host: " << Host << std::endl;
+    // std::cout  << Port << std::endl;
+    // std::cout << "Methode: " << Methode << std::endl;
+    std::cout << "Path: " << Port << std::endl;
+    // for (std::map<std::string, std::string>::iterator it = stor.begin(); it != stor.end(); ++it)
+    //         std::cout << it->first << " --> " << it->second << std::endl;
     Response *response = new Response();
+    int TargetServer = 1;
     for (it = servers.begin(); it != servers.end(); it++)
     {
         std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
@@ -64,27 +66,37 @@ void Server::_GetDataServers(Parsing *parsing)
         /* Print Server DATA*/
 
         for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
-            std::cout << GRN << "\t"<< it3->first << RED << " --> " << it3->second << reset << std::endl;
+        {
+            if (it3->first.find("listen") != std::string::npos)
+            {
+                if (Port.find(it3->second) != std::string::npos)
+                {
+                    TargetServer = it->first;
+                }
+            }
+        }
 
         std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
 
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {
-            if (indexOfServer == it2->first)
+            if (indexOfServer == TargetServer)
             {
                 location_tmp = _GetFirstLocation(it2);
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
-                    if (indexOfLocation != std::stoi(it4->first.substr(0, it4->first.find(" "))))
-                        std::cout << MAG << "\t\tlocation ---> " << it4->first.substr(0, it4->first.find(" ")) << RED << " " << location_tmp << reset << std::endl;
-                    indexOfLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
-                    LocationContent.insert(std::pair<std::string, std::string>(it4->first, it4->second));
-                    std::cout << it4->first.substr(it4->first.find(" ") + 1) << GRN << " ===> " << reset << it4->second << std::endl;
+                    
+                        if (indexOfLocation != std::stoi(it4->first.substr(0, it4->first.find(" "))))
+                            std::cout << MAG << "\t\tlocation ---> " << it4->first.substr(0, it4->first.find(" ")) << RED << " " << location_tmp << reset << std::endl;
+                        indexOfLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
+                        LocationContent.insert(std::pair<std::string, std::string>(it4->first, it4->second));
+                        std::cout << it4->first.substr(it4->first.find(" ") + 1) << GRN << " ===> " << reset << it4->second << std::endl;
                 }
             }
         }
         indexOfServer++;
     }
+    exit(0);
 }
 
 Server::Server(Parsing *p, char *envp[])
@@ -156,7 +168,7 @@ Server::Server(Parsing *p, char *envp[])
                             buffer[rc] = '\0';
                             if (it != _clients.end())
                                 it->second += buffer;
-                            someString ="";
+                            someString = "";
                             if (checkRequest(it->second) == true)
                             {
                                 someString = it->second;
@@ -189,7 +201,7 @@ Server::Server(Parsing *p, char *envp[])
 
                                     //Show Stor
 
-                                    _GetDataServers(p); 
+                                    _GetDataServers(p);
 
                                     // std::map<int, std::string>::iterator op = ips.begin();
                                     // for(op = ips.begin(); op != ips.end(); op++)
