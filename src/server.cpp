@@ -31,15 +31,12 @@ void Server::_GetDataServers(Parsing *parsing)
 {
     std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
     std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
-
     std::map<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
-
     //show data servers
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
     std::multimap<std::string, std::string> LocationContent;
-
     int indexOfServer = 1;
     int indexOfLocation = 1;
     std::string location_tmp = _GetFirstLocation(locations.begin());
@@ -47,13 +44,17 @@ void Server::_GetDataServers(Parsing *parsing)
     /*
         simulation Of data from Server Request
     */
-
+    std::string Host = stor["Host"].substr(0, stor["Host"].find(":"));
+    std::string Port = stor["Host"].substr(stor["Host"].find(":") + 1, stor["Host"].size());
+    std::string Methode = (stor.find("GET") != stor.end() ? "GET" : (stor.find("POST") != stor.end())? "POST" : (stor.find("DELETE") != stor.end())? "DELETE" : "UNKNOWN");
+    std::string Path = stor[Methode];
+    std::cout << "Host: " << Host << std::endl;
+    std::cout << "Port: " << Port << std::endl;
+    std::cout << "Methode: " << Methode << std::endl;
+    std::cout << "Path: " << Path << std::endl;
+    for (std::map<std::string, std::string>::iterator it = stor.begin(); it != stor.end(); ++it)
+            std::cout << it->first << " --> " << it->second << std::endl;
     Response *response = new Response();
-    std::string server_adr = "localhost";
-    std::string Port = "8080";
-    std::string method = "GET";
-    std::string path = "/";
-
     for (it = servers.begin(); it != servers.end(); it++)
     {
         std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
@@ -63,7 +64,7 @@ void Server::_GetDataServers(Parsing *parsing)
         /* Print Server DATA*/
 
         for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
-            std::cout << GRN << "\t" << it3->first << RED << " --> " << it3->second << reset << std::endl;
+            std::cout << GRN << "\t"<< it3->first << RED << " --> " << it3->second << reset << std::endl;
 
         std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
 
@@ -95,16 +96,13 @@ Server::Server(Parsing *p, char *envp[])
     int rc = 0;
     char buffer[BUFFER_SIZE + 1];
     cgi *c;
-    loc = p->Getloc_map();
 
     /*
         Print Config Data 
     */
-    _GetDataServers(p); 
     /* 
         Warning Of Exit
     */
-    exit(EXIT_SUCCESS);
 
     FD_ZERO(&masterfds);
     MasterSockets = this->sock->_Get_server_fds();
@@ -158,42 +156,44 @@ Server::Server(Parsing *p, char *envp[])
                             buffer[rc] = '\0';
                             if (it != _clients.end())
                                 it->second += buffer;
+                            someString ="";
                             if (checkRequest(it->second) == true)
                             {
-                                // someString = it->second;
+                                someString = it->second;
                                 if (FD_ISSET(sock_fd, &writefds))
                                 {
-                                    struct addrinfo hints;
-                                    struct addrinfo *result, *rp;
-                                    // getaddrinfo("127.0.0.1","5000", NULL, &result);
-                                    // for (result->)
-                                    // std::stringstream ss(someString);
-                                    // int t = 0;
-                                    // while (std::getline(ss, line1, '\n'))
-                                    // {
-                                    //     if (line1.find_first_of(":") != std::string::npos && t == 1)
-                                    //     {
-                                    //         tmp1 = line1.substr(0, line1.find_first_of(":"));
-                                    //         tmp2 = line1.substr(line1.find_first_of(":") + 1);
-                                    //         stor[tmp1] = tmp2;
-                                    //     }
-                                    //     else if (t == 0)
-                                    //     {
-                                    //         tmp1 = line1.substr(0, line1.find_first_of(" "));
-                                    //         tmp2 = line1.substr(line1.find_first_of(" ") + 1);
-                                    //         stor[tmp1] = "webpage" + tmp2.substr(0, tmp2.find_first_of(" "));
-                                    //         t++;
-                                    //     }
-                                    //     else
-                                    //     {
-                                    //         t++;
-                                    //         Content.push_back(line1);
-                                    //     }
-                                    //     i++;
-                                    // }
+                                    std::stringstream ss(someString);
+                                    int t = 0;
+                                    while (std::getline(ss, line1, '\n'))
+                                    {
+                                        if (line1.find_first_of(":") != std::string::npos && t == 1)
+                                        {
+                                            tmp1 = line1.substr(0, line1.find_first_of(":"));
+                                            tmp2 = line1.substr(line1.find_first_of(":") + 1);
+                                            stor[tmp1] = tmp2;
+                                        }
+                                        else if (t == 0)
+                                        {
+                                            tmp1 = line1.substr(0, line1.find_first_of(" "));
+                                            tmp2 = line1.substr(line1.find_first_of(" ") + 1);
+                                            stor[tmp1] = tmp2.substr(0, tmp2.find_first_of(" "));
+                                            t++;
+                                        }
+                                        else
+                                        {
+                                            t++;
+                                            Content.push_back(line1);
+                                        }
+                                        i++;
+                                    }
+
+                                    //Show Stor
+
+                                    _GetDataServers(p); 
+
                                     // std::map<int, std::string>::iterator op = ips.begin();
                                     // for(op = ips.begin(); op != ips.end(); op++)
-                                    // {std::cout << op->first << " ==> " << op->second << std::endl;}
+                                    // // {std::cout << op->first << " ==> " << op->second << std::endl;}
                                     // witch_server(ips, p);
                                     // std::map< int , std::multimap<std::string, std::string> > tmp = p->GetServerMap();
                                     // std::map< int , std::multimap<std::string, std::string> >::iterator  sp;
@@ -222,6 +222,7 @@ Server::Server(Parsing *p, char *envp[])
                                     //     }
                                     //     std::cout << "" << std::endl;
                                     // }
+                                    // loc = p->Getloc_map();
                                     // if (stor.find("GET") != stor.end())
                                     //     Get_methode(c, envp);
                                     // else if (stor.find("POST") != stor.end())
@@ -230,7 +231,8 @@ Server::Server(Parsing *p, char *envp[])
                                     //     Delete_methode();
                                     status = "200 OK";
                                     version = "HTTP/1.1 ";
-                                    std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(body.length()) + "\n\n" + body;
+                                    body = "<html><head><title>Web Server</title></head><body><h1>Web Server</h1><p>Hello World</p></body></html>";
+                                    std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(body.size()) + "\n\n" + body;
                                     write(sock_fd, header.c_str(), strlen(header.c_str()));
                                 }
                             }
