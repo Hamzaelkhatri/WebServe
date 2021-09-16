@@ -65,18 +65,14 @@ bool checkRequest(std::string &req)
         return false;
     if (req.find("Content-Length") != std::string::npos)
     {
-
         data = req.substr(i + 4);
         if (data.find("\r\n\r\n") == std::string::npos)
-        {
             return false;
-        }
     }
-    // std::cout << req;
     return true;
 }
 
-std::string _GetFirstLine(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
+std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
 {
     std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
@@ -106,25 +102,43 @@ void Server::_GetDataServers(Parsing *parsing)
 
     int indexOfServer = 1;
     int indexOfLocation = 1;
-    std::string location_tmp = _GetFirstLine(locations.begin());
+    std::string location_tmp = _GetFirstLocation(locations.begin());
+
+    /*
+        simulation Of data from Server Request
+    */
+
+    Response *response = new Response();
+    std::string server_adr = "localhost";
+    std::string Port = "8080";
+    std::string method = "GET";
+    std::string path = "/";
+
     for (it = servers.begin(); it != servers.end(); it++)
     {
         std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
-        std::cout << BLU << "\t\t\tServer " << RED << indexOfServer << reset << std::endl;
-        std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
+        std::cout << BLU << "\t\tServer INFO " << RED << indexOfServer << reset << std::endl;
         indexOfLocation = 0;
+
+        /* Print Server DATA*/
+
+        for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
+            std::cout << GRN << "\t" << it3->first << RED << " --> " << it3->second << reset << std::endl;
+
+        std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
+
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {
             if (indexOfServer == it2->first)
             {
-                location_tmp = _GetFirstLine(it2);
+                location_tmp = _GetFirstLocation(it2);
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
-                    if(indexOfLocation != std::stoi(it4->first.substr(0, it4->first.find(" "))))
-                        std::cout << MAG <<"\t\tlocation ---> " << it4->first.substr(0, it4->first.find(" ")) << RED<< " " << location_tmp << reset << std::endl;
+                    if (indexOfLocation != std::stoi(it4->first.substr(0, it4->first.find(" "))))
+                        std::cout << MAG << "\t\tlocation ---> " << it4->first.substr(0, it4->first.find(" ")) << RED << " " << location_tmp << reset << std::endl;
                     indexOfLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
                     LocationContent.insert(std::pair<std::string, std::string>(it4->first, it4->second));
-                    std::cout << it4->first.substr(it4->first.find(" ") + 1) << GRN << " ===> "  << reset << it4->second << std::endl;
+                    std::cout << it4->first.substr(it4->first.find(" ") + 1) << GRN << " ===> " << reset << it4->second << std::endl;
                 }
             }
         }
@@ -142,8 +156,16 @@ Server::Server(Parsing *p, char *envp[])
     char buffer[BUFFER_SIZE + 1];
     cgi *c;
     loc = p->Getloc_map();
+
+    /*
+        Print Config Data 
+    */
     _GetDataServers(p);
+    /* 
+        Warning Of Exit
+    */
     exit(EXIT_SUCCESS);
+
     FD_ZERO(&masterfds);
     MasterSockets = this->sock->_Get_server_fds();
     int i = 0;
@@ -201,37 +223,41 @@ Server::Server(Parsing *p, char *envp[])
                                 it->second += buffer;
                             if (checkRequest(it->second) == true)
                             {
-                                someString = it->second;
+                                // someString = it->second;
                                 if (FD_ISSET(sock_fd, &writefds))
                                 {
-                                    std::stringstream ss(someString);
-                                    int t = 0;
-                                    while (std::getline(ss, line1, '\n'))
-                                    {
-                                        if (line1.find_first_of(":") != std::string::npos && t == 1)
-                                        {
-                                            tmp1 = line1.substr(0, line1.find_first_of(":"));
-                                            tmp2 = line1.substr(line1.find_first_of(":") + 1);
-                                            stor[tmp1] = tmp2;
-                                        }
-                                        else if (t == 0)
-                                        {
-                                            tmp1 = line1.substr(0, line1.find_first_of(" "));
-                                            tmp2 = line1.substr(line1.find_first_of(" ") + 1);
-                                            stor[tmp1] = "webpage" + tmp2.substr(0, tmp2.find_first_of(" "));
-                                            t++;
-                                        }
-                                        else
-                                        {
-                                            t++;
-                                            Content.push_back(line1);
-                                        }
-                                        i++;
-                                    }
+                                    struct addrinfo hints;
+                                    struct addrinfo *result, *rp;
+                                    // getaddrinfo("127.0.0.1","5000", NULL, &result);
+                                    // for (result->)
+                                    // std::stringstream ss(someString);
+                                    // int t = 0;
+                                    // while (std::getline(ss, line1, '\n'))
+                                    // {
+                                    //     if (line1.find_first_of(":") != std::string::npos && t == 1)
+                                    //     {
+                                    //         tmp1 = line1.substr(0, line1.find_first_of(":"));
+                                    //         tmp2 = line1.substr(line1.find_first_of(":") + 1);
+                                    //         stor[tmp1] = tmp2;
+                                    //     }
+                                    //     else if (t == 0)
+                                    //     {
+                                    //         tmp1 = line1.substr(0, line1.find_first_of(" "));
+                                    //         tmp2 = line1.substr(line1.find_first_of(" ") + 1);
+                                    //         stor[tmp1] = "webpage" + tmp2.substr(0, tmp2.find_first_of(" "));
+                                    //         t++;
+                                    //     }
+                                    //     else
+                                    //     {
+                                    //         t++;
+                                    //         Content.push_back(line1);
+                                    //     }
+                                    //     i++;
+                                    // }
                                     // std::map<int, std::string>::iterator op = ips.begin();
                                     // for(op = ips.begin(); op != ips.end(); op++)
                                     // {std::cout << op->first << " ==> " << op->second << std::endl;}
-                                    witch_server(ips, p);
+                                    // witch_server(ips, p);
                                     // std::map< int , std::multimap<std::string, std::string> > tmp = p->GetServerMap();
                                     // std::map< int , std::multimap<std::string, std::string> >::iterator  sp;
                                     // std::multimap<std::string, std::string>::iterator sp2;
@@ -259,12 +285,12 @@ Server::Server(Parsing *p, char *envp[])
                                     //     }
                                     //     std::cout << "" << std::endl;
                                     // }
-                                    if (stor.find("GET") != stor.end())
-                                        Get_methode(c, envp);
-                                    else if (stor.find("POST") != stor.end())
-                                        Post_methode();
-                                    else if (stor.find("DELETE") != stor.end())
-                                        Delete_methode();
+                                    // if (stor.find("GET") != stor.end())
+                                    //     Get_methode(c, envp);
+                                    // else if (stor.find("POST") != stor.end())
+                                    //     Post_methode();
+                                    // else if (stor.find("DELETE") != stor.end())
+                                    //     Delete_methode();
                                     status = "200 OK";
                                     version = "HTTP/1.1 ";
                                     std::string header = version + status + "\nContent-type: text/html; charset=UTF-8\nContent-Length: " + std::to_string(body.length()) + "\n\n" + body;

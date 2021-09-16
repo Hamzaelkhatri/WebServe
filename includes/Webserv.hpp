@@ -6,6 +6,7 @@
 #include "server.hpp"
 #include "pars.hpp"
 #include "socket.hpp"
+#include "response.hpp"
 
 
 #endif

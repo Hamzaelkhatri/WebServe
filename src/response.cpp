@@ -48,6 +48,16 @@ std::string Response::getCookie()
 
 //seters
 
+Response::Response()
+{
+
+}
+
+Response::~Response()
+{
+    
+}
+
 void Response::setStatus(std::string status)
 {
     this->status = status;
