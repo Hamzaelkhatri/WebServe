@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/07 18:47:53 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/16 12:13:38 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ std::map<int, std::string> get_map(char *av)
     char line[1024];
     int fd = open(file.c_str(), O_RDONLY);
     if (fd < 0)
-        error_msg("Error file not found");
+        throw ErrorHandling::FileNotFound();
     while ((res = read(fd, line, 1024)) > 0)
     {
         if (std::strcmp(line, "\n") != 0)
@@ -151,15 +151,15 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
     for (it = res.begin(); it != res.end(); ++it)
     {
         if (res[it->first].find("#") != std::string::npos)
-            error_msg("Error: no comment allowed");
+            throw ErrorHandling::NoComment();
         if (it->first == 1 && res[it->first] != "server")
-            error_msg("Error : file should start with server");
+            throw ErrorHandling::StartWithServer();
         if (res[it->first] == "server" && res[it->first + 1] != "{")
-            error_msg("Error : after server should be only  open bracket");
+            throw ErrorHandling::OpenBracket();
         if( (res[it->first].find("location") != std::string::npos ) &&    res[it->first].find("}") != std::string::npos )
-                error_msg("Error : close  bracket in new line alone");
+            throw ErrorHandling::CloseBracket();
         if( (res[it->first].find("location") != std::string::npos ) &&    res[it->first].find("{") != std::string::npos )
-                error_msg("Error : open bracket in new line alone");    
+            throw ErrorHandling::NewlineBracket();
         if (res[it->first].find("}") != std::string::npos)
             k++;
         if (res[it->first].find("{") != std::string::npos)
@@ -171,7 +171,7 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
             while (it1 != res.end())
             {
                 if (res[it1->first].find(" server ") != std::string::npos && res[it1->first + 1].find("{") != std::string::npos && k != 0)
-                    error_msg("Error!! not 2 server inside another one");
+                    throw ErrorHandling::Oneserver();
                 else
                     it1++;
             }
@@ -179,7 +179,7 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
         }
     }
     if (k != 0)
-        error_msg("Error : check The number of brackets");
+        throw ErrorHandling::NumberBrackets();
  
     for (it = res.begin(); it != res.end(); ++it)
     {
@@ -206,7 +206,7 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
             while (it1 != res.end())
             {
                 if (k != 0 && (res[it->first].find(" server ") != std::string::npos || res[it->first].find("location") != std::string::npos))
-                    error_msg("Error!!");
+                      throw  ErrorHandling::Oneserver();
                 else
                     it1++;
             }

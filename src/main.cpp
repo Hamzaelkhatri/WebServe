@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/12 14:47:49 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/16 12:11:14 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,18 @@ int main(int ac, char *av[], char *envp[])
     }
     if (compare_end(av[1], ".conf") == true)
     {
-        ErrorHandling error(av[1]);
-        Parsing *pars = new Parsing(av[1]);
-        Server  serv(pars , envp);
+        try
+        {
+            ErrorHandling error(av[1]);
+            Parsing *pars = new Parsing(av[1]);
+            Server  serv(pars , envp);
+        }
+        catch(const std::exception& e)
+        {
+            std::cerr << e.what() << '\n';
+        }
+        
+      
     }
     else
         std::cerr << "wrong file \n";

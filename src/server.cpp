@@ -6,75 +6,15 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/15 19:41:24 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/16 12:17:31 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Webserv.hpp"
 
-int Server::_Accept_client(int sock)
+std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations)
 {
-    socklen_t client_len = sizeof(client);
-    int addrlen = sizeof(client);
-    csock = accept(sock, (struct sockaddr *)&client, (socklen_t *)&addrlen);
-    if (csock != -1)
-    {
-        fcntl(csock, F_SETFL, O_NONBLOCK);
-        FD_SET(csock, &masterfds);
-        FD_SET(csock, &writefds);
-        if (csock > maxfd)
-            maxfd = csock;
-
-        std::cout << csock << "\t  =  New connection" << std::endl;
-    }
-    else
-    {
-        perror("accept");
-        exit(EXIT_FAILURE);
-    }
-    _clients.insert(std::pair<int, std::string>(csock, ""));
-    return (csock);
-}
-
-int Server::_Get_request(int sock)
-{
-    char buf[BUFFER_SIZE + 1];
-    int n;
-    int i = 0;
-    bzero(buf, BUFFER_SIZE + 1);
-    if ((n = recv(sock, buf, BUFFER_SIZE, 0)) > 0)
-    {
-        if (i == 0)
-        {
-            std::strcpy(this->request, buf);
-            i++;
-        }
-        else
-            std::strcat(this->request, buf);
-    }
-    return (n);
-}
-
-bool checkRequest(std::string &req)
-{
-    std::string data;
-    size_t i;
-
-    i = req.find("\r\n\r\n");
-    if (i == std::string::npos)
-        return false;
-    if (req.find("Content-Length") != std::string::npos)
-    {
-        data = req.substr(i + 4);
-        if (data.find("\r\n\r\n") == std::string::npos)
-            return false;
-    }
-    return true;
-}
-
-std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
-{
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -89,11 +29,11 @@ std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std:
 
 void Server::_GetDataServers(Parsing *parsing)
 {
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
 
-    std::map<int, std::multimap<std::string, std::string>>::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
+    std::map<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
 
     //show data servers
     std::multimap<std::string, std::string>::iterator it3;
@@ -160,7 +100,7 @@ Server::Server(Parsing *p, char *envp[])
     /*
         Print Config Data 
     */
-    _GetDataServers(p);
+    _GetDataServers(p); 
     /* 
         Warning Of Exit
     */
@@ -187,10 +127,7 @@ Server::Server(Parsing *p, char *envp[])
         struct timeval _tv = {30, 0};
         selected = select(maxfd + 1, &readfds, &writefds, NULL, &_tv);
         if (selected < 0)
-        {
-            perror("select");
-            exit(1);
-        }
+            throw(SelectFailed());
         else
             for (int sock_fd = 0; sock_fd <= maxfd; sock_fd++)
             {

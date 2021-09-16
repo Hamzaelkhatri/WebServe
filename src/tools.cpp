@@ -3,20 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   tools.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 17:24:36 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/08/16 00:33:11 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/16 11:38:32 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/tools.hpp"
-
-void    error_msg(std::string const msg)
-{
-    std::cout << msg << std::endl;
-    exit(EXIT_FAILURE);    
-}
 
 bool	line_equal(std::string const &line, std::string const &str)
 {

@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/12 14:17:15 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/15 10:43:56 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/16 12:16:45 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,11 @@ void Socket::set_socket()
     {
         server_fds.push_back(socket(AF_INET,SOCK_STREAM, 0));
         if (server_fds[i] == -1)
-        {
-            std::cerr << "socket failed" << std::endl;
-            exit(EXIT_FAILURE);
-        }
+            throw(CreatSocketFailed());
         fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
         int buffsize = 1;
         if (setsockopt(server_fds[i], SOL_SOCKET, SO_REUSEADDR, &buffsize, sizeof(buffsize)) == -1 )
-        {
-            perror("setsockopt");
-            exit(EXIT_FAILURE);
-        }
-        // std::cout << server_fds[i] << std::endl;
+            throw(SetSocketFailed());
     }
 }
 
@@ -76,18 +69,16 @@ void Socket::_Set_Binding()
     {
         if (bind(server_fds[i], (struct sockaddr *)&address[i], sizeof(address[i])) == -1)
         {
-            perror("bind() failed");
             close(server_fds[i]);
-            exit(EXIT_FAILURE);
+            throw(BindFailed());
         }
-        // fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
+        fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
         if(listen(server_fds[i], 2048) == -1)
         {
-            perror("listen() failed");
             close(server_fds[i]);
-            exit(EXIT_FAILURE);
+            throw(ListenFailed());
         }
-        // fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
+        fcntl(server_fds[i], F_SETFL, O_NONBLOCK);
         // std::cout << "listening on port " << ntohs(address[i].sin_port) << "" std::endl;
     }
 }

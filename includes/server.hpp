@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/15 19:34:21 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/16 11:29:27 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,25 +53,25 @@ class Socket;
 class Server  : public Socket 
 {
     private:
-        int sd;
-        int len;
-        int cnx;
-        int nfds;
-        int maxfd;
-        int csock;
-        int lenght;
-        Socket *sock;
-        int selected;
-        char * request;
-        fd_set readfds;
-        fd_set writefds;
-        fd_set exceptfds;
+        int         sd;
+        int         len;
+        int         cnx;
+        int         nfds;
+        int         maxfd;
+        int         csock;
+        int         lenght;
+        int         selected;
+        char        *request;
+        Socket        *sock;
+        fd_set      readfds;
+        fd_set      writefds;
+        fd_set      masterfds;
+        fd_set      exceptfds;
+        std::string path;
         std::string tmp2;
         std::string tmp1;
         std::string body;
         std::string line1;
-        std::string path;
-        fd_set masterfds;
         std::string status;
         std::string someString;
         std::vector<int> clients;
@@ -85,14 +85,26 @@ class Server  : public Socket
         Server(Parsing *pars,char *envp[]);
         int             _Accept_client(int sock);
         int             _Get_request(int csock);
-        void            Get_methode(cgi *c,char *envp[]);
-        void            Post_methode();
-        void            Delete_methode();
-        int check_index(std::string str);
-        std::string     getBody(std::string path);
+        int             check_index(std::string str);
         int             check_dir(std::string dir, std::string str);
+        bool            checkRequest(std::string &req);
+        void            Post_methode();
         void           _GetDataServers(Parsing *parsing);
         void            witch_server(std::map<int, std::string> str,Parsing *pars);
+        void            Delete_methode();
+        void            Get_methode(cgi *c,char *envp[]);
+        std::string     getBody(std::string path);
+        
+        class  AcceptFailed : public std::exception
+        {
+            virtual const char *what() const throw();
+        };
+        class SelectFailed : public std::exception
+        {
+            virtual const char *what() const throw();
+        };
+        
+        
         ~Server();
 
 };

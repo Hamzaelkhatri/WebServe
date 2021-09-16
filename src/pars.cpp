@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 19:03:57 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/12 12:00:53 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/16 12:16:49 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ Parsing::Parsing(char *av)
     char line[1024];
     int fd = open(file.c_str(), O_RDONLY);
     if (fd < 0)
-        error_msg("Error file not found");
+        throw std::runtime_error("Error opening file");
     while ((res = read(fd, line, 1024)) > 0)
     {
         if (std::strcmp(line, "\n") != 0)

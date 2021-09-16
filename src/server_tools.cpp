@@ -6,11 +6,69 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/03 21:46:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/15 19:41:25 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/16 12:16:50 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/server.hpp"
+
+int Server::_Accept_client(int sock)
+{
+    socklen_t client_len = sizeof(client);
+    int addrlen = sizeof(client);
+    csock = accept(sock, (struct sockaddr *)&client, (socklen_t *)&addrlen);
+    if (csock != -1)
+    {
+        fcntl(csock, F_SETFL, O_NONBLOCK);
+        FD_SET(csock, &masterfds);
+        FD_SET(csock, &writefds);
+        if (csock > maxfd)
+            maxfd = csock;
+
+        std::cout << csock << "\t  =  New connection" << std::endl;
+    }
+    else
+      throw(AcceptFailed());
+    _clients.insert(std::pair<int, std::string>(csock, ""));
+    return (csock);
+}
+
+int Server::_Get_request(int sock)
+{
+    char buf[BUFFER_SIZE + 1];
+    int n;
+    int i = 0;
+    bzero(buf, BUFFER_SIZE + 1);
+    if ((n = recv(sock, buf, BUFFER_SIZE, 0)) > 0)
+    {
+        if (i == 0)
+        {
+            std::strcpy(this->request, buf);
+            i++;
+        }
+        else
+            std::strcat(this->request, buf);
+    }
+    return (n);
+}
+
+bool Server::checkRequest(std::string &req)
+{
+    std::string data;
+    size_t i;
+
+    i = req.find("\r\n\r\n");
+    if (i == std::string::npos)
+        return false;
+    if (req.find("Content-Length") != std::string::npos)
+    {
+        data = req.substr(i + 4);
+        if (data.find("\r\n\r\n") == std::string::npos)
+            return false;
+    }
+    return true;
+}
+
 
 void    Server::witch_server(std::map<int,std::string> str ,Parsing *pars)
 {
@@ -18,28 +76,6 @@ void    Server::witch_server(std::map<int,std::string> str ,Parsing *pars)
     // _loc_map = p->Getloc_map();
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // char * removeHTTPHeader(char *buffer, int &bodySize)
 //  {

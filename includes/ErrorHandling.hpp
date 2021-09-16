@@ -1,3 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ErrorHandling.hpp                                  :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/09/16 11:58:37 by zdnaya            #+#    #+#             */
+/*   Updated: 2021/09/16 12:14:48 by zdnaya           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+
 #ifndef ERRORHANDLING_HPP
 #define ERRORHANDLING_HPP
 
@@ -21,6 +34,7 @@
 #include <iterator>
 #include <unordered_map>
 #include <ctype.h>
+#include <stdexcept>
 
 class ErrorHandling
 {
@@ -36,17 +50,49 @@ private:
 
 public:
     ErrorHandling(char *file);
-    ~ErrorHandling();
     void set_map(std::map<int, std::string> map_s);
     std::map<int, std::string> get_map_s();
     int get_nbr_server();
     int get_nbr_location();
     std::unordered_multimap<std::string, std::string> get_cmap(void);
+    
+    class FileNotFound : public std::exception
+    {
+        virtual const char *what() const throw();
+    };
+    class NoComment : public std::exception
+    {
+        virtual const char *what() const throw();
+    };
+    class StartWithServer : public std::exception
+    {
+        virtual const char *what() const throw();
+    };
+    class OpenBracket : public std::exception
+    {
+        virtual const char *what() const throw();
+    };
+    class CloseBracket : public std::exception
+    {
+        virtual const char *what() const throw();
+    };
+    class NewlineBracket: public std::exception
+    {
+        virtual const char *what() const throw();
+    };
+    class Oneserver : public std::exception
+    {
+        virtual const char *what() const throw();
+    };
+    class NumberBrackets : public std::exception
+    {
+        virtual const char *what() const throw();
+    };
+    ~ErrorHandling();
 };
 
 std::map<int, std::string> get_map(char *av);
 std::map<int, std::string> clean_map(std::map<int, std::string> error_mp);
-void error_msg(std::string const msg);
 std::string Those_lines(std::string txt, int nbr_line, int txt_lines);
 
 #endif

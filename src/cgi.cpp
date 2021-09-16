@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/03 12:22:53 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/10 12:21:28 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/16 12:15:49 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,7 @@ std::string cgi::CGI(char *av[], char *envp[])
         close(fd[0]);
         chdir("/home/hamza/Desktop/WebServe/webpage/cgi");
         execve(av[0], av, envp);
-        perror("execve");
-        exit(0);
+        throw std::runtime_error("execve");
     }
     else
     {
@@ -55,3 +54,8 @@ std::string cgi::CGI(char *av[], char *envp[])
     }
     return (str);
 }
+
+// const char *cgi::cgiFailed::what() const throw()
+// {
+//     return "CGI failed";
+// }

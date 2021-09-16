@@ -6,13 +6,14 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/12 10:48:26 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/12 16:43:32 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/16 11:41:43 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
+#include <stdexcept>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -55,8 +56,26 @@ class Socket
         std::vector<struct sockaddr_in> _Get_addr();
         std::vector<int> _Get_server_fds();
         std::map<int, std::multimap<std::string, std::string> >  _get_tmp();
+
+        class  CreatSocketFailed : public std::exception
+        {
+            virtual const char *what() const throw();
+        };
+        class SetSocketFailed : public std::exception
+        {
+            virtual const char *what() const throw();
+        };
+        class BindFailed : public std::exception
+        {
+            virtual const char *what() const throw();
+        };
+        class ListenFailed : public std::exception
+        {
+            virtual const char *what() const throw();
+        };
+
         ~Socket();
-};
+};  
 int nbr_sockets(Parsing *p);
 std::map<int, std::string> addr_map(std::map<int, std::multimap<std::string, std::string> > tmp);
 #endif
