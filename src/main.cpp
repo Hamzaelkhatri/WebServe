@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/17 19:51:19 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/17 20:10:35 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ int main(int ac, char *av[], char *envp[])
         try
         {
             ErrorHandling error(av[1]);
+            error.get_map_s();
             Parsing *pars = new Parsing(av[1]);
             std::map< int , std::multimap<std::string, std::string> >::iterator it;
             std::multimap<std::string, std::string>::iterator  it2;
@@ -53,8 +54,10 @@ int main(int ac, char *av[], char *envp[])
                 }
 
             }
+            std::cout << YEL  << "" << reset<< std::endl;
             // Server  serv(pars , envp);
         }
+
         catch(const std::exception& e)
         {
             std::cerr << e.what() << '\n';

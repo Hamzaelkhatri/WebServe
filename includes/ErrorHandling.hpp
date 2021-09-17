@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/16 11:58:37 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/16 12:14:48 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/17 19:56:45 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,5 @@ public:
 
 std::map<int, std::string> get_map(char *av);
 std::map<int, std::string> clean_map(std::map<int, std::string> error_mp);
-std::string Those_lines(std::string txt, int nbr_line, int txt_lines);
 
 #endif

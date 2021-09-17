@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/17 17:58:14 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/17 20:10:21 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,7 @@ ErrorHandling::ErrorHandling(char *file)
     this->location = 0;
     this->file = file;
 
-    // set_map(clean_map(get_map(file)));
-    // get_map_s();
+    set_map(clean_map(get_map(file)));
 }
 
 int ErrorHandling::get_nbr_server(void)
@@ -44,10 +43,6 @@ std::map<int, std::string> ErrorHandling::get_map_s()
     // std::map<int, std::string>::iterator it = this->map_s.begin();
     // for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
     // {
-    //     if (it->second == "server")
-    //         this->nbr_server++;
-    //     if (it->second.find("location") != std::string::npos)
-    //         this->nbr_location++;
     //     std::cout << "[ " << it->first;
     //     std::cout << " ] \t\t\t ==> [ ";
     //     std::cout << it->second << " ]" << std::endl;
@@ -68,35 +63,6 @@ int check_end_of_string(std::string str, int i, int j)
     return (1);
 }
 
-std::string Those_lines(std::string txt, int nbr_line, int txt_lines)
-{
-    int i = 0;
-    int j = 0;
-    int w = 0;
-    int k = 0;
-    std::string res;
-    // if (nbr_line >= txt_lines)
-    //     return ("");
-    while (txt[j] != '\n') // for the space befor  txt start from where the txt begins
-    {
-        res[k] = txt[j];
-        j++;
-        k++;
-    }
-    std::cout << res;
-    std::string res_s = trim(res); 
-    // std::cout << res_s << std::endl;
-    // w = 0;
-    // while (txt[j + w] != '\n') // when the line ends until \n
-    // {
-    //     w++;
-    // }
-    // while (w > 0) // escape space after the txt o the line
-    // {
-    //     w--;
-    // }
-    return (res_s);
-}
 /****************************************************************************/
 
 /************* Map *********************************************************/
@@ -106,23 +72,42 @@ std::map<int, std::string> get_map(char *av)
     std::map<int, std::string> map_s;
     std::string result;
     std::string file = av;
-    char line[1024];
+    char line1[1024];
     int fd = open(file.c_str(), O_RDONLY);
     if (fd < 0)
         throw ErrorHandling::FileNotFound();
-    while ((res = read(fd, line, 1024)) > 0)
+    while ((res = read(fd, line1, 1024)) > 0)
     {
-        if (std::strcmp(line, "\n") != 0)
-            result = result + line;
+        if (std::strcmp(line1, "\n") != 0)
+            result = result + line1;
         int i = 0;
         while (i < 1024)
-            line[i++] = 0;
+            line1[i++] = 0;
     }
-    int i = 0;
     int len = nbr_lines(result);
+    std::string line[len];
+    std::ifstream myfile;
+    myfile.open(file);
+    if(myfile.is_open())
+    {
+        int i = 0;
+        std::string tmp;
+        while (!myfile.eof() &&  i < len)
+        {
+            std::getline(myfile, tmp);
+            if(trim(tmp).length() > 0) 
+            {   
+                line[i] = trim(tmp);
+                i++;
+            }
+        }
+    }
+    else
+        throw std::runtime_error("Error opening file");   
+    int i = 0;
     while (i < len)
     {
-        map_s[i] = Those_lines(result, i, (len)); // no spaces befor or after
+        map_s[i] = line[i]; // no spaces befor or after
         i++;
     }
     return (map_s);
