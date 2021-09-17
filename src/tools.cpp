@@ -6,11 +6,14 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 17:24:36 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/16 11:38:32 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/17 17:53:48 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/tools.hpp"
+
+const std::string WHITESPACE = " \n\r\t\f\v";
+
 
 bool	line_equal(std::string const &line, std::string const &str)
 {
@@ -148,3 +151,21 @@ char **ft_charSplit(char const *s, char *set)
     tab[count_same_str(s, set)] = NULL;
     return (tab);
 }
+ 
+ 
+std::string ltrim(const std::string &s)
+{
+    size_t start = s.find_first_not_of(WHITESPACE);
+    return (start == std::string::npos) ? "" : s.substr(start);
+}
+ 
+std::string rtrim(const std::string &s)
+{
+    size_t end = s.find_last_not_of(WHITESPACE);
+    return (end == std::string::npos) ? "" : s.substr(0, end + 1);
+}
+ 
+std::string trim(const std::string &s) {
+    return rtrim(ltrim(s));
+}
+ 

@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:27:10 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/16 12:17:31 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/17 17:43:22 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,8 +212,8 @@ Server::Server(Parsing *p, char *envp[])
                                     }
 
                                     //Show Stor
-
-                                    _GetDataServers(p);
+                            std::cout  << someString << std::endl;
+                                    // _GetDataServers(p);
 
                                     // std::map<int, std::string>::iterator op = ips.begin();
                                     // for(op = ips.begin(); op != ips.end(); op++)

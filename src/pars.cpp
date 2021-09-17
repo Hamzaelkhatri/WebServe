@@ -6,11 +6,12 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 19:03:57 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/16 12:16:49 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/17 19:35:54 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pars.hpp"
+#include <fstream>
 
 Server_element::Server_element()
 {
@@ -35,43 +36,60 @@ Parsing::Parsing(char *av)
     std::map<int, std::string> map_s;
     std::string result;
     std::string file = av;
-    char line[1024];
+    char line1[1024];
     int fd = open(file.c_str(), O_RDONLY);
-    if (fd < 0)
-        throw std::runtime_error("Error opening file");
-    while ((res = read(fd, line, 1024)) > 0)
+    while ((res = read(fd, line1, 1024)) > 0)
     {
-        if (std::strcmp(line, "\n") != 0)
-            result = result + line;
+        if (std::strcmp(line1, "\n") != 0)
+            result = result + line1;
         int i = 0;
         while (i < 1024)
-            line[i++] = 0;
+            line1[i++] = 0;
     }
     int len = nbr_lines(result);
-    int i = 0;
+    std::string line[len];
+    std::ifstream myfile;
+    myfile.open(file);
+    if(myfile.is_open())
+    {
+        int i = 0;
+        std::string tmp;
+        while (!myfile.eof() &&  i < len)
+        {
+            std::getline(myfile, tmp);
+            if(trim(tmp).length() > 0) 
+            {   
+                line[i] = trim(tmp);
+                // std::cout << "|" << line [i]<< "|" << std::endl;   
+                i++;
+            }
+        }
+    }
+    else
+        throw std::runtime_error("Error opening file");    
     char **ptr = new char * [len + 1];
     int l = 0;
     int serverIndex = 0;
     int d = 0;
     int locIndex = 0;
-    while (i < len )
+    int i = 0;
+    while (i < len)
     {
-        // while(std::strcmp(Those_lines(result, i, len).c_str(), "") == 0 )
-        //             i++;
-        if(std::strcmp(Those_lines(result, i, len).c_str(), "server") == 0 )
+            
+        if(line[i] ==  "server")
         {
             i++;
             serverIndex++;
-            while(std::strcmp(Those_lines(result, i, len).c_str(), "{") == 0 ||  std::strcmp(Those_lines(result, i, len).c_str(), "}") == 0)
+            while(line[i] == "{" ||  line[i] ==  "}")
                     i++;
-            while(Those_lines(result, i, len) !=  "server"   && i < len && Those_lines(result, i, len).find("location") == std::string::npos)
+            while(line[i] !=  "server"   && i < len && line[i].find("location") == std::string::npos)
             {
                 locIndex = 0;
-                  while(std::strcmp(Those_lines(result, i, len).c_str(), "{") == 0 ||  std::strcmp(Those_lines(result, i, len).c_str(), "}") == 0)
+                  while(line[i] ==  "{" ||  line[i] == "}")
                     i++;
-                if(Those_lines(result, i, len) != "" &&  Those_lines(result, i, len).find("location") == std::string::npos )
+                if(line[i] != "" &&  line[i].find("location") == std::string::npos )
                 {
-                    char **ptr = ft_charSplit(Those_lines(result, i, len).c_str(), (char *)" \t");
+                    char **ptr = ft_charSplit(line[i].c_str(), (char *)"\t ");
                     std::string str ;
                     std::string key = ptr[0];
                      int k = 1;
@@ -95,14 +113,14 @@ Parsing::Parsing(char *av)
             this->server_map.clear();      
             }
             
-                  if (Those_lines(result, i, len).find("location") != std::string::npos)
+                  if (line[i].find("location") != std::string::npos)
                 {
                     locIndex++;
-                    while (Those_lines(result, i, len).find("}") == std::string::npos)
+                    while (line[i].find("}") == std::string::npos)
                     {
-                        if (Those_lines(result, i, len) != "" && Those_lines(result, i, len) != "}" && Those_lines(result, i, len) != "{")
+                        if (line[i] != "" && line[i] != "}" && line[i] != "{")
                         {
-                            char **ptr = ft_charSplit(Those_lines(result, i, len).c_str(), (char *)" \t");
+                            char **ptr = ft_charSplit(line[i].c_str(), (char *)" \t");
                             std::string str;
                             std::string key = ptr[0];
                             int k = 1;
@@ -126,6 +144,7 @@ Parsing::Parsing(char *av)
             }
             i++;
     }
+    myfile.close();
 }
 
 Parsing::~Parsing()

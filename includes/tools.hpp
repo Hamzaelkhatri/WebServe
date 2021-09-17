@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/07 23:51:29 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/10 17:33:49 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/17 19:34:38 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ int check_details(std::string line);
 int nbr_lines(std::string source);
 bool is_whitespace(const std::string &s);
 char **ft_charSplit(char const *s, char *set);
+std::string trim(const std::string &s);
 
 
 

@@ -6,11 +6,12 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/16 12:13:38 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/17 17:58:14 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ErrorHandling.hpp"
+#include "../includes/tools.hpp"
 
 ErrorHandling::ErrorHandling(char *file)
 {
@@ -20,7 +21,7 @@ ErrorHandling::ErrorHandling(char *file)
     this->location = 0;
     this->file = file;
 
-    set_map(clean_map(get_map(file)));
+    // set_map(clean_map(get_map(file)));
     // get_map_s();
 }
 
@@ -72,26 +73,29 @@ std::string Those_lines(std::string txt, int nbr_line, int txt_lines)
     int i = 0;
     int j = 0;
     int w = 0;
-    if (nbr_line >= txt_lines)
-        return ("");
-    while (i < nbr_line)
+    int k = 0;
+    std::string res;
+    // if (nbr_line >= txt_lines)
+    //     return ("");
+    while (txt[j] != '\n') // for the space befor  txt start from where the txt begins
     {
-        if (txt[j] == '\n')
-            i++;
+        res[k] = txt[j];
         j++;
+        k++;
     }
-    while (txt[j] != '\n' && std::isspace(txt[j])) // for the space befor  txt start from where the txt begins
-        j++;
-    w = 0;
-    while (txt[j + w] && txt[w + j] != '\n' && std::isprint(txt[j + w])) // when the line ends until \n
-    {
-        w++;
-    }
-    while (w > 0 && std::isspace(txt[w + j - 1])) // escape space after the txt o the line
-    {
-        w--;
-    }
-    return (std::string(txt, j, w));
+    std::cout << res;
+    std::string res_s = trim(res); 
+    // std::cout << res_s << std::endl;
+    // w = 0;
+    // while (txt[j + w] != '\n') // when the line ends until \n
+    // {
+    //     w++;
+    // }
+    // while (w > 0) // escape space after the txt o the line
+    // {
+    //     w--;
+    // }
+    return (res_s);
 }
 /****************************************************************************/
 
