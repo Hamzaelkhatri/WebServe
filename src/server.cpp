@@ -43,6 +43,38 @@ bool CheckRightServer(std::multimap<std::string, std::string>::iterator it3, Req
     return (TargetServer == 1 ? true : false);
 }
 
+bool is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location)
+{
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<std::string, std::string>::iterator it2;
+
+    for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
+    {
+        if (it2->first.find("location") != std::string::npos && it2->second.find(location) != std::string::npos)
+        {
+            return (true);
+        }
+    }
+    return (false);
+}
+
+int is_Path_exists(std::string path)
+{
+    std::ifstream ifs(path.c_str());
+    return (ifs.good() ? 1 : 0);
+}
+
+int is_dir(std::string dir)
+{
+    struct stat st;
+    if (stat(dir.c_str(), &st) == 0)
+    {
+        if (S_ISDIR(st.st_mode))
+            return (1);
+    }
+    return (0);
+}
+
 void Server::_GetDataServers(Parsing *parsing)
 {
     std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
@@ -92,7 +124,7 @@ void Server::_GetDataServers(Parsing *parsing)
                 break;
             }
         }
-
+        std::string TargetLocation = "";
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {
             if (it2->first == TargetServer)
@@ -100,8 +132,16 @@ void Server::_GetDataServers(Parsing *parsing)
                 location_tmp = _GetFirstLocation(it2);
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
-                    std::cout << it2->first << " "
-                              << " " << it4->first << it4->second << std::endl;
+                    if (request->get_path().find(".php") != std::string::npos)
+                        TargetLocation = "*.php";
+                    else if (is_location(it2, request->get_path()))
+                        TargetLocation = request->get_path();
+                    else
+                        TargetLocation = request->get_path().substr(request->get_path().find("/"), request->get_path().find("/") + 1);
+                    if (location_tmp == TargetLocation)
+                    {
+                        // response->set_status(200);
+                    }
                 }
             }
         }

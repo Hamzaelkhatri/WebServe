@@ -25,17 +25,14 @@ int main(int ac, char *av[], char *envp[])
         {
             ErrorHandling error(av[1]);
             Parsing *pars = new Parsing(av[1]);
-            Server  serv(pars , envp);
+            Server serv(pars, envp);
         }
-        catch(const std::exception& e)
+        catch (const std::exception &e)
         {
             std::cerr << e.what() << '\n';
         }
-        
-      
     }
     else
         std::cerr << "wrong file \n";
     return (0);
 }
-
