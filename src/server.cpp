@@ -28,17 +28,17 @@ std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std:
     return (std::string(""));
 }
 
-bool CheckRightServer(std::multimap<std::string, std::string>::iterator it3,Request *request,std::map<int, std::multimap<std::string, std::string> >::iterator it)
+bool CheckRightServer(std::multimap<std::string, std::string>::iterator it3, Request *request, std::map<int, std::multimap<std::string, std::string> >::iterator it)
 {
     int TargetServer = 0;
     if (it3->first.find("listen") != std::string::npos && request->get_port().find(it3->second) == std::string::npos) // 8011 != 8060
         return (false);
     else
     {
-    if(it3->first.find("server_addr") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
-        TargetServer +=1;
-    else if(it3->first.find("server_name")!= std::string::npos && request->get_host().find(it3->second) != std::string::npos)
-        TargetServer +=1;
+        if (it3->first.find("server_addr") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
+            TargetServer += 1;
+        else if (it3->first.find("server_name") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
+            TargetServer += 1;
     }
     return (TargetServer == 1 ? true : false);
 }
@@ -72,46 +72,41 @@ void Server::_GetDataServers(Parsing *parsing)
     request->set_method(Methode);
     request->set_path(Path);
 
-    
     Response *response = new Response();
-    int TargetServer = 1;
+    int TargetServer = 0;
     for (it = servers.begin(); it != servers.end(); it++)
     {
-        // std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
-        // std::cout << BLU << "\t\tServer INFO " << RED << indexOfServer << reset << std::endl;
         indexOfLocation = 0;
-
+        TargetServer = 0;
         for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
         {
-            if(CheckRightServer(it3,request,it))
-                {
-                    // std::cout << "\t\t" << indexOfServer << ") " << it3->second << ": " << std::endl;
-                    TargetServer = indexOfServer;
-                    break;
-                }
-                else
-                continue;
+            if (it3->first.find("listen") != std::string::npos && request->get_port().find(it3->second) != std::string::npos)
+                TargetServer -= 1;
+            if (it3->first.find("server_addr") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
+                TargetServer -= 1;
+            else if (it3->first.find("server_name") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
+                TargetServer -= 1;
+            if (TargetServer <= -2)
+            {
+                TargetServer = indexOfServer;
+                break;
+            }
         }
-
-        // std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
 
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {
-            if (indexOfServer == TargetServer)
+            if (it2->first == TargetServer)
             {
                 location_tmp = _GetFirstLocation(it2);
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
-                    
-                        if (indexOfLocation != std::stoi(it4->first.substr(0, it4->first.find(" "))))
-                            std::cout << MAG << "\t\tlocation ---> " << it4->first.substr(0, it4->first.find(" ")) << RED << " " << location_tmp << reset << std::endl;
-                        indexOfLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
-                        LocationContent.insert(std::pair<std::string, std::string>(it4->first, it4->second));
-                        std::cout << it4->first.substr(it4->first.find(" ") + 1) << GRN << " ===> " << reset << it4->second << std::endl;
+                    std::cout << it2->first << " "
+                              << " " << it4->first << it4->second << std::endl;
                 }
             }
         }
         indexOfServer++;
+        std::cout << YEL << "***********************************" << reset << std::endl;
     }
     exit(0);
 }
