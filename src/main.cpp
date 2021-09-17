@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/17 19:39:50 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/17 19:47:22 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,20 @@ int main(int ac, char *av[], char *envp[])
                 std::cout << YEL  << "\t" << reset<< std::endl;
 
             }
-            std::multimap<std::string, std::string> it1;
+            std::multimap< int , std::multimap<std::string, std::string> > tmp1 = pars->Getloc_map();
+            std::multimap< int , std::multimap<std::string, std::string> >::iterator it3;
+            std::multimap<std::string, std::string>::iterator it1;
+            for(it3 = tmp1.begin(); it3 != tmp1.end(); ++it3)
+            {
+                std::cout <<  YEL << "\tLocation" << reset<< std::endl; 
+                std::cout <<  RED << "\t\tLocation\t\t" << it3->first << ":" << reset << std::endl;
+                for(it1 = it3->second.begin(); it1 != it3->second.end(); ++it1)
+                {
+                std::cout << "\t" << it1->first << "\t\t\t" << it1->second << "\n\n";
+                }
+                std::cout << YEL  << "\t" << reset<< std::endl;
 
-
+            }
             // Server  serv(pars , envp);
         }
         catch(const std::exception& e)
