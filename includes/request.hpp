@@ -36,6 +36,7 @@ public:
     void set_content_lenght(int content_lenght);
     //constructors
     ~Request();
+    Request();
     Request(Server* server, int client_sock);
     //methods
     void parse_request();

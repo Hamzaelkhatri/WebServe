@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../includes/Webserv.hpp"
+#include "../includes/request.hpp"
 
 std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations)
 {
@@ -27,6 +28,21 @@ std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std:
     return (std::string(""));
 }
 
+bool CheckRightServer(std::multimap<std::string, std::string>::iterator it3,Request *request,std::map<int, std::multimap<std::string, std::string> >::iterator it)
+{
+    int TargetServer = 0;
+    if (it3->first.find("listen") != std::string::npos && request->get_port().find(it3->second) == std::string::npos) // 8011 != 8060
+        return (false);
+    else
+    {
+    if(it3->first.find("server_addr") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
+        TargetServer +=1;
+    else if(it3->first.find("server_name")!= std::string::npos && request->get_host().find(it3->second) != std::string::npos)
+        TargetServer +=1;
+    }
+    return (TargetServer == 1 ? true : false);
+}
+
 void Server::_GetDataServers(Parsing *parsing)
 {
     std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
@@ -40,7 +56,6 @@ void Server::_GetDataServers(Parsing *parsing)
     int indexOfServer = 1;
     int indexOfLocation = 1;
     std::string location_tmp = _GetFirstLocation(locations.begin());
-
     /*
         simulation Of data from Server Request
     */
@@ -49,34 +64,36 @@ void Server::_GetDataServers(Parsing *parsing)
     std::string Methode = (stor.find("GET") != stor.end() ? "GET" : (stor.find("POST") != stor.end()) ? "POST"
                                                                 : (stor.find("DELETE") != stor.end()) ? "DELETE"
                                                                                                       : "UNKNOWN");
-    // std::cout << "Host: " << Host << std::endl;
-    // std::cout  << Port << std::endl;
-    // std::cout << "Methode: " << Methode << std::endl;
-    std::cout << "Path: " << Port << std::endl;
-    // for (std::map<std::string, std::string>::iterator it = stor.begin(); it != stor.end(); ++it)
-    //         std::cout << it->first << " --> " << it->second << std::endl;
+    std::string Path = stor[Methode];
+
+    Request *request = new Request();
+    request->set_host(Host);
+    request->set_port(Port);
+    request->set_method(Methode);
+    request->set_path(Path);
+
+    
     Response *response = new Response();
     int TargetServer = 1;
     for (it = servers.begin(); it != servers.end(); it++)
     {
-        std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
-        std::cout << BLU << "\t\tServer INFO " << RED << indexOfServer << reset << std::endl;
+        // std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
+        // std::cout << BLU << "\t\tServer INFO " << RED << indexOfServer << reset << std::endl;
         indexOfLocation = 0;
-
-        /* Print Server DATA*/
 
         for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
         {
-            if (it3->first.find("listen") != std::string::npos)
-            {
-                if (Port.find(it3->second) != std::string::npos)
+            if(CheckRightServer(it3,request,it))
                 {
-                    TargetServer = it->first;
+                    // std::cout << "\t\t" << indexOfServer << ") " << it3->second << ": " << std::endl;
+                    TargetServer = indexOfServer;
+                    break;
                 }
-            }
+                else
+                continue;
         }
 
-        std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
+        // std::cout << YEL << "------------------------------------------------------" << reset << std::endl;
 
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {

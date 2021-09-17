@@ -7,6 +7,7 @@
 #include "pars.hpp"
 #include "socket.hpp"
 #include "response.hpp"
+#include "request.hpp"
 
 
 #endif

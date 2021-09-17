@@ -77,6 +77,12 @@ Request::~Request()
 
 }
 
+Request::Request()
+{
+
+}
+
+
 Request::Request(Server *server,int client_sock)
 {
     this->server = server;
