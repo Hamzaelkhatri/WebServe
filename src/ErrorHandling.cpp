@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/17 20:10:21 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/18 11:10:40 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,13 @@ void ErrorHandling::set_map(std::map<int, std::string> map)
 
 std::map<int, std::string> ErrorHandling::get_map_s()
 {
-    // std::map<int, std::string>::iterator it = this->map_s.begin();
-    // for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
-    // {
-    //     std::cout << "[ " << it->first;
-    //     std::cout << " ] \t\t\t ==> [ ";
-    //     std::cout << it->second << " ]" << std::endl;
-    // }
+    std::map<int, std::string>::iterator it = this->map_s.begin();
+    for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
+    {
+        std::cout << "[" << CYN << it->first << RESET;
+        std::cout << "] \t\t\t ==> [";
+        std::cout << CYN << it->second << RESET  << "]" << std::endl;
+    }
     return (this->map_s);
 }
 
@@ -112,16 +112,13 @@ std::map<int, std::string> get_map(char *av)
     }
     return (map_s);
 }
-/**************************************************************************/
-
 /******************** Error *******************************************/
-
 std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
 {
     std::map<int, std::string>::iterator it = error_mp.begin();
     std::map<int, std::string> res;
     int i = 1;
-       int m = 0;
+    int m = 0;
     while (it != error_mp.end())
     {
         if (is_whitespace(it->second) == true)
@@ -139,67 +136,51 @@ std::map<int, std::string> clean_map(std::map<int, std::string> error_mp)
     int k = 0;
     for (it = res.begin(); it != res.end(); ++it)
     {
+        m++;
         if (res[it->first].find("#") != std::string::npos)
             throw ErrorHandling::NoComment();
-        if (it->first == 1 && res[it->first] != "server")
+        if (m == 1 && res[it->first] != "server")
             throw ErrorHandling::StartWithServer();
         if (res[it->first] == "server" && res[it->first + 1] != "{")
             throw ErrorHandling::OpenBracket();
-        if( (res[it->first].find("location") != std::string::npos ) &&    res[it->first].find("}") != std::string::npos )
+        if(res[it->first].find("location") != std::string::npos && res[it->first].find("}") != std::string::npos )
             throw ErrorHandling::CloseBracket();
-        if( (res[it->first].find("location") != std::string::npos ) &&    res[it->first].find("{") != std::string::npos )
+        if(res[it->first].find("location") != std::string::npos && res[it->first].find("{") != std::string::npos )
             throw ErrorHandling::NewlineBracket();
-        if (res[it->first].find("}") != std::string::npos)
+        if((res[it->first].find("}") != std::string::npos || res[it->first].find("{") != std::string::npos) && res[it->first].length() > 1)
+            throw std::runtime_error("Error the brackets are allowed just after Server and location  in newLine Not other place");
+        if (res[it->first].find("}") != std::string::npos && res[it->first].length() ==  1)
             k++;
-        if (res[it->first].find("{") != std::string::npos)
+        if (res[it->first].find("{") != std::string::npos && res[it->first].length() ==  1)
             k--;
-        if ((res[it->first].find(" server ") != std::string::npos && m == 1) || (res[it->first].find(" server ") != std::string::npos && res[it->first - 1].find("}") != std::string::npos))
+        if ( m > 0 && k != 0 && res[it->first] == "server")
+           throw std::runtime_error("Error You can't put sever inside a server");
+        if(res[it->first].find("location") != std::string::npos)
         {
-            std::map<int, std::string>::iterator it1 = it;
-            it1++;
-            while (it1 != res.end())
+            while(res[it->first].find("}") != std::string::npos)
             {
-                if (res[it1->first].find(" server ") != std::string::npos && res[it1->first + 1].find("{") != std::string::npos && k != 0)
-                    throw ErrorHandling::Oneserver();
-                else
-                    it1++;
+                if(res[it->first].find("location") != std::string::npos)
+                    throw std::runtime_error("Error You can't put location inside location");
+                if(res[it->first].find("server") != std::string::npos)
+                    throw std::runtime_error("Error You can't put server inside location");
+                it++;
             }
-            m++;
         }
     }
     if (k != 0)
         throw ErrorHandling::NumberBrackets();
- 
-    for (it = res.begin(); it != res.end(); ++it)
+    for(it = res.begin(); it != res.end(); ++it)
     {
-        // if ((res[it->first].find("server") != std::string::npos && m == 1) || (res[it->first].find("server") != std::string::npos && res[it->first - 1].find("}") != std::string::npos))
-        // {
-        //     std::map<int, std::string>::iterator it1 = it;
-        //     it1++;
-        //     while (it1 != res.end())
-        //     {
-        //         std::cout << res[it1->first] << std::endl;
-        //         if (res[it1->first].find("server") != std::string::npos && res[it1->first + 1].find("{") != std::string::npos )
-        //             error_msg("Error!! not 2 server inside another one");
-        //         else
-        //             it1++;
-        //     }
-        //     m++;
-        // }
-        // else 
-        if (res[it->first].find(" location ") != std::string::npos)
-        {
-            std::map<int, std::string>::iterator it1 = it;
-            it1++;
-
-            while (it1 != res.end())
-            {
-                if (k != 0 && (res[it->first].find(" server ") != std::string::npos || res[it->first].find("location") != std::string::npos))
-                      throw  ErrorHandling::Oneserver();
-                else
-                    it1++;
-            }
-        }
+        if(res[it->first] == "listen")
+            throw std::runtime_error("Error Add a PORT infront of listen");
+        if(res[it->first].find(":") != std::string::npos && res[it->first].find("listen") != std::string::npos && res[it->first].find(".") != std::string::npos)
+            throw std::runtime_error("Error seperate Port in listen and the IP in server_addr");
+        if(res[it->first].find(":") != std::string::npos && res[it->first].find("server_addr") != std::string::npos && res[it->first].find(".") == std::string::npos)
+            throw std::runtime_error("Error seperate Port in listen and the IP in server_addr");
+        if(res[it->first] == "server_name")
+                res[it->first] += " localhost";
+        if(res[it->first].find("\"") != std::string::npos)
+            throw std::runtime_error("Error You can't put double quotes on Anything");
     }
     return (res);
 }

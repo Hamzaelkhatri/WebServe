@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/16 11:58:37 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/17 19:56:45 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/18 10:58:51 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@
 #include <unordered_map>
 #include <ctype.h>
 #include <stdexcept>
+#define CYN "\e[0;36m"
+#define RESET "\e[0m"
 
 class ErrorHandling
 {
