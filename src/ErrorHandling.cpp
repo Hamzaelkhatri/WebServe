@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/18 11:10:40 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/18 16:18:21 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,13 @@ void ErrorHandling::set_map(std::map<int, std::string> map)
 
 std::map<int, std::string> ErrorHandling::get_map_s()
 {
-    std::map<int, std::string>::iterator it = this->map_s.begin();
-    for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
-    {
-        std::cout << "[" << CYN << it->first << RESET;
-        std::cout << "] \t\t\t ==> [";
-        std::cout << CYN << it->second << RESET  << "]" << std::endl;
-    }
+    // std::map<int, std::string>::iterator it = this->map_s.begin();
+    // for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
+    // {
+    //     std::cout << "[" << CYN << it->first << RESET;
+    //     std::cout << "] \t\t\t ==> [";
+    //     std::cout << CYN << it->second << RESET  << "]" << std::endl;
+    // }
     return (this->map_s);
 }
 

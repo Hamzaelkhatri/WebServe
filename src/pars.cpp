@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 19:03:57 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/17 19:35:54 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/18 17:31:20 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,53 @@ std::map< int , std::multimap<std::string, std::string> > Parsing::GetServerMap(
     return (this->_server_map);
 }
 
+
+void Parsing::set_serverMap(std::map< int , std::multimap<std::string, std::string> >  srv,std::multimap <int, std::multimap<std::string, std::string> > loc)
+{
+    int addr = 0;
+    int port = 0;
+    int name = 0;
+    int root = 0;
+    std::map< int , std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<std::string, std::string>::iterator it1;
+    srv = this->_server_map;
+    for(it = srv.begin(); it != srv.end(); it++)
+    {
+        for(it1 =  it->second.begin() ; it1 != it->second.end(); ++it1)
+        {
+            if(it1->first == "listen")
+                port++;
+            if(it1->first == "server_addr")
+                addr++;
+            if(it1->first == "server_name")
+                name++;
+            if(it1->first  == "root")
+                root++;
+        }
+        if (port == 0)
+            it->second.insert(std::pair<std::string, std::string>("listen", "5000"));
+        if(addr == 0)
+            it->second.insert(std::pair<std::string, std::string>("server_addr", "127.0.0.1"));
+        if(name == 0)
+            it->second.insert(std::pair<std::string, std::string>("server_name", "localhost"));
+    }
+    loc = this->_loc_map;
+    std::multimap< int , std::multimap<std::string, std::string> >::iterator it2;
+    for(it2 = loc.begin(); it2 != loc.end(); it2++)
+    {
+        for(it1 =  it2->second.begin() ; it1 != it2->second.end(); ++it1)
+        {
+            // std::cout << it1->first << std::endl;
+            if(it1->first.find("root") != std::string::npos)
+                root++;
+        }
+    }
+    if(root == 0)
+        throw std::runtime_error("No root element");
+}
+
+
+
 void Parsing::set_env(char **env) 
 {
     this->env = env;
@@ -41,7 +88,6 @@ char **Parsing::get_env()
 Parsing::Parsing(char *av)
 {
     int  z = 0;
-
     int res = 0;
     std::map<int, std::string> map_s;
     std::string result = "";

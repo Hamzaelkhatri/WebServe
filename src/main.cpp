@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/18 10:38:55 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/18 17:25:47 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,9 @@ int main(int ac, char *av[], char *envp[])
         try
         {
             ErrorHandling error(av[1]);
-            error.get_map_s();
-            // Parsing *pars = new Parsing(av[1]);
+            // error.get_map_s();
+            Parsing *pars = new Parsing(av[1]);
+            pars->set_serverMap(pars->GetServerMap(),pars->Getloc_map());
             // std::map< int , std::multimap<std::string, std::string> >::iterator it;
             // std::multimap<std::string, std::string>::iterator  it2;
             // std::map< int , std::multimap<std::string, std::string> > tmp = pars->GetServerMap();
@@ -37,8 +38,8 @@ int main(int ac, char *av[], char *envp[])
             //     {
             //     std::cout << "\t" << it2->first << "\t\t\t" << it2->second << "\n\n";
             //     }
-
             // }
+            // std::cout << YEL << "\n\n";
             // std::cout << YEL  << "" << reset<< std::endl;
             // std::cout <<  RED << "" << reset<< std::endl; 
             // std::multimap< int , std::multimap<std::string, std::string> > tmp1 = pars->Getloc_map();
