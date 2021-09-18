@@ -69,7 +69,7 @@ void Server::Get_methode(cgi *c,char *envp[])
       argv[0] = (char *)str.c_str();
       argv[1] = (char *)stor.find("GET")->second.c_str();
       argv[2] = NULL;
-      body = c->CGI(argv, envp);
+    //   body = c->CGI(argv, envp);
       body = body.substr(body.find("\r\n\r\n")+4,body.size());
       len = body.size();
   }

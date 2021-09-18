@@ -28,13 +28,23 @@ std::map< int , std::multimap<std::string, std::string> > Parsing::GetServerMap(
     return (this->_server_map);
 }
 
+void Parsing::set_env(char **env) 
+{
+    this->env = env;
+}
+
+char **Parsing::get_env()
+{
+    return (this->env);
+}
+
 Parsing::Parsing(char *av)
 {
     int  z = 0;
 
     int res = 0;
     std::map<int, std::string> map_s;
-    std::string result;
+    std::string result = "";
     std::string file = av;
     char line1[1024];
     int fd = open(file.c_str(), O_RDONLY);

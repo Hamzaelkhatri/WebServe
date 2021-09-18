@@ -39,6 +39,7 @@ class Parsing
 {
 private:
     Server_element *server;
+    char **env;
     std::map<int, Server_element> parsing;
     std::multimap<std::string, std::string> server_map;
     std::multimap<std::string, std::string> loc_map;
@@ -46,6 +47,8 @@ private:
     std::multimap <int, std::multimap<std::string, std::string> > _loc_map;
 
 public:
+    void set_env(char **env); 
+    char **get_env();
     Parsing( char *av);
     std::map< int , std::multimap<std::string, std::string> > GetServerMap();
     std::multimap <int, std::multimap<std::string, std::string> > Getloc_map();

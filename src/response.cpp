@@ -1,5 +1,10 @@
 #include "response.hpp"
 
+//read file
+#include <fstream>
+#include <iostream>
+#include <string>
+
 std::string Response::getStatus()
 {
     return (status);
@@ -45,24 +50,80 @@ std::string Response::getCookie()
     return (cookie);
 }
 
+std::string Response::getPath()
+{
+    return (path);
+}
+
+std::string Response::getHost()
+{
+    return (host);
+}
+
+std::string Response::getPort()
+{
+    return (port);
+}
+std::string Response::getMethod()
+{
+    return (method);
+}
 
 //seters
 
+void Response::setPath(std::string path)
+{
+    this->path = path;
+}
+
+void Response::setHost(std::string host)
+{
+    this->host = host;
+}
+
+void Response::setServerName(std::string servername)
+{
+    this->servername = servername;
+}
+
+void Response::setCGIPath(std::string cgi_path)
+{
+    this->cgipath = cgi_path;
+}
+
+std::string Response::getCGIPath()
+{
+    return (cgipath);
+}
+
+
+std::string Response::getServerName()
+{
+    return (servername);
+}
+
+void Response::setPort(std::string port)
+{
+    this->port = port;
+}
+
+void Response::setMethod(std::string method)
+{
+    this->method = method;
+}
+
 Response::Response()
 {
-
 }
 
 Response::~Response()
 {
-    
 }
 
 void Response::setStatus(std::string status)
 {
     this->status = status;
 }
-
 
 void Response::setRedirection(std::string redirection)
 {
@@ -71,7 +132,8 @@ void Response::setRedirection(std::string redirection)
 
 void Response::setBody(std::string body)
 {
-    this->body = body;
+    //read from Body Path
+    body = body;
 }
 
 void Response::setCharset(std::string charset)
@@ -86,7 +148,7 @@ void Response::setCookie(std::string cookie)
 
 void Response::setContentLength(std::string content_length)
 {
-    this->content_length = content_length;
+    this->content_length = std::to_string(body.size());
 }
 
 void Response::setContentType(std::string content_type)
@@ -94,3 +156,12 @@ void Response::setContentType(std::string content_type)
     this->content_type = content_type;
 }
 
+void Response::setVersion(std::string version)
+{
+    this->version = version;
+}
+
+void Response::setSetCookie(std::string set_cookie)
+{
+    this->set_cookie = set_cookie;
+}

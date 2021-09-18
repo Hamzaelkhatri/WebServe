@@ -23,6 +23,12 @@ private:
     std::string charset;
     std::string set_cookie;
     std::string cookie;
+    std::string path;
+    std::string host;
+    std::string port;
+    std::string method;
+    std::string servername;
+    std::string cgipath;
 
 public:
     Response();
@@ -38,6 +44,12 @@ public:
     std::string getCharset();
     std::string getSetCookie();
     std::string getCookie();
+    std::string getPath();
+    std::string getHost();
+    std::string getPort();
+    std::string getMethod();
+    std::string getServerName();
+    std::string getCGIPath();
     //setters
     void setStatus(std::string status);
     void setVersion(std::string version);
@@ -48,6 +60,12 @@ public:
     void setCharset(std::string charset);
     void setSetCookie(std::string set_cookie);
     void setCookie(std::string cookie);
+    void setPath(std::string path);
+    void setHost(std::string host);
+    void setPort(std::string port);
+    void setMethod(std::string method);
+    void setServerName(std::string servername);
+    void setCGIPath(std::string cgipath);
 };
 
 #endif

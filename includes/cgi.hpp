@@ -15,21 +15,16 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <stdexcept>
-
-#define die(e)                      \
-    {                               \
-        fprintf(stderr, "%s\n", e); \
-        exit(EXIT_FAILURE);         \
-    }
+#include "response.hpp"
 
 class cgi
 {
 private:
 public:
-    std::string CGI(char *argv[], char *envp[]);
-        //  class  cgiFailed : public std::exception
-        // {
-        //     virtual const char *what() const throw();
-        // };
+    std::string CGI(Response *r, char *envp[]);
+    //  class  cgiFailed : public std::exception
+    // {
+    //     virtual const char *what() const throw();
+    // };
 };
 #endif
