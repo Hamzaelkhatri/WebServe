@@ -96,7 +96,6 @@ std::string Response::getCGIPath()
     return (cgipath);
 }
 
-
 std::string Response::getServerName()
 {
     return (servername);
@@ -122,7 +121,12 @@ Response::~Response()
 
 void Response::setStatus(std::string status)
 {
-    this->status = status;
+    if (status == "")
+    {
+        this->status = "200 OK";
+    }
+    else
+        this->status = status;
 }
 
 void Response::setRedirection(std::string redirection)
@@ -133,7 +137,7 @@ void Response::setRedirection(std::string redirection)
 void Response::setBody(std::string body)
 {
     //read from Body Path
-    body = body;
+    this->body = body;
 }
 
 void Response::setCharset(std::string charset)

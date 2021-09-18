@@ -34,7 +34,8 @@ std::string cgi::CGI(Response *r, char *envp[])
     setenv("REDIRECT_STATUS", r->getStatus().c_str(), 1); //status of cnx
     setenv("QUERY_STRING", "?hello", 1);
     const char **av = new const char *[3];
-    av[0] =  strdup(r->getCGIPath().c_str());
+    av[0] = strdup(r->getCGIPath().c_str());
+    std::cout << r->getCGIPath().c_str() << std::endl;
     av[1] = fullpath.c_str();
     av[2] = NULL;
     if (pipe(fd) == -1) // cat hel.txt | cat -e  FD[1] ---> FD[0] 0 1 2 3

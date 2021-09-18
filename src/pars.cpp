@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 19:03:57 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/18 17:31:20 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/18 20:09:10 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,16 @@ void Parsing::set_serverMap(std::map< int , std::multimap<std::string, std::stri
     }
     if(root == 0)
         throw std::runtime_error("No root element");
+    if(loc.size() == 0)
+    {
+        std::multimap<std::string, std::string> tmp;
+        tmp.insert(std::pair<std::string, std::string>("location","/"));
+        tmp.insert(std::pair<std::string, std::string>("index","/index.html"));
+        tmp.insert(std::pair<std::string, std::string>("method","GET"));
+        loc.insert(std::pair<int, std::multimap<std::string, std::string> >(1,tmp));
+    }
+    this->_loc_map = loc;
+        // std::cout << "No Location found\n";
 }
 
 
@@ -105,6 +115,7 @@ Parsing::Parsing(char *av)
     int len = nbr_lines(result);
     std::string line[len];
     std::ifstream myfile;
+    int nbr_server = 0;
     myfile.open(file);
     if(myfile.is_open())
     {
@@ -116,6 +127,8 @@ Parsing::Parsing(char *av)
             if(trim(tmp).length() > 0) 
             {   
                 line[i] = trim(tmp);
+                if(line[i] == "server")
+                    nbr_server++;
                 // std::cout << "|" << line [i]<< "|" << std::endl;   
                 i++;
             }
@@ -129,11 +142,12 @@ Parsing::Parsing(char *av)
     int d = 0;
     int locIndex = 0;
     int i = 0;
+    int s = 0;
     while (i < len)
     {
-            
         if(line[i] ==  "server")
         {
+            
             i++;
             serverIndex++;
             while(line[i] == "{" ||  line[i] ==  "}")
@@ -141,7 +155,7 @@ Parsing::Parsing(char *av)
             while(line[i] !=  "server"   && i < len && line[i].find("location") == std::string::npos)
             {
                 locIndex = 0;
-                  while(line[i] ==  "{" ||  line[i] == "}")
+                while(line[i] ==  "{" ||  line[i] == "}")
                     i++;
                 if(line[i] != "" &&  line[i].find("location") == std::string::npos )
                 {
@@ -159,46 +173,58 @@ Parsing::Parsing(char *av)
                     }
                     this->server_map.insert(std::pair<std::string, std::string>(key, str));
                 }
-               
-                 i++;
+                i++;
             }
-       
             std::multimap<std::string, std::string> tmp;
             tmp = this->server_map;
-            this->_server_map[serverIndex] = tmp ;
-            this->server_map.clear();      
-            }
-            
-                  if (line[i].find("location") != std::string::npos)
+            this->_server_map[serverIndex] = tmp;
+            this->server_map.clear();
+            s = 0;
+        }
+        if (line[i].find("location") != std::string::npos)
+        {
+            s++;
+            locIndex++;
+            while (line[i].find("}") == std::string::npos)
+            {
+                if (line[i] != "" && line[i] != "}" && line[i] != "{")
                 {
-                    locIndex++;
-                    while (line[i].find("}") == std::string::npos)
+                    char **ptr = ft_charSplit(line[i].c_str(), (char *)" \t");
+                    std::string str;
+                    std::string key = ptr[0];
+                    int k = 1;
+                    while (ptr[k])
                     {
-                        if (line[i] != "" && line[i] != "}" && line[i] != "{")
-                        {
-                            char **ptr = ft_charSplit(line[i].c_str(), (char *)" \t");
-                            std::string str;
-                            std::string key = ptr[0];
-                            int k = 1;
-                            while (ptr[k])
-                            {
-                                if (k == 1)
-                                    str = ptr[k];
-                                else
-                                    str = str + " " + ptr[k];
-                                k++;
-                            }
-                            this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex)+" "+key, str));
-                        }
-                        i++;
+                        if (k == 1)
+                            str = ptr[k];
+                        else
+                            str = str + " " + ptr[k];
+                        k++;
                     }
+                    this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex)+" "+key, str));
+                }
+                i++;
+            }
             std::multimap<std::string, std::string> tmp1;
             tmp1 = this->loc_map;
             this->_loc_map.insert(std::pair<int, std::multimap<std::string, std::string> >(serverIndex, tmp1));
             this->loc_map.clear();
-            i--;
-            }
-            i++;
+             i--;
+        }
+        if ( s == 0 && line[i] == "}")
+        {
+            std::multimap<std::string, std::string> tmp;
+            locIndex++;
+            this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex)+" location", "/"));
+            this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex)+" index", "/index.html"));
+            this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex)+" method", "GET"));
+            tmp = this->loc_map;
+            this->_loc_map.insert(std::pair<int, std::multimap<std::string, std::string> >(serverIndex,tmp));
+            this->loc_map.clear();
+            //  i--;
+        }
+       
+        i++;
     }
     myfile.close();
 }
