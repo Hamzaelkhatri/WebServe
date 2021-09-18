@@ -13,8 +13,8 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <arpa/inet.h>     //it have all data sockaddr ....
-#include <netdb.h> // definitions for network database operations
+#include <arpa/inet.h>  //it have all data sockaddr ....
+#include <netdb.h>      // definitions for network database operations
 #include <sys/socket.h> // have data of socket ... lenght 32bits
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -32,12 +32,12 @@
 #include <unistd.h>
 #include <string>
 #include <regex>
-#include <arpa/inet.h> 
+#include <arpa/inet.h>
 #include "socket.hpp"
 #include "pars.hpp"
 #include <string.h>
 
-#define BUFFER_SIZE   65507
+#define BUFFER_SIZE 65507
 //Regular text
 #define BLK "\e[0;30m"
 #define RED "\e[0;31m"
@@ -50,63 +50,62 @@
 #define reset "\e[0m"
 
 class Socket;
-class Server  : public Socket 
+class Server : public Socket
 {
-    private:
-        int         sd;
-        int         len;
-        int         cnx;
-        int         nfds;
-        int         maxfd;
-        int         csock;
-        int         lenght;
-        int         selected;
-        char        *request;
-        Socket        *sock;
-        fd_set      readfds;
-        fd_set      writefds;
-        fd_set      masterfds;
-        fd_set      exceptfds;
-        std::string path;
-        std::string tmp2;
-        std::string tmp1;
-        std::string body;
-        std::string line1;
-        std::string status;
-        std::string someString;
-        std::vector<int> clients;
-        struct sockaddr_in client;
-        std::vector<int> MasterSockets;
-        std::vector<std::string> Content;
-        std::map<int, std::string> _clients;
-        std::map<std::string, std::string> stor;
-        std::multimap<int, std::multimap<std::string, std::string> > loc;
-    public:
-        Server(Parsing *pars,char *envp[]);
-        int             _Accept_client(int sock);
-        int             _Get_request(int csock);
-        int             check_index(std::string str);
-        int             check_dir(std::string dir, std::string str);
-        bool            checkRequest(std::string &req);
-        void            Post_methode();
-        void           _GetDataServers(Parsing *parsing);
-        void            witch_server(std::map<int, std::string> str,Parsing *pars);
-        void            Delete_methode();
-        void            Get_methode(cgi *c,char *envp[]);
-        std::string     getBody(std::string path);
-        
-        class  AcceptFailed : public std::exception
-        {
-            virtual const char *what() const throw();
-        };
-        class SelectFailed : public std::exception
-        {
-            virtual const char *what() const throw();
-        };
-        
-        
-        ~Server();
+private:
+    int sd;
+    int len;
+    int cnx;
+    int nfds;
+    int maxfd;
+    int csock;
+    int lenght;
+    int selected;
+    char *request;
+    Socket *sock;
+    fd_set readfds;
+    fd_set writefds;
+    fd_set masterfds;
+    fd_set exceptfds;
+    std::string path;
+    std::string tmp2;
+    std::string tmp1;
+    std::string body;
+    std::string line1;
+    std::string status;
+    std::string someString;
+    std::vector<int> clients;
+    struct sockaddr_in client;
+    std::vector<int> MasterSockets;
+    std::vector<std::string> Content;
+    std::map<int, std::string> _clients;
+    std::map<std::string, std::string> stor;
+    std::multimap<int, std::multimap<std::string, std::string> > loc;
 
+public:
+    Server(Parsing *pars, char *envp[]);
+    int _Accept_client(int sock);
+    int _Get_request(int csock);
+    int check_index(std::string str);
+    int check_dir(std::string dir, std::string str);
+    bool checkRequest(std::string &req);
+    void Post_methode();
+    void _GetDataServers(Parsing *parsing, Response *response);
+    void witch_server(std::map<int, std::string> str, Parsing *pars);
+    void Delete_methode();
+    void Get_methode(cgi *c, char *envp[]);
+    std::string getBody(std::string path);
+
+    class AcceptFailed : public std::exception
+    {
+        virtual const char *what() const throw();
+    };
+    class SelectFailed : public std::exception
+    {
+        virtual const char *what() const throw();
+    };
+
+    ~Server();
 };
 
 #endif

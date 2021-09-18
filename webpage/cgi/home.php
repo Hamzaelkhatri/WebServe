@@ -7,14 +7,16 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>
         <?php
-            echo "HELLO";
+            echo "Title with PHP";
         ?>
     </title>
 </head>
 <body>
+    <h1>
 <?php
             echo "Welcome to Home Page of php";
         ?>
+    </h1>
 </body>
 </html>
 
