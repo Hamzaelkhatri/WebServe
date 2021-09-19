@@ -131,6 +131,11 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
     request->set_path(Path);
     cgi *c;
 
+    std::cout << "Host: " << Host << std::endl;
+    std::cout << "Port: " << Port << std::endl;
+    std::cout << "Methode: " << Methode << std::endl;
+    std::cout << "Path: " << Path << std::endl;
+
     response->setContentType("text/html");
     response->setVersion("HTTP/1.1");
     response->setCharset("UTF-8");
@@ -168,7 +173,8 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                     {
                         if (location_tmp == "*.php")
                         {
-                            root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
+                            if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
+                                root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
                             if (check_if_file_or_dir(root + request->get_path()) == 1)
                             {
                                 response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
@@ -184,9 +190,8 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                                 response->setMethod(request->get_method());
                                 response->setRedirection("");
                                 std::string Bodytmp = c->CGI(response, parsing->get_env());
-                                response->setBody(Bodytmp);
+                                response->setBody(Bodytmp.substr(Bodytmp.find("\r\n\r\n")));
                                 response->setContentLength("");
-                                body = Bodytmp.substr(Bodytmp.find("\r\n\r\n"));
                             }
                             else
                                 std::cout << "404 found" << std::endl;
@@ -194,14 +199,15 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                     }
                     else if (request->get_path().substr(0, request->get_path().find_last_of("/") + 1) == "/")
                     {
-                        root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
+                        root = GetValueBykeyServer(servers, indexOfServer, "root");
                         if (location_tmp == "/")
                         {
-                            root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
+                            if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") == "")
+                                root = GetValueBykeyServer(servers, indexOfServer, "root");
                             if (check_if_file_or_dir(root + request->get_path()) == 1)
                             {
+                                std::cout << root + request->get_path().substr(response->getPath().find_last_of("/")) << std::endl;
                                 response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
-                                std::cout << response->getStatus() << std::endl;
                                 response->setCookie("");
                                 response->setSetCookie("");
                                 response->setPath(root + request->get_path());
@@ -213,15 +219,15 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                                 response->setCGIPath(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "cgi_path"));
                                 response->setMethod(request->get_method());
                                 response->setRedirection("");
-                                std::string Bodytmp = c->CGI(response, parsing->get_env());
+                                std::string Bodytmp = getBodyFromFile(root + request->get_path());
                                 response->setBody(Bodytmp);
                                 response->setContentLength("");
-                                body = Bodytmp.substr(Bodytmp.find("\r\n\r\n"));
                             }
                             else if (check_if_file_or_dir(root + request->get_path()) == 2)
                             {
                                 if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") != "")
                                 {
+                                    std::cout << root << std::endl;
                                     std::string BodyTmp = getBodyFromFile(root + "/" + GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index"));
                                     response->setBody(BodyTmp);
                                     response->setStatus("200");
@@ -345,7 +351,6 @@ Server::Server(Parsing *p, char **envp)
                                     //Show Stor
                                     // std::cout  << someString << std::endl;
                                     _GetDataServers(p, response);
-
                                     // std::map<int, std::string>::iterator op = ips.begin();
                                     // for(op = ips.begin(); op != ips.end(); op++)
                                     // // {std::cout << op->first << " ==> " << op->second << std::endl;}
@@ -386,7 +391,7 @@ Server::Server(Parsing *p, char **envp)
                                     //     Delete_methode();
                                     // std::cout << someString << std::endl;;
 
-                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + "\nContent-Length: " + std::to_string(body.size()) + "\n\n" + body;
+                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\n\n" + response->getBody();
                                     write(sock_fd, header.c_str(), strlen(header.c_str()));
                                 }
                             }

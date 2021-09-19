@@ -66,7 +66,7 @@ bool Server::checkRequest(std::string &req)
         if (data.find("\r\n\r\n") == std::string::npos)
             return false;
     }
-    std::cout << RED << "REQUEST" << reset<< std::endl; 
+    // std::cout << RED << "REQUEST" << reset<< std::endl; 
     // std::cout << req << std::endl;
     return true;
 }
