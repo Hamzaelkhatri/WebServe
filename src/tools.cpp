@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 17:24:36 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/19 12:06:42 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/18 11:02:57 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,31 +132,22 @@ char **ft_charSplit(char const *s, char *set)
     i = -1;
     j = 0;
     k = 0;
-
-    tab = new char*[count_same_str(s, set) + 1];
-    memset(tab, 0, sizeof(char *) * (count_same_str(s, set)));
+    if (!(tab = (char **) malloc(sizeof(char *) * (count_same_str(s, set) + 1))))
+        return (NULL);
     while (s[++i])
     {
         if (exist_or_not(set, s[i]) != 1)
         {
-            // std::cout << s[i] << std::endl;
             if (k == 0)
-            {
-                tab[j] = new char[count_after_same_pos(s, set, i) + 1];
-            }
+                if (!(tab[j] = (char *)malloc(sizeof(char) * count_after_same_pos(s, set, i) + 1)))
+                    return (NULL);
             tab[j][k] = s[i];
             tab[j][++k] = '\0';
         }
-        if (s[i] && (exist_or_not(set, s[i]) && !exist_or_not(set, s[i + 1]) && k > 0) && (k = 0) == 0)
+        if ((exist_or_not(set, s[i]) && !exist_or_not(set, s[i + 1]) && k > 0) && (k = 0) == 0)
             j++;
     }
     tab[count_same_str(s, set)] = NULL;
-    //print tab
-    // for (i = 0; i < count_same_str(s, set); i++)
-    // {
-    //     // std::cout << tab[i]<< " | " << i << std::endl;
-    // }
-    
     return (tab);
 }
  

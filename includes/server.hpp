@@ -79,7 +79,6 @@ private:
     std::vector<int> MasterSockets;
     std::vector<std::string> Content;
     std::map<int, std::string> _clients;
-    std::map<std::string, std::string> stor;
     std::multimap<int, std::multimap<std::string, std::string> > loc;
 
 public:

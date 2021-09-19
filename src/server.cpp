@@ -2,9 +2,9 @@
 #include "../includes/Webserv.hpp"
 #include "../includes/request.hpp"
 
-std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations)
+std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
 {
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -17,16 +17,16 @@ std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std:
     return (std::string(""));
 }
 
-std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key)
+std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key)
 {
     if (servers.find(indexOfserver)->second.find(key)->second != "")
         return (servers.find(indexOfserver)->second.find(key)->second);
     return (std::string(""));
 }
 
-std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string> > locations, int indexOfServer, int indexOfLocation, std::string key)
+std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key)
 {
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = locations.begin(); it != locations.end(); ++it)
@@ -56,9 +56,9 @@ int check_if_file_or_dir(std::string path)
     return (-1);
 }
 
-bool is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location)
+bool is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location)
 {
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -102,11 +102,36 @@ std::string getBodyFromFile(std::string path)
 
 void Server::_GetDataServers(Parsing *parsing, Response *response)
 {
+    std::stringstream ss(someString);
+    int t = 0;
+    std::map<std::string, std::string> stor;
 
-    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string> >::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
+    // stor.clear();
+    while (std::getline(ss, line1, '\n'))
+    {
+        if (line1.find_first_of(":") != std::string::npos && t == 1)
+        {
+            tmp1 = line1.substr(0, line1.find_first_of(":"));
+            tmp2 = line1.substr(line1.find_first_of(":") + 1);
+            stor[tmp1] = tmp2;
+        }
+        else if (t == 0)
+        {
+            tmp1 = line1.substr(0, line1.find_first_of(" "));
+            tmp2 = line1.substr(line1.find_first_of(" ") + 1);
+            stor[tmp1] = tmp2.substr(0, tmp2.find_first_of(" "));
+            t++;
+        }
+        else
+        {
+            t++;
+            Content.push_back(line1);
+        }
+    }
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
     //show data servers
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
@@ -204,9 +229,10 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                         {
                             if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") == "")
                                 root = GetValueBykeyServer(servers, indexOfServer, "root");
+                            else
+                                root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
                             if (check_if_file_or_dir(root + request->get_path()) == 1)
                             {
-                                std::cout << root + request->get_path().substr(response->getPath().find_last_of("/")) << std::endl;
                                 response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
                                 response->setCookie("");
                                 response->setSetCookie("");
@@ -227,7 +253,8 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                             {
                                 if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") != "")
                                 {
-                                    std::cout << root << std::endl;
+                                    std::cout << root + "/" + GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") << std::endl;
+
                                     std::string BodyTmp = getBodyFromFile(root + "/" + GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index"));
                                     response->setBody(BodyTmp);
                                     response->setStatus("200");
@@ -240,7 +267,9 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                                 }
                             }
                             else
+                            {
                                 std::cout << root + request->get_path() << " 404 found" << std::endl;
+                            }
                         }
                     }
                 }
@@ -248,7 +277,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
             TargetLocation++;
         }
         indexOfServer++;
-        std::cout << YEL << "***********************************" << reset << std::endl;
     }
     // exit(0);
 }
@@ -320,36 +348,13 @@ Server::Server(Parsing *p, char **envp)
                             someString = "";
                             if (checkRequest(it->second) == true)
                             {
-                                someString = it->second;
+                                // someString = it->second;
                                 if (FD_ISSET(sock_fd, &writefds))
                                 {
-                                    std::stringstream ss(someString);
-                                    int t = 0;
-                                    while (std::getline(ss, line1, '\n'))
-                                    {
-                                        if (line1.find_first_of(":") != std::string::npos && t == 1)
-                                        {
-                                            tmp1 = line1.substr(0, line1.find_first_of(":"));
-                                            tmp2 = line1.substr(line1.find_first_of(":") + 1);
-                                            stor[tmp1] = tmp2;
-                                        }
-                                        else if (t == 0)
-                                        {
-                                            tmp1 = line1.substr(0, line1.find_first_of(" "));
-                                            tmp2 = line1.substr(line1.find_first_of(" ") + 1);
-                                            stor[tmp1] = tmp2.substr(0, tmp2.find_first_of(" "));
-                                            t++;
-                                        }
-                                        else
-                                        {
-                                            t++;
-                                            Content.push_back(line1);
-                                        }
-                                        i++;
-                                    }
-
                                     //Show Stor
-                                    // std::cout  << someString << std::endl;
+                                    std::cout << YEL << "***********************************" << reset << std::endl;
+                                    std::cout << someString << std::endl;
+                                    std::cout << YEL << "***********************************" << reset << std::endl;
                                     _GetDataServers(p, response);
                                     // std::map<int, std::string>::iterator op = ips.begin();
                                     // for(op = ips.begin(); op != ips.end(); op++)
@@ -393,6 +398,7 @@ Server::Server(Parsing *p, char **envp)
 
                                     std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\n\n" + response->getBody();
                                     write(sock_fd, header.c_str(), strlen(header.c_str()));
+                                    it->second.clear();
                                 }
                             }
                         }
