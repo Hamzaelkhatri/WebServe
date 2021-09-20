@@ -26,20 +26,19 @@ int main(int ac, char *av[], char *envp[])
             ErrorHandling error(av[1]);
             // error.get_map_s();
             Parsing *pars = new Parsing(av[1]);
-            pars->set_serverMap(pars->GetServerMap(), pars->Getloc_map());
-            std::map<int, std::multimap<std::string, std::string> >::iterator it;
-            std::multimap<std::string, std::string>::iterator it2;
-            std::map<int, std::multimap<std::string, std::string> > tmp = pars->GetServerMap();
-            for (it = tmp.begin(); it != tmp.end(); ++it)
-            {
-                std::cout << YEL << "Server" << reset << std::endl;
-                std::cout << RED << "\t\tServer\t\t" << it->first << ":" << reset << std::endl;
-                for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
-                {
-                    std::cout << "\t" << it2->first << "\t\t\t" << it2->second << "\n\n";
-                }
-            }
-            std::cout << YEL << "\n\n";
+            // std::map<int, std::multimap<std::string, std::string> >::iterator it;
+            // std::multimap<std::string, std::string>::iterator it2;
+            // std::map<int, std::multimap<std::string, std::string> > tmp = pars->GetServerMap();
+            // for (it = tmp.begin(); it != tmp.end(); ++it)
+            // {
+            //     std::cout << YEL << "Server" << reset << std::endl;
+            //     std::cout << RED << "\t\tServer\t\t" << it->first << ":" << reset << std::endl;
+            //     for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+            //     {
+            //         std::cout << "\t" << it2->first << "\t\t\t" << it2->second << "\n\n";
+            //     }
+            // }
+            // std::cout << YEL << "\n\n";
 
             // std::multimap<int, std::multimap<std::string, std::string> > tmp1 = pars->Getloc_map();
             // std::multimap<int, std::multimap<std::string, std::string> >::iterator it3;
@@ -54,7 +53,7 @@ int main(int ac, char *av[], char *envp[])
             //     }
             // }
             // std::cout << YEL << "" << reset << std::endl;
-            // Server  serv(pars , envp);
+            Server serv(pars, envp);
         }
 
         catch (const std::exception &e)

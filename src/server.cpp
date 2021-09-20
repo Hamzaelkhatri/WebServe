@@ -84,7 +84,12 @@ int is_dir(std::string dir)
     return (0);
 }
 
-std::string getBodyFromFile(std::string path)
+void CreateAutoIndexHtmlFile(std::string)
+{
+}
+
+std::string
+getBodyFromFile(std::string path)
 {
     std::string res = "";
     //read file
@@ -154,10 +159,10 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
     request->set_path(Path);
     cgi *c;
 
-    std::cout << "Host: " << Host << std::endl;
-    std::cout << "Port: " << Port << std::endl;
-    std::cout << "Methode: " << Methode << std::endl;
-    std::cout << "Path: " << Path << std::endl;
+    // std::cout << "Host: " << Host << std::endl;
+    // std::cout << "Port: " << Port << std::endl;
+    // std::cout << "Methode: " << Methode << std::endl;
+    // std::cout << "Path: " << Path << std::endl;
 
     response->setContentType("text/html");
     response->setVersion("HTTP/1.1");
@@ -265,6 +270,9 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                                     response->setSetCookie("");
                                     response->setContentLength("");
                                     body = response->getBody();
+                                }
+                                else if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "autoindex") != "" && GetValueBykeyLocation(locations, TargetServer, TargetLocation, "") == "off")
+                                {
                                 }
                             }
                             else

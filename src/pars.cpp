@@ -68,9 +68,9 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
                 root++;
         }
         if (port == 0)
-            throw std::runtime_error("No port in server");
+            throw std::runtime_error("No port in server in server nbr " + std::to_string(it->first));
         if (addr == 0)
-            throw std::runtime_error("No address in server");
+            throw std::runtime_error("No address  in server nbr " + std::to_string(it->first));
         if (root == 0)
             TargetServer.push_back(it->first);
         indexOfServer++;
@@ -88,12 +88,13 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
         }
         if (root == 0 && SearchIntoVector(TargetServer, it2->first))
         {
-            std::cout << " I m here" << std::endl;
+            // std::cout << " I m here" << std::endl;
             it = srv.begin();
             for (it = srv.begin(); it != srv.end(); it++)
             {
                 if (it->first == it2->first)
-                    it->second.insert(it1, std::pair<std::string, std::string>("root", "/Users/helkhatr/Desktop/Webserve/webpage"));
+                    it->second.insert(it1, std::pair<std::string, std::string>("root", "/Users/helkhatr/Desktop/WebServe/webpage"));
+                break;
             }
         }
         root = 0;
@@ -101,7 +102,6 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
     }
     this->_loc_map = loc;
     this->_server_map = srv;
-
 }
 
 void Parsing::set_env(char **env)
@@ -246,6 +246,7 @@ Parsing::Parsing(char *av)
         i++;
     }
     myfile.close();
+    set_serverMap(this->_server_map, this->_loc_map);
 }
 
 Parsing::~Parsing()
