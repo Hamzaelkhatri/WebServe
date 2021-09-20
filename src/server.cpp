@@ -250,7 +250,8 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                     else if (pathLocation.substr(0, pathLocation.find_last_of("/") + 1) == "/")
                     {
                         root = GetValueBykeyServer(servers, indexOfServer, "root");
-                        if (location_tmp == pathLocation)
+                        //std::cout << root << std::endl;
+                        if (location_tmp == pathLocation.substr(0, pathLocation.find_last_of("/") + 1))
                         {
                             std::cout << location_tmp << " " << pathLocation << std::endl;
                             if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") == "")
@@ -277,7 +278,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                             }
                             else if (check_if_file_or_dir(root + request->get_path()) == 2)
                             {
-                                // puts("Directory not found");
                                 if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") != "")
                                 {
                                     if (Path[Path.size() - 1] != '/')
