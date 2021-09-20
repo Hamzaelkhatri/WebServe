@@ -26,3 +26,4 @@
 <a href= "https://developer.mozilla.org/fr/docs/Web/HTTP/Methods/POST"> Post </a></br>
 <a href = "https://www.oreilly.com/openbook/cgi/ch12_04.html" > CGI </a></br>
 <a href="http://www.cplusplus.com/forum/unices/109131/"> Multi-server(port/listen)[select] </a></br>
+<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#client_error_responses">Error paeges</a>

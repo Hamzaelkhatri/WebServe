@@ -2,31 +2,29 @@
 #include "../includes/Webserv.hpp"
 #include "../includes/request.hpp"
 
-std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
+std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
     {
         if (it2->first.find("location") != std::string::npos)
-        {
             return (it2->second);
-        }
     }
     return (std::string(""));
 }
 
-std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key)
+std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key)
 {
     if (servers.find(indexOfserver)->second.find(key)->second != "")
         return (servers.find(indexOfserver)->second.find(key)->second);
     return (std::string(""));
 }
 
-std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key)
+std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string> > locations, int indexOfServer, int indexOfLocation, std::string key)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = locations.begin(); it != locations.end(); ++it)
@@ -56,9 +54,9 @@ int check_if_file_or_dir(std::string path)
     return (-1);
 }
 
-bool is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location)
+bool is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -128,10 +126,10 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
             Content.push_back(line1);
         }
     }
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string>>::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
     //show data servers
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
@@ -253,11 +251,14 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                             {
                                 if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") != "")
                                 {
-                                    std::cout << root + "/" + GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") << std::endl;
-
                                     std::string BodyTmp = getBodyFromFile(root + "/" + GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index"));
                                     response->setBody(BodyTmp);
                                     response->setStatus("200");
+                                    if (Path[Path.size() - 1] != '/')
+                                    {
+                                        response->setStatus("301"); //moved permanently
+                                        response->setRedirection("\nlocation:" + Path + "/");
+                                    }
                                     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
                                         response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
                                     response->setCookie("");
@@ -396,7 +397,7 @@ Server::Server(Parsing *p, char **envp)
                                     //     Delete_methode();
                                     // std::cout << someString << std::endl;;
 
-                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\n\n" + response->getBody();
+                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\n\n" + response->getBody();
                                     write(sock_fd, header.c_str(), strlen(header.c_str()));
                                     it->second.clear();
                                 }

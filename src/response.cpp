@@ -111,7 +111,7 @@ void Response::setMethod(std::string method)
     this->method = method;
 }
 
-Response::Response()
+Response::Response() : status("200 OK"), version("HTTP/1.1"), redirection(""), charset(""), content_type("text/html"), content_length(""), set_cookie(""), cookie(""), path("/"), host("localhost"), port("80"), method("GET")
 {
 }
 
