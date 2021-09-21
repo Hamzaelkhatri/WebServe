@@ -2,29 +2,9 @@
 #include "../includes/request.hpp"
 #include <dirent.h>
 
-std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string >  >::iterator locations)
+std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key)
 {
-    std::multimap<int, std::multimap<std::string, std::string >  >::iterator it;
-    std::multimap<std::string, std::string>::iterator it2;
-
-    for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
-    {
-        if (it2->first.find("location") != std::string::npos)
-            return (it2->second);
-    }
-    return (std::string(""));
-}
-
-std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string >  > servers, int indexOfserver, std::string key)
-{
-    if (servers.find(indexOfserver)->second.find(key)->second != "")
-        return (servers.find(indexOfserver)->second.find(key)->second);
-    return (std::string(""));
-}
-
-std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string >  > locations, int indexOfServer, int indexOfLocation, std::string key)
-{
-    std::multimap<int, std::multimap<std::string, std::string >  >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = locations.begin(); it != locations.end(); ++it)
@@ -41,6 +21,27 @@ std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, 
     }
     return ("");
 }
+
+std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
+{
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<std::string, std::string>::iterator it2;
+
+    for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
+    {
+        if (it2->first.find("location") != std::string::npos)
+            return (it2->second);
+    }
+    return (std::string(""));
+}
+
+std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key)
+{
+    if (servers.find(indexOfserver)->second.find(key)->second != "")
+        return (servers.find(indexOfserver)->second.find(key)->second);
+    return (std::string(""));
+}
+
 int check_if_file_or_dir(std::string path)
 {
     struct stat info;
@@ -54,9 +55,9 @@ int check_if_file_or_dir(std::string path)
     return (-1);
 }
 
-bool is_location(std::multimap<int, std::multimap<std::string, std::string >  >::iterator locations, std::string location)
+bool is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location)
 {
-    std::multimap<int, std::multimap<std::string, std::string >  >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -124,6 +125,40 @@ getBodyFromFile(std::string path)
     return (res);
 }
 
+void execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request)
+{
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+
+    if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
+        root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
+    // std::cout << "root: " << root + request->get_path() << std::endl;
+    if (check_if_file_or_dir(root + request->get_path()) == 1)
+    {
+        response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
+        response->setCookie("");
+        response->setSetCookie("");
+        response->setPath(root + request->get_path());
+        response->setHost(GetValueBykeyServer(servers, TargetServer, "server_addr"));
+        if (GetValueBykeyServer(servers, TargetServer, "server_name") != "")
+            response->setServerName(GetValueBykeyServer(servers, TargetServer, "server_name"));
+        else
+            response->setServerName("localhost");
+        response->setCGIPath(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "cgi_path"));
+        response->setMethod(request->get_method());
+        response->setRedirection("");
+        std::string Bodytmp = c->CGI(response, parsing->get_env());
+        if (Bodytmp.find("\r\n\r\n") != std::string::npos)
+            response->setBody(Bodytmp.substr(Bodytmp.find("\r\n\r\n")));
+        else
+            response->setBody(Bodytmp.substr(Bodytmp.find("()") + 2));
+        response->setContentLength("");
+    }
+    else
+        std::cout << " 404 found" << std::endl;
+    return;
+}
+
 void Server::_GetDataServers(Parsing *parsing, Response *response)
 {
     std::stringstream ss(someString);
@@ -152,10 +187,10 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
             Content.push_back(line1);
         }
     }
-    std::map<int, std::multimap<std::string, std::string >  > servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string >  > locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string >  >::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string >  >::iterator it2;
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
     //show data servers
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
@@ -200,12 +235,12 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
         {
             if (it3->first.find("listen") != std::string::npos && request->get_port().find(it3->second) != std::string::npos)
                 TargetServer -= 1;
-            if (it3->first.find("server_addr") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
+            if (it3->first.find("server_addr") != std::string::npos && (request->get_host().find(it3->second) != std::string::npos || request->get_host().find("localhost") != std::string::npos))
                 TargetServer -= 1;
             else if (it3->first.find("server_name") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
-                {
-                    TargetServer -= 1;
-                }
+            {
+                TargetServer -= 1;
+            }
             if (TargetServer <= -2)
             {
                 check_server = 1;
@@ -233,37 +268,19 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                 location_tmp = _GetFirstLocation(it2);
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
-                    if (pathLocation.find(".php") != std::string::npos)
+                    if (pathLocation.find(".py") != std::string::npos)
                     {
-                        // puts("php");
+                        if (location_tmp == "*.py")
+                        {
+                            execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
+                        }
+                    }
+                    else if (pathLocation.find(".php") != std::string::npos)
+                    {
                         if (location_tmp == "*.php")
                         {
-
-                            if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
-                                root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
-                            // std::cout << "root: " << root + request->get_path() << std::endl;
-                            if (check_if_file_or_dir(root + request->get_path()) == 1)
-                            {
-                                response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
-                                response->setCookie("");
-                                response->setSetCookie("");
-                                response->setPath(root + request->get_path());
-                                response->setHost(GetValueBykeyServer(servers, TargetServer, "server_addr"));
-                                if (GetValueBykeyServer(servers, TargetServer, "server_name") != "")
-                                    response->setServerName(GetValueBykeyServer(servers, TargetServer, "server_name"));
-                                else
-                                    response->setServerName("localhost");
-                                response->setCGIPath(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "cgi_path"));
-                                response->setMethod(request->get_method());
-                                response->setRedirection("");
-                                std::string Bodytmp = c->CGI(response, parsing->get_env());
-                                response->setBody(Bodytmp.substr(Bodytmp.find("\r\n\r\n")));
-                                response->setContentLength("");
-                            }
-                            else
-                                std::cout << root + request->get_path() << " 404 found" << std::endl;
+                            execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
                         }
-                        break;
                     }
                     else
                     {

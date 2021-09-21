@@ -49,7 +49,7 @@ void Request::set_content_lenght(int content_lenght)
 
 void Request::set_host(std::string host)
 {
-    this->host = host;
+    this->host = trim(host);
 }
 
 void Request::set_method(std::string method)

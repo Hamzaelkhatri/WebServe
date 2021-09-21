@@ -121,6 +121,9 @@ Response::~Response()
 
 void Response::setStatus(std::string status)
 {
+    if(status == "")
+        this->status = "200 OK";
+    else
         this->status = status;
 }
 
