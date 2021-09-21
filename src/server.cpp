@@ -2,9 +2,9 @@
 #include "../includes/request.hpp"
 #include <dirent.h>
 
-std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
+std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string >  >::iterator locations)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string >  >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -15,16 +15,16 @@ std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std:
     return (std::string(""));
 }
 
-std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key)
+std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string >  > servers, int indexOfserver, std::string key)
 {
     if (servers.find(indexOfserver)->second.find(key)->second != "")
         return (servers.find(indexOfserver)->second.find(key)->second);
     return (std::string(""));
 }
 
-std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key)
+std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string >  > locations, int indexOfServer, int indexOfLocation, std::string key)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string >  >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = locations.begin(); it != locations.end(); ++it)
@@ -54,9 +54,9 @@ int check_if_file_or_dir(std::string path)
     return (-1);
 }
 
-bool is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location)
+bool is_location(std::multimap<int, std::multimap<std::string, std::string >  >::iterator locations, std::string location)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string >  >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -152,10 +152,10 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
             Content.push_back(line1);
         }
     }
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string>>::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
+    std::map<int, std::multimap<std::string, std::string >  > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string >  > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string >  >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string >  >::iterator it2;
     //show data servers
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
@@ -191,6 +191,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
     std::string root = "";
     int TargetServer = 0;
     int TargetLocation = 0;
+    int check_server = 0;
     for (it = servers.begin(); it != servers.end(); it++)
     {
         indexOfLocation = 0;
@@ -202,13 +203,26 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
             if (it3->first.find("server_addr") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
                 TargetServer -= 1;
             else if (it3->first.find("server_name") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
-                TargetServer -= 1;
+                {
+                    TargetServer -= 1;
+                }
             if (TargetServer <= -2)
             {
+                check_server = 1;
                 TargetServer = indexOfServer;
                 root = GetValueBykeyServer(servers, indexOfServer, "root");
                 break;
             }
+        }
+        if (check_server == 0)
+        {
+            response->setStatus("403");
+            response->setContentType("text/html");
+            response->setVersion("HTTP/1.1");
+            response->setCharset("UTF-8");
+            response->setBody("<html><head><title>403</title></head><body><h1>403 </h1> </body> </html>");
+            response->setContentLength("");
+            return;
         }
         TargetLocation = 1;
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
