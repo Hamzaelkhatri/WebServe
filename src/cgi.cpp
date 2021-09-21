@@ -25,7 +25,7 @@ std::string cgi::CGI(Response *r, char *envp[])
     std::string path = fullpath.substr(0, fullpath.find_last_of("/") + 1);
     setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);             //version Of Gate away interface
     setenv("SERVER_PROTOCOL", r->getVersion().c_str(), 1); //version of http , hyper text protocole
-    setenv("PATH_INFO", fullpath.c_str(), 1);
+    setenv("SCRIPT_FILENAME", fullpath.c_str(), 1);
     setenv("SERVER_PORT", r->getPort().c_str(), 1);       // PORT OF SERVER
     setenv("REQUEST_METHOD", r->getMethod().c_str(), 1);  // METHODE HTTP
     setenv("REMOTE_ADDR", r->getHost().c_str(), 1);       //
@@ -36,6 +36,7 @@ std::string cgi::CGI(Response *r, char *envp[])
     const char **av = new const char *[3];
     av[0] = strdup(r->getCGIPath().c_str());
     std::cout << r->getCGIPath().c_str() << std::endl;
+    extern char** environ;
     av[1] = fullpath.c_str();
     av[2] = NULL;
     if (pipe(fd) == -1) // cat hel.txt | cat -e  FD[1] ---> FD[0] 0 1 2 3
@@ -48,7 +49,7 @@ std::string cgi::CGI(Response *r, char *envp[])
         dup2(fd[1], STDOUT_FILENO); // 1
         close(fd[0]);
         chdir(path.c_str());
-        if (execve(av[0], (char **)av, envp) < 0)
+        if (execve(av[0], (char **)av, environ) < 0)
             perror("exeve");
     }
     else

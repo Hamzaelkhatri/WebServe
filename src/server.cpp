@@ -221,10 +221,13 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                 {
                     if (pathLocation.find(".php") != std::string::npos)
                     {
+                        // puts("php");
                         if (location_tmp == "*.php")
                         {
+
                             if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
                                 root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
+                            // std::cout << "root: " << root + request->get_path() << std::endl;
                             if (check_if_file_or_dir(root + request->get_path()) == 1)
                             {
                                 response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
@@ -246,14 +249,13 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                             else
                                 std::cout << root + request->get_path() << " 404 found" << std::endl;
                         }
+                        break;
                     }
-                    else if (pathLocation.substr(0, pathLocation.find_last_of("/") + 1) == "/")
+                    else
                     {
                         root = GetValueBykeyServer(servers, indexOfServer, "root");
-                        //std::cout << root << std::endl;
-                        if (location_tmp == pathLocation.substr(0, pathLocation.find_last_of("/") + 1))
+                        if (location_tmp == pathLocation)
                         {
-                            std::cout << location_tmp << " " << pathLocation << std::endl;
                             if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") == "")
                                 root = GetValueBykeyServer(servers, indexOfServer, "root");
                             else
@@ -300,7 +302,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                                     response->setSetCookie("");
                                     response->setContentLength("");
                                     body = response->getBody();
-                                    break;
                                 }
                                 else if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "autoindex") != "" && GetValueBykeyLocation(locations, TargetServer, TargetLocation, "") == "off")
                                 {
@@ -311,32 +312,24 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                                     {
                                         response->setStatus("301"); //moved permanently
                                         response->setRedirection("\nlocation:" + Path + "/");
-                                        break;
                                     }
-                                    break;
                                 }
                             }
                             else
-                            {
                                 std::cout << root + request->get_path() << " 404 found" << std::endl;
-                            }
                             break;
                         }
                     }
+                    if (pathLocation.find_last_of("/") != std::string::npos)
+                        pathLocation = pathLocation.substr(0, pathLocation.find_last_of("/"));
                     else
-                    {
-                        if (pathLocation.find_last_of("/") != std::string::npos)
-                            pathLocation = pathLocation.substr(0, pathLocation.find_last_of("/"));
-                        else
-                            pathLocation = "/";
-                    }
+                        pathLocation = "/";
                 }
             }
             TargetLocation++;
         }
         indexOfServer++;
     }
-    // exit(0);
 }
 
 Server::Server(Parsing *p, char **envp)
