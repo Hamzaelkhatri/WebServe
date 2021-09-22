@@ -98,8 +98,7 @@ std::string Server::CreateAutoIndexHtmlFile(std::string path, std::string locati
 {
 
     std::string body = "<html><head> <link rel=\"shortcut icon\" href=\"data:image/x-icon;,\" type=\"image/x-icon\"> <title>Auto Index </title/> </head> <body> <h1> index of " + locatioName + " </h1>";
-    //get all element in directory
-
+    std::vector<std::string> files;
     DIR *dir;
     struct dirent *ent;
     dir = opendir(path.c_str());
@@ -110,6 +109,12 @@ std::string Server::CreateAutoIndexHtmlFile(std::string path, std::string locati
     while ((ent = readdir(dir)) != NULL)
     {
         std::string tmp(ent->d_name);
+        files.push_back(tmp);
+    }
+    std::sort(files.begin(), files.end());
+    for (int i = 0; i < files.size(); i++)
+    {
+        std::string tmp = files[i];
         body += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
     }
     body += "</body></html>";
