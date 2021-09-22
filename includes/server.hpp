@@ -36,6 +36,7 @@
 #include "socket.hpp"
 #include "pars.hpp"
 #include <string.h>
+#include "request.hpp"
 
 #define BUFFER_SIZE 65507
 //Regular text
@@ -89,10 +90,12 @@ public:
     int check_dir(std::string dir, std::string str);
     bool checkRequest(std::string &req);
     void Post_methode();
-    void _GetDataServers(Parsing *parsing, Response *response);
+    void _GetDataServers(Parsing *parsing, Response *response,Request *request);
     void witch_server(std::map<int, std::string> str, Parsing *pars);
     void Delete_methode();
     void Get_methode(cgi *c, char *envp[]);
+    std::string str5 = "";
+
     std::string getBody(std::string path);
     std::map<int, std::string>::iterator its;
 

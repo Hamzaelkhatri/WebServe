@@ -49,7 +49,7 @@ void Request::set_content_lenght(int content_lenght)
 
 void Request::set_host(std::string host)
 {
-    this->host = trim(host);
+    this->host =host;
 }
 
 void Request::set_method(std::string method)
@@ -83,8 +83,7 @@ Request::Request()
 }
 
 
-Request::Request(Server *server,int client_sock)
+Request::Request(int client_sock)
 {
-    this->server = server;
     this->client_sock = client_sock;
 }

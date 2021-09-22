@@ -182,7 +182,7 @@ void SaveAsFile(std::string path, std::string body)
     file.close();
 }
 
-void Server::_GetDataServers(Parsing *parsing, Response *response)
+void Server::_GetDataServers(Parsing *parsing, Response *response, Request *request)
 {
     std::stringstream ss(someString);
     int t = 0;
@@ -231,7 +231,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                                                                                                       : "UNKNOWN");
     std::string Path = stor[Methode];
 
-    Request *request = new Request();
     request->set_host(Host);
     request->set_port(Port);
     request->set_method(Methode);
@@ -250,8 +249,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
     int TargetServer = 0;
     int TargetLocation = 0;
     int check_server = 0;
-    std::string str5 = "";
-    str5 +=its->second;
+    str5 += its->second;
 
     for (it = servers.begin(); it != servers.end(); it++)
     {
@@ -294,8 +292,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                     {
                         if (location_tmp == "*.php")
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
-                        if(Methode == "POST")
-                            str5 +=its->second;
                         break;
                     }
                     else
@@ -378,11 +374,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
         }
         indexOfServer++;
     }
-    if (Methode == "POST")
-    {
-        SaveAsFile("/home/hamza/Desktop/WebServe/output.txt", str5);
-        // std::cout << "POST" << std::endl;
-    }
+
     if (check_server == 0)
     {
         std::cout << TargetServer << std::endl;
@@ -420,6 +412,8 @@ Server::Server(Parsing *p, char **envp)
     FD_ZERO(&writefds);
     memcpy(&writefds, &masterfds, sizeof(masterfds));
     std::map<int, std::string> ips;
+    Request *request = new Request();
+    int b = 0;
     int o = 0;
     while (1)
     {
@@ -470,7 +464,13 @@ Server::Server(Parsing *p, char **envp)
                                     // std::cout << YEL << "***********************************" << reset << std::endl;
                                     // std::cout << someString << std::endl;
                                     // std::cout << YEL << "***********************************" << reset << std::endl;
-                                    _GetDataServers(p, response);
+                                    _GetDataServers(p, response, request);
+                                    if (request->get_method() == "POST" || b == 1)
+                                    {
+                                        SaveAsFile("/home/hamza/Desktop/WebServe/output.txt",its->second);
+                                        b=1;
+                                    }
+                                    // std::cout << "POST" << std::endl;
                                     // std::map<int, std::string>::iterator op = ips.begin();
                                     // for(op = ips.begin(); op != ips.end(); op++)
                                     // // {std::cout << op->first << " ==> " << op->second << std::endl;}
@@ -521,8 +521,9 @@ Server::Server(Parsing *p, char **envp)
                         {
                             if (rc == 0)
                             {
+                                b = 0;
                                 // someString = "";
-                                // its->second.clear();
+                                its->second.clear();
                                 std::cout << sock_fd << "\t  =   Diconnected" << std::endl;
                                 close(sock_fd);
                                 FD_CLR(sock_fd, &masterfds);

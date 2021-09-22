@@ -1,13 +1,18 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
+#include <iostream>
+#include <string>
+#include <vector>
+#include <iomanip>
+#include <cstring>
+#include <fcntl.h>
+#include <sstream>
 
-#include "server.hpp"
 
 class Request
 {
 private:
-    Server* server;
     std::string port;
     std::string host;
     std::string path;
@@ -37,7 +42,7 @@ public:
     //constructors
     ~Request();
     Request();
-    Request(Server* server, int client_sock);
+    Request(int client_sock);
     //methods
     void parse_request();
     void send_response();
