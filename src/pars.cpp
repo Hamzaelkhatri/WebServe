@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pars.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 19:03:57 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/18 20:09:10 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/22 10:01:01 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,8 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
                 addr++;
             if (it1->first == "root")
                 root++;
+            if(it1->first == "server_name")
+                name++;
         }
         if (port == 0)
             throw std::runtime_error("No port in server in server nbr " + std::to_string(it->first));
@@ -73,6 +75,10 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
             throw std::runtime_error("No address  in server nbr " + std::to_string(it->first));
         if (root == 0)
             TargetServer.push_back(it->first);
+        if(addr > 1)
+            throw std::runtime_error("More than one server_addr in server nbr " + std::to_string(it->first));
+        if(name > 1)
+            throw std::runtime_error("More than one server_name in server nbr " + std::to_string(it->first));
         indexOfServer++;
     }
 
