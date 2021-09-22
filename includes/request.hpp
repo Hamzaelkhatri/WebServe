@@ -19,12 +19,14 @@ private:
     std::string method;
     std::string version;
     std::string body;
+    std::string filename;
     int client_sock;
     int content_lenght;
 public:
     //getters and setters
     std::string get_port();
     std::string get_host();
+    std::string get_filename();
     std::string get_path();
     std::string get_method();
     std::string get_version();
@@ -39,6 +41,7 @@ public:
     void set_body(std::string body);
     void set_client_sock(int client_sock);
     void set_content_lenght(int content_lenght);
+    void set_filename(std::string filename);
     //constructors
     ~Request();
     Request();

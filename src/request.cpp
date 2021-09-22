@@ -47,6 +47,13 @@ void Request::set_content_lenght(int content_lenght)
     this->content_lenght = content_lenght;
 }
 
+void Request::set_filename(std::string filename)
+{
+    this->filename = filename;
+}
+
+
+
 void Request::set_host(std::string host)
 {
     this->host =host;

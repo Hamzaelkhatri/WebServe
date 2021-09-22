@@ -147,7 +147,7 @@ void execute_cgi(Response *response, int TargetServer, int TargetLocation, std::
 
     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
         root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
-    std::cout << "root: " << root + request->get_path() << std::endl;
+    // std::cout << "root: " << root + request->get_path() << std::endl;
     if (check_if_file_or_dir(root + request->get_path()) == 1)
     {
         response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
@@ -174,10 +174,13 @@ void execute_cgi(Response *response, int TargetServer, int TargetLocation, std::
     return;
 }
 
-void SaveAsFile(std::string path, std::string body)
+void SaveAsFile(std::string path, std::string body, int b)
 {
     std::ofstream file;
-    file.open(path, std::ios_base::app);
+    if (b == 1)
+        file.open(path, std::ios_base::app);
+    else
+        file.open(path);
     file << body;
     file.close();
 }
@@ -200,6 +203,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
         else if (t == 0)
         {
             tmp1 = line1.substr(0, line1.find_first_of(" "));
+            std::cout << " tmp1  |" << tmp1 << "|" << std::endl;
             tmp2 = line1.substr(line1.find_first_of(" ") + 1);
             stor[tmp1] = tmp2.substr(0, tmp2.find_first_of(" "));
             t++;
@@ -229,12 +233,26 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
     std::string Methode = (stor.find("GET") != stor.end() ? "GET" : (stor.find("POST") != stor.end()) ? "POST"
                                                                 : (stor.find("DELETE") != stor.end()) ? "DELETE"
                                                                                                       : "UNKNOWN");
+    std::string Content_lenght = (stor.find("Content-Length") != stor.end()) ? stor["Content-Length"] : "0";
+    std::string Content_Disposition = "";
+    for (int j = 0; j < Content.size(); j++)
+    {
+        if (Content[j].find("Content-Disposition") != std::string::npos)
+        {
+            // std::string tmp = Content[j].substr(Content[j].find("filename=") + 9, Content[j].size());
+            // tmp = tmp.substr(0, tmp.find(";"));
+            Content_Disposition = Content[j].substr(Content[j].find("filename=") + 9, Content[j].size());
+            break;
+        }
+    }
+    // std::cout << Content_Disposition << std::endl;
     std::string Path = stor[Methode];
 
     request->set_host(Host);
     request->set_port(Port);
     request->set_method(Methode);
     request->set_path(Path);
+    request->set_filename(Content_Disposition);
     cgi *c;
 
     // std::cout << "Host: " << Host << std::endl;
@@ -287,12 +305,13 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                     {
                         if (location_tmp == "*.py")
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
+                        break;
                     }
                     else if (pathLocation.find(".php") != std::string::npos)
                     {
                         if (location_tmp == "*.php")
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
-                        break;
+                        // break;
                     }
                     else
                     {
@@ -374,6 +393,9 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
         }
         indexOfServer++;
     }
+    // std::cout << request->get_method();
+    if (request->get_method() == "POST")
+        SaveAsFile("/home/hamza/Desktop/WebServe/output.txt", its->second, 1);
 
     if (check_server == 0)
     {
@@ -457,6 +479,7 @@ Server::Server(Parsing *p, char **envp)
                             // std::cout << someString << std::endl;
                             if (checkRequest(its->second) == true)
                             {
+                                // puts("here");
                                 // someString = it->second;
                                 if (FD_ISSET(sock_fd, &writefds))
                                 {
@@ -465,52 +488,6 @@ Server::Server(Parsing *p, char **envp)
                                     // std::cout << someString << std::endl;
                                     // std::cout << YEL << "***********************************" << reset << std::endl;
                                     _GetDataServers(p, response, request);
-                                    if (request->get_method() == "POST" || b == 1)
-                                    {
-                                        SaveAsFile("/home/hamza/Desktop/WebServe/output.txt",its->second);
-                                        b=1;
-                                    }
-                                    // std::cout << "POST" << std::endl;
-                                    // std::map<int, std::string>::iterator op = ips.begin();
-                                    // for(op = ips.begin(); op != ips.end(); op++)
-                                    // // {std::cout << op->first << " ==> " << op->second << std::endl;}
-                                    // witch_server(ips, p);
-                                    // std::map< int , std::multimap<std::string, std::string> > tmp = p->GetServerMap();
-                                    // std::map< int , std::multimap<std::string, std::string> >::iterator  sp;
-                                    // std::multimap<std::string, std::string>::iterator sp2;
-                                    // for(sp = tmp.begin(); sp!= tmp.end(); sp++)
-                                    // {
-                                    //     std::cout << sp->first << std::endl;
-                                    //     for(sp2 = sp->second.begin(); sp2 != sp->second.end(); sp2++)
-                                    //     {
-                                    //         if(sp2->first == "listen")
-                                    //         {
-                                    //         std::cout <<   sp2->first <<  "==>"<< sp2->second << std::endl;
-                                    //         std::cout << " Host :" << stor["Host"] << std::endl;
-                                    //             // if(sp2->second.find(stor["Host"]) != std::string::npos)
-                                    //             //     {
-                                    //             //         std::cout <<  sp->first << "==>" << sp2->second << std::endl;
-                                    //             //         break;
-                                    //             //     }
-
-                                    //         }
-                                    //         if(sp2->first == "server_addr")
-                                    //         {
-                                    //             std::cout <<   sp2->first <<  "==>"<< sp2->second << std::endl;
-                                    //             std::cout << " Host :" << stor["Host"] << std::endl;
-                                    //         }
-                                    //     }
-                                    //     std::cout << "" << std::endl;
-                                    // }
-                                    // loc = p->Getloc_map();
-                                    // if (stor.find("GET") != stor.end())
-                                    //     Get_methode(c, envp);
-                                    // else if (stor.find("POST") != stor.end())
-                                    //     Post_methode();
-                                    // else if (stor.find("DELETE") != stor.end())
-                                    //     Delete_methode();
-                                    // std::cout << someString << std::endl;;
-
                                     std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\n\n" + response->getBody();
                                     write(sock_fd, header.c_str(), strlen(header.c_str()));
                                     its->second.clear();

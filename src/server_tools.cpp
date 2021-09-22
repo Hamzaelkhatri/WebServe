@@ -51,28 +51,22 @@ int Server::_Get_request(int sock)
     }
     return (n);
 }
-
 bool Server::checkRequest(std::string &req)
 {
-    std::string data;
-    size_t i;
-
-    i = req.find("\r\n\r\n");
-
-    if (i == std::string::npos)
-        return false;
-    if (req.find("Content-Length") != std::string::npos)
-    {
-        data = req.substr(i + 4);
-        if (data.find("\r\n\r\n") == std::string::npos)
-            return false;
-    }
-    someString = req;
-    // std::cout << RED << "REQUEST" << reset<< std::endl; 
-    // std::cout << req << std::endl;
-    return true;
+	if (!(req.find("\r\n\r\n") == std::string::npos))
+	{
+		std::string headers = req.substr(0, req.find("\r\n\r\n") + 4);
+		if (headers.find("Content-Length") != std::string::npos)
+		{
+			size_t length = std::atoi(headers.substr(headers.find("Content-Length: ")).c_str() + 16);
+			std::string body = req.substr(req.find("\r\n\r\n") + 4);
+			if (body.length() < length)
+				return false;
+		}
+		return true;
+	}
+	return false;
 }
-
 
 void    Server::witch_server(std::map<int,std::string> str ,Parsing *pars)
 {
