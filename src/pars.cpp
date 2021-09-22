@@ -57,6 +57,7 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
         port = 0;
         addr = 0;
         root = 0;
+        name = 0;
         for (it1 = it->second.begin(); it1 != it->second.end(); ++it1)
         {
             // std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second << "|" << "\n\n";

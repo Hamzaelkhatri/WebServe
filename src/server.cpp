@@ -2,9 +2,9 @@
 #include "../includes/request.hpp"
 #include <dirent.h>
 
-std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string> > locations, int indexOfServer, int indexOfLocation, std::string key)
+std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key)
 {
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = locations.begin(); it != locations.end(); ++it)
@@ -14,7 +14,9 @@ std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, 
             for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
             {
                 if (it2->first.find(std::to_string(indexOfLocation) + " " + key) != std::string::npos)
+                {
                     return (it2->second);
+                }
             }
         }
         // std::string res = locations.find(indexOfServer)->second.find()->second;
@@ -22,9 +24,9 @@ std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, 
     return ("");
 }
 
-std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations)
+std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
 {
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -35,7 +37,7 @@ std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std:
     return (std::string(""));
 }
 
-std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key)
+std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key)
 {
     std::map<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
@@ -68,9 +70,9 @@ int check_if_file_or_dir(std::string path)
     return (-1);
 }
 
-bool is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location)
+bool is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location)
 {
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -140,12 +142,12 @@ getBodyFromFile(std::string path)
 
 void execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request)
 {
-    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
 
     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
         root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
-    // std::cout << "root: " << root + request->get_path() << std::endl;
+    std::cout << "root: " << root + request->get_path() << std::endl;
     if (check_if_file_or_dir(root + request->get_path()) == 1)
     {
         response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
@@ -170,6 +172,14 @@ void execute_cgi(Response *response, int TargetServer, int TargetLocation, std::
     else
         std::cout << " 404 found" << std::endl;
     return;
+}
+
+void SaveAsFile(std::string path, std::string body)
+{
+    std::ofstream file;
+    file.open(path, std::ios_base::app);
+    file << body;
+    file.close();
 }
 
 void Server::_GetDataServers(Parsing *parsing, Response *response)
@@ -200,10 +210,10 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
             Content.push_back(line1);
         }
     }
-    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string> >::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
     //show data servers
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
@@ -240,6 +250,9 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
     int TargetServer = 0;
     int TargetLocation = 0;
     int check_server = 0;
+    std::string str5 = "";
+    str5 +=its->second;
+
     for (it = servers.begin(); it != servers.end(); it++)
     {
         indexOfLocation = 0;
@@ -261,6 +274,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
             }
         }
         TargetLocation = 1;
+
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {
             std::string pathLocation = request->get_path();
@@ -280,6 +294,9 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                     {
                         if (location_tmp == "*.php")
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
+                        if(Methode == "POST")
+                            str5 +=its->second;
+                        break;
                     }
                     else
                     {
@@ -290,6 +307,8 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                                 root = GetValueBykeyServer(servers, indexOfServer, "root");
                             else
                                 root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
+                            // std::cout << GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") << std::endl;
+
                             if (check_if_file_or_dir(root + request->get_path()) == 1)
                             {
                                 response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
@@ -361,7 +380,8 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
     }
     if (Methode == "POST")
     {
-        std::cout << "POST" << std::endl;
+        SaveAsFile("/home/hamza/Desktop/WebServe/output.txt", str5);
+        // std::cout << "POST" << std::endl;
     }
     if (check_server == 0)
     {
@@ -373,14 +393,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
         response->setBody("<html><head><title>403</title></head><body><h1>403 </h1> </body> </html>");
         response->setContentLength("");
     }
-}
-
-void SaveAsFile(std::string path, std::string body)
-{
-    std::ofstream file;
-    file.open(path, std::ios_base::app);
-    file << body;
-    file.close();
 }
 
 Server::Server(Parsing *p, char **envp)
@@ -498,7 +510,6 @@ Server::Server(Parsing *p, char **envp)
                                     // else if (stor.find("DELETE") != stor.end())
                                     //     Delete_methode();
                                     // std::cout << someString << std::endl;;
-                                    SaveAsFile("/home/hamza/Desktop/WebServe/output.txt", its->second);
 
                                     std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\n\n" + response->getBody();
                                     write(sock_fd, header.c_str(), strlen(header.c_str()));
