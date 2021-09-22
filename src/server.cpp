@@ -13,6 +13,7 @@ std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, 
         {
             for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
             {
+                std::cout << it2->first << " " << it2->second << std::endl;
                 if (it2->first.find(std::to_string(indexOfLocation) + " " + key) != std::string::npos)
                     return (it2->second);
             }
@@ -37,8 +38,21 @@ std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std:
 
 std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key)
 {
-    if (servers.find(indexOfserver)->second.find(key)->second != "")
-        return (servers.find(indexOfserver)->second.find(key)->second);
+    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<std::string, std::string>::iterator it2;
+
+    for (it = servers.begin(); it != servers.end(); ++it)
+    {
+        if (it->first == indexOfserver)
+        {
+            for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+            {
+                if (it2->first.find(key) != std::string::npos)
+                    return (it2->second);
+            }
+        }
+        // std::string res = locations.find(indexOfServer)->second.find()->second;
+    }
     return (std::string(""));
 }
 
@@ -249,16 +263,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                 break;
             }
         }
-        if (check_server == 0)
-        {
-            response->setStatus("403");
-            response->setContentType("text/html");
-            response->setVersion("HTTP/1.1");
-            response->setCharset("UTF-8");
-            response->setBody("<html><head><title>403</title></head><body><h1>403 </h1> </body> </html>");
-            response->setContentLength("");
-            return;
-        }
         TargetLocation = 1;
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {
@@ -266,21 +270,19 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
             if (it2->first == TargetServer)
             {
                 location_tmp = _GetFirstLocation(it2);
+                // std::cout << location_tmp << std::endl;
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
+                    TargetLocation = std::stoi( it4->first.substr(0, it4->first.find(" ")));
                     if (pathLocation.find(".py") != std::string::npos)
                     {
                         if (location_tmp == "*.py")
-                        {
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
-                        }
                     }
                     else if (pathLocation.find(".php") != std::string::npos)
                     {
                         if (location_tmp == "*.php")
-                        {
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
-                        }
                     }
                     else
                     {
@@ -311,14 +313,15 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                             }
                             else if (check_if_file_or_dir(root + request->get_path()) == 2)
                             {
-                                if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") != "")
+                                // std::cout << GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") << std::endl;
+                                if (GetValueBykeyLocation(locations, TargetServer,TargetLocation, "index") != "")
                                 {
                                     if (Path[Path.size() - 1] != '/')
                                     {
                                         response->setStatus("301"); //moved permanently
                                         response->setRedirection("\nlocation:" + Path + "/");
                                         response->setPath(root + request->get_path() + "/");
-                                        break;
+                                        // return;
                                     }
                                     std::string BodyTmp = getBodyFromFile(root + request->get_path() + GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index"));
                                     if (BodyTmp.empty())
@@ -347,7 +350,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                                 }
                             }
                             else
-                                std::cout << root + request->get_path() << " 404 found" << std::endl;
+                                std::cout << root + request->get_path() << " 404 not found" << std::endl;
                             break;
                         }
                     }
@@ -356,10 +359,21 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                     else
                         pathLocation = "/";
                 }
+                // return;
             }
             TargetLocation++;
         }
         indexOfServer++;
+    }
+    if (check_server == 0)
+    {
+        std::cout << TargetServer << std::endl;
+        response->setStatus("403");
+        response->setContentType("text/html");
+        response->setVersion("HTTP/1.1");
+        response->setCharset("UTF-8");
+        response->setBody("<html><head><title>403</title></head><body><h1>403 </h1> </body> </html>");
+        response->setContentLength("");
     }
 }
 
