@@ -9,113 +9,169 @@
 /*   Updated: 2021/09/15 10:49:30 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+#include "../includes/Webserv.hpp"
+#include "../includes/request.hpp"
+#include <dirent.h>
 
-#include "../includes/server.hpp"
-
-std::string Server::getBody(std::string path)
+std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key)
 {
-    std::string body;
-    std::ifstream file(path);
-    if (file.is_open())
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<std::string, std::string>::iterator it2;
+
+    for (it = locations.begin(); it != locations.end(); ++it)
     {
-        std::string line;
-        while (getline(file, line))
+        if (it->first == indexOfServer)
         {
-            body += line;
-            body += "\n";
+            for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+            {
+                if (it2->first.find(std::to_string(indexOfLocation) + " " + key) != std::string::npos)
+                {
+                    return (it2->second);
+                }
+            }
         }
-        file.close();
+        // std::string res = locations.find(indexOfServer)->second.find()->second;
     }
-    return body;
+    return ("");
 }
 
-void Server::Get_methode(cgi *c, char *envp[])
+std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
 {
-    int dir = 0;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<std::string, std::string>::iterator it2;
 
-    // std::multimap<std::string, std::string> mtmp = loc.find(1)->second;
-    // path = "webpage" ;
-    // if (stor.find("GET")->second.find(".php") == std::string::npos)
-    // {
-    //     if (stor.find("GET")->second == path)
-    //     {
-    //         body = getBody(stor.find("GET")->second + "/index.html");
-    //         len = body.size();
-    //     }
-    //     else if ((dir = check_dir(path, stor.find("GET")->second)))
-    //     {
-    //         if (dir == 1)
-    //         {
-    //             body = getBody(stor.find("GET")->second + "/index.html");
-    //             len = body.size();
-    //         }
-    //         else
-    //         {
-    //             body = getBody(stor.find("GET")->second);
-    //             len = body.size();
-    //         }
-    //     }
-    //     else
-    //     {
-    //         body = getBody("webpage/errors/404.html");
-    //         len = body.size();
-    //         status = "404 Not Found";
-    //     }
-    // }
-    // else
-    // {
-    //     char *argv[3];
-    //     std::string str("/Users/helkhatr/goinfre/.brew/bin/php-cgi");
-    //     argv[0] = (char *)str.c_str();
-    //     argv[1] = (char *)stor.find("GET")->second.c_str();
-    //     argv[2] = NULL;
-    //     //   body = c->CGI(argv, envp);
-    //     body = body.substr(body.find("\r\n\r\n") + 4, body.size());
-    //     len = body.size();
-    // }
+    for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
+    {
+        if (it2->first.find("location") != std::string::npos)
+            return (it2->second);
+    }
+    return (std::string(""));
 }
 
-void Server::Post_methode()
+std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key)
 {
+    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<std::string, std::string>::iterator it2;
 
-    // std::multimap<std::string, std::string> mtmp = loc.find(1)->second;
-    // path = "webpage" + mtmp.find("location")->second;
-    // if (mtmp.find("http_methods")->second.find("POST") != std::string::npos)
-    // {
-    //     int dir = 0;
-    //     if (stor.find("POST")->second == path)
-    //     {
-    //         body = getBody(stor.find("POST")->second + "/index.html");
-    //         lenght = body.size();
-    //     }
-    //     else if ((dir = check_dir(path, stor.find("POST")->second)))
-    //     {
-    //         if (dir == 1)
-    //         {
-    //             body = getBody(stor.find("POST")->second + "/index.html");
-    //             lenght = body.size();
-    //         }
-    //         else
-    //         {
-    //             body = getBody(stor.find("POST")->second);
-    //             lenght = body.size();
-    //         }
-    //     }
-    //     else
-    //     {
-    //         body = getBody("webpage/errors/404.html");
-    //         lenght = body.size();
-    //         status = "404 Not Found";
-    //     }
-    // }
-    // else
-    // {
-    //     body = getBody("webpage/errors/405.html");
-    //     lenght = body.size();
-    //     status = "405 Not Allowed";
-    // }
+    for (it = servers.begin(); it != servers.end(); ++it)
+    {
+        if (it->first == indexOfserver)
+        {
+            for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
+            {
+                if (it2->first.find(key) != std::string::npos)
+                    return (it2->second);
+            }
+        }
+        // std::string res = locations.find(indexOfServer)->second.find()->second;
+    }
+    return (std::string(""));
 }
 
-void Server::Delete_methode()
+int Server::check_if_file_or_dir(std::string path)
 {
+    struct stat info;
+    if (stat(path.c_str(), &info) == 0)
+    {
+        if (S_ISREG(info.st_mode))
+            return (1);
+        else if (S_ISDIR(info.st_mode))
+            return (2);
+    }
+    return (-1);
+}
+
+bool Server::is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location)
+{
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<std::string, std::string>::iterator it2;
+
+    for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
+    {
+        if (it2->first.find("location") != std::string::npos && it2->second.find(location) != std::string::npos)
+            return (true);
+    }
+    return (false);
+}
+
+std::string Server::CreateAutoIndexHtmlFile(std::string path, std::string locatioName)
+{
+
+    std::string body = "<html><head> <link rel=\"shortcut icon\" href=\"data:image/x-icon;,\" type=\"image/x-icon\"> <title>Auto Index </title/> </head> <body> <h1> index of " + locatioName + " </h1>";
+    //get all element in directory
+
+    DIR *dir;
+    struct dirent *ent;
+    dir = opendir(path.c_str());
+    if (dir == NULL)
+    {
+        return ("");
+    }
+    while ((ent = readdir(dir)) != NULL)
+    {
+        std::string tmp(ent->d_name);
+        body += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
+    }
+    body += "</body></html>";
+    closedir(dir);
+    return (body);
+}
+
+std::string Server::getBodyFromFile(std::string path)
+{
+    std::string res = "";
+    //read file
+    std::ifstream ifs(path.c_str());
+    //line by line
+    std::string line;
+    while (getline(ifs, line))
+    {
+        res += line + "\n";
+    }
+    return (res);
+}
+
+void Server::execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request)
+{
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+
+    if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
+        root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
+    // std::cout << "root: " << root + request->get_path() << std::endl;
+    if (check_if_file_or_dir(root + request->get_path()) == 1)
+    {
+        response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
+        response->setCookie("");
+        response->setSetCookie("");
+        response->setPath(root + request->get_path());
+        response->setHost(GetValueBykeyServer(servers, TargetServer, "server_addr"));
+        if (GetValueBykeyServer(servers, TargetServer, "server_name") != "")
+            response->setServerName(GetValueBykeyServer(servers, TargetServer, "server_name"));
+        else
+            response->setServerName("localhost");
+        response->setCGIPath(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "cgi_path"));
+        response->setMethod(request->get_method());
+        response->setRedirection("");
+        std::string Bodytmp = c->CGI(response, parsing->get_env());
+        if (Bodytmp.find("\r\n\r\n") != std::string::npos)
+            response->setBody(Bodytmp.substr(Bodytmp.find("\r\n\r\n")));
+        else
+            response->setBody(Bodytmp.substr(Bodytmp.find("()") + 2));
+        response->setContentLength("");
+    }
+    else
+        std::cout << " 404 found" << std::endl;
+    return;
+}
+
+void Server::SaveAsFile(std::string path, std::string body, int b)
+{
+    std::ofstream file;
+    if (b == 1)
+        file.open(path, std::ios_base::app);
+    else
+        file.open(path);
+    file << body;
+    file.close();
 }
