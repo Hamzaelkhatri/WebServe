@@ -2,13 +2,11 @@
 #include "../includes/request.hpp"
 #include <dirent.h>
 
-void Server::_GetDataServers(Parsing *parsing, Response *response, Request *request)
+std::map<std::string, std::string> Server::pars_request()
 {
     std::stringstream ss(someString);
-    int t = 0;
     std::map<std::string, std::string> stor;
-
-    // stor.clear();
+    int t = 0;
     while (std::getline(ss, line1, '\n'))
     {
         if (line1.find_first_of(":") != std::string::npos && t == 1)
@@ -31,20 +29,21 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
             Content.push_back(line1);
         }
     }
+    return (stor);
+}
+void Server::_GetDataServers(Parsing *parsing, Response *response, Request *request)
+{
+    stor = pars_request();
     std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
     std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
     std::map<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
-    //show data servers
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
     std::multimap<std::string, std::string> LocationContent;
     int indexOfServer = 1;
     int indexOfLocation = 1;
     std::string location_tmp = _GetFirstLocation(locations.begin());
-    /*
-        simulation Of data from Server Request
-    */
     std::string Host = stor["Host"].substr(0, stor["Host"].find(":"));
     std::string Port = stor["Host"].substr(stor["Host"].find(":") + 1, stor["Host"].size());
     std::string Methode = (stor.find("GET") != stor.end() ? "GET" : (stor.find("POST") != stor.end()) ? "POST"
@@ -62,13 +61,14 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
             break;
         }
     }
-    // std::cout << Content_Disposition << std::endl;
+    std::cout << Content_Disposition << std::endl;
     std::string Path = stor[Methode];
 
     request->set_host(Host);
     request->set_port(Port);
     request->set_method(Methode);
     request->set_path(Path);
+    request->set_content_lenght(std::stoi(Content_lenght));
     request->set_filename(Content_Disposition);
     cgi *c;
 
@@ -127,8 +127,26 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                     else if (pathLocation.find(".php") != std::string::npos)
                     {
                         if (location_tmp == "*.php")
+                        {
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
-                        // break;
+                            if (request->get_method() == "POST")
+                            {
+                                std::string BodySize = GetValueBykeyServer(servers, indexOfServer, "client_body_size");
+                                if (BodySize == "")
+                                    BodySize = "10m";
+                                std::cout << request->get_content_lenght()<< " " << (std::stol(BodySize)* 1048576) << std::endl;
+                                if (request->get_content_lenght() > 0 && std::stoi(BodySize) > 0 && request->get_content_lenght() <= (std::stol(BodySize)* 1048576))
+                                {
+                                    SaveAsFile("/home/hamza/Desktop/WebServe/output.txt", its->second, 1);
+                                }
+                                else
+                                {
+                                    response->setStatus("413");
+                                    response->setBody("413 Request Entity Too Large");
+                                }
+                            }
+                        }
+                        break;
                     }
                     else
                     {
@@ -211,8 +229,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
         indexOfServer++;
     }
     // std::cout << request->get_method();
-    if (request->get_method() == "POST")
-        SaveAsFile("/home/hamza/Desktop/WebServe/output.txt", its->second, 1);
 
     if (check_server == 0)
     {

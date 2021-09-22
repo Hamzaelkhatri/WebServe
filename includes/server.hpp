@@ -80,6 +80,7 @@ private:
     std::vector<int> MasterSockets;
     std::vector<std::string> Content;
     std::map<int, std::string> _clients;
+         std::map<std::string, std::string> stor;
     std::multimap<int, std::multimap<std::string, std::string>> loc;
 
 public:
@@ -116,6 +117,7 @@ public:
     std::string getBodyFromFile(std::string path);
 void execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request);
 void SaveAsFile(std::string path, std::string body, int b);
+std::map<std::string, std::string> pars_request();
     ~Server();
 };
 

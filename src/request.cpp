@@ -89,6 +89,12 @@ Request::Request()
 
 }
 
+int Request::get_content_lenght()
+{
+    return content_lenght;
+}
+
+
 
 Request::Request(int client_sock)
 {

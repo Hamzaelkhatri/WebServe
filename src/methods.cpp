@@ -168,10 +168,7 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
 void Server::SaveAsFile(std::string path, std::string body, int b)
 {
     std::ofstream file;
-    if (b == 1)
-        file.open(path, std::ios_base::app);
-    else
-        file.open(path);
+    file.open(path);
     file << body;
     file.close();
 }
