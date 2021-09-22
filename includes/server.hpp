@@ -79,7 +79,7 @@ private:
     std::vector<int> MasterSockets;
     std::vector<std::string> Content;
     std::map<int, std::string> _clients;
-    std::multimap<int, std::multimap<std::string, std::string> > loc;
+    std::multimap<int, std::multimap<std::string, std::string>> loc;
 
 public:
     Server(Parsing *pars, char *envp[]);
@@ -94,6 +94,7 @@ public:
     void Delete_methode();
     void Get_methode(cgi *c, char *envp[]);
     std::string getBody(std::string path);
+    std::map<int, std::string>::iterator its;
 
     class AcceptFailed : public std::exception
     {

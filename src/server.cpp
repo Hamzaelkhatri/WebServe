@@ -13,7 +13,6 @@ std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, 
         {
             for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
             {
-                std::cout << it2->first << " " << it2->second << std::endl;
                 if (it2->first.find(std::to_string(indexOfLocation) + " " + key) != std::string::npos)
                     return (it2->second);
             }
@@ -252,9 +251,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
             if (it3->first.find("server_addr") != std::string::npos && (request->get_host().find(it3->second) != std::string::npos || request->get_host().find("localhost") != std::string::npos))
                 TargetServer -= 1;
             else if (it3->first.find("server_name") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
-            {
                 TargetServer -= 1;
-            }
             if (TargetServer <= -2)
             {
                 check_server = 1;
@@ -273,7 +270,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                 // std::cout << location_tmp << std::endl;
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
-                    TargetLocation = std::stoi( it4->first.substr(0, it4->first.find(" ")));
+                    TargetLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
                     if (pathLocation.find(".py") != std::string::npos)
                     {
                         if (location_tmp == "*.py")
@@ -313,15 +310,13 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                             }
                             else if (check_if_file_or_dir(root + request->get_path()) == 2)
                             {
-                                // std::cout << GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") << std::endl;
-                                if (GetValueBykeyLocation(locations, TargetServer,TargetLocation, "index") != "")
+                                if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") != "")
                                 {
                                     if (Path[Path.size() - 1] != '/')
                                     {
                                         response->setStatus("301"); //moved permanently
                                         response->setRedirection("\nlocation:" + Path + "/");
                                         response->setPath(root + request->get_path() + "/");
-                                        // return;
                                     }
                                     std::string BodyTmp = getBodyFromFile(root + request->get_path() + GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index"));
                                     if (BodyTmp.empty())
@@ -359,11 +354,14 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
                     else
                         pathLocation = "/";
                 }
-                // return;
             }
             TargetLocation++;
         }
         indexOfServer++;
+    }
+    if (Methode == "POST")
+    {
+        std::cout << "POST" << std::endl;
     }
     if (check_server == 0)
     {
@@ -375,6 +373,14 @@ void Server::_GetDataServers(Parsing *parsing, Response *response)
         response->setBody("<html><head><title>403</title></head><body><h1>403 </h1> </body> </html>");
         response->setContentLength("");
     }
+}
+
+void SaveAsFile(std::string path, std::string body)
+{
+    std::ofstream file;
+    file.open(path, std::ios_base::app);
+    file << body;
+    file.close();
 }
 
 Server::Server(Parsing *p, char **envp)
@@ -437,12 +443,13 @@ Server::Server(Parsing *p, char **envp)
                         rc = recv(sock_fd, buffer, BUFFER_SIZE, 0);
                         if (rc > 0)
                         {
-                            std::map<int, std::string>::iterator it = _clients.find(sock_fd);
+                            its = _clients.find(sock_fd);
                             buffer[rc] = '\0';
-                            if (it != _clients.end())
-                                it->second += buffer;
-                            someString = "";
-                            if (checkRequest(it->second) == true)
+                            if (its != _clients.end())
+                                its->second += buffer;
+                            someString = its->second;
+                            // std::cout << someString << std::endl;
+                            if (checkRequest(its->second) == true)
                             {
                                 // someString = it->second;
                                 if (FD_ISSET(sock_fd, &writefds))
@@ -491,10 +498,11 @@ Server::Server(Parsing *p, char **envp)
                                     // else if (stor.find("DELETE") != stor.end())
                                     //     Delete_methode();
                                     // std::cout << someString << std::endl;;
+                                    SaveAsFile("/home/hamza/Desktop/WebServe/output.txt", its->second);
 
                                     std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\n\n" + response->getBody();
                                     write(sock_fd, header.c_str(), strlen(header.c_str()));
-                                    it->second.clear();
+                                    its->second.clear();
                                 }
                             }
                         }
@@ -502,10 +510,13 @@ Server::Server(Parsing *p, char **envp)
                         {
                             if (rc == 0)
                             {
+                                // someString = "";
+                                // its->second.clear();
                                 std::cout << sock_fd << "\t  =   Diconnected" << std::endl;
                                 close(sock_fd);
                                 FD_CLR(sock_fd, &masterfds);
                                 FD_CLR(sock_fd, &writefds);
+                                // exit(0);
                             }
                             else
                                 continue;

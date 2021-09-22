@@ -58,6 +58,7 @@ bool Server::checkRequest(std::string &req)
     size_t i;
 
     i = req.find("\r\n\r\n");
+
     if (i == std::string::npos)
         return false;
     if (req.find("Content-Length") != std::string::npos)
