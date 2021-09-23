@@ -166,6 +166,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                         {
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
+                            Delete_methode(request, parsing, TargetServer, TargetLocation, response);
                             break;
                         }
                     }
@@ -175,6 +176,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                         {
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
+                            Delete_methode(request, parsing, TargetServer, TargetLocation, response);
                             break;
                         }
                     }
@@ -188,7 +190,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                 root = GetValueBykeyServer(servers, indexOfServer, "root");
                             else
                                 root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
-                             // std::cout << GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") << std::endl;
                             if (check_if_file_or_dir(root + request->get_path()) == 1)
                             {
                                 response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
@@ -246,6 +247,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                             else
                                 std::cout << root + request->get_path() << " 404 not found" << std::endl;
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
+                            Delete_methode(request, parsing, TargetServer, TargetLocation, response);
                             break;
                         }
                     }

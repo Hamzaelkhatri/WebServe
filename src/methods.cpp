@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/23 09:54:58 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/23 14:16:56 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,4 +176,65 @@ void Server::SaveAsFile(std::string path, std::string body, int b)
     file.open(path);
     file << body;
     file.close();
+}
+
+int checkPermission(const char *path)
+{
+    struct stat fileStat;
+    if (stat(path, &fileStat) == 0)
+    {
+        if (fileStat.st_mode & S_IWOTH)
+        {
+            return (1);
+        }
+        else
+            return(0);
+    }
+    return (0);
+}
+
+
+void Server::Delete_methode(Request *request,Parsing *parsing,int indexOfServer,int indexOflocation,Response *response)
+{
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::string root;
+    if(request->get_method() == "DELETE")
+    {
+        std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "http_methods");
+        if(methode_http.find("DELETE") != std::string::npos)
+        {
+            if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
+                   root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
+            std::string path = request->get_path();
+            // std::cout << root + path << std::endl;
+            if(check_if_file_or_dir(root + path) == 1)
+            {
+                     response->setContentLength("");
+                if(checkPermission((root + path).c_str()) == 1)
+                 {
+                    response->setStatus("200 ok");
+                    response->setBody("Deleted");
+                     response->setContentLength("");
+                    remove( (root + path).c_str()) ;
+                }
+                else
+                  {
+                      
+                   response->setStatus("403");
+                    response->setBody("Forbiden");
+                  }
+            }
+            else
+            {
+                         response->setStatus("404");
+            response->setBody("Method Not Allowed");
+        }
+        }
+        else
+        {
+            response->setStatus("405");
+            response->setBody("Method Not Allowed");
+        }
+    }
 }
