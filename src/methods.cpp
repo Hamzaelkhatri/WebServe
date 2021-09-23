@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/23 18:32:04 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/23 19:33:02 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,8 +208,10 @@ void Server::Delete_methode(Request *request,Parsing *parsing,int indexOfServer,
         std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "http_methods");
         if(methode_http.find("DELETE") != std::string::npos)
         {
-            if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
+                if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
                    root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
+                else
+                    root = GetValueBykeyServer(servers, indexOfServer, "root");
             std::string path = request->get_path();
             // std::cout << root + path << std::endl;
             if(check_if_file_or_dir(root + path) == 1)

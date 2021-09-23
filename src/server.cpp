@@ -81,18 +81,38 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
         else if ((upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0) && request->get_content_lenght() > (std::stol(BodySize) * 1048576))
         {
             response->setStatus("413");
-            response->setBody("413 Request Entity  TooLarge");
+            response->setContentLength("");
+            std::string root = "";
+                if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
+                   root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
+                else
+                    root = GetValueBykeyServer(servers, indexOfServer, "root");
+            std::string BodyTmp = getBodyFromFile(root +  "/errors/413.html");
+            response->setBody(BodyTmp);
         }
         else if (upload_status == "on" && request->get_content_lenght() == 0)
         {
             response->setStatus("411");
-            response->setBody("411 Length Required");
+             response->setContentLength("");
+            std::string root = "";
+                if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
+                   root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
+                else
+                    root = GetValueBykeyServer(servers, indexOfServer, "root");
+            std::string BodyTmp = getBodyFromFile(root +  "/errors/411.html");
         }
         else if ((upload_status == "on" && std::stoi(BodySize) == 0) || (upload_status == "off" && request->get_content_lenght() > 0) || upload_status == "")
         {
             // std::cout << upload_status << "|" << std::stoi(BodySize) << "|" << request->get_content_lenght() << std::endl;
             response->setStatus("400");
-            response->setBody("400 Bad Request");
+             response->setContentLength("");
+            std::string root = "";
+                if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
+                   root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
+                else
+                    root = GetValueBykeyServer(servers, indexOfServer, "root");
+            std::string BodyTmp = getBodyFromFile(root +  "/errors/400.html");
+            response->setBody(BodyTmp);
         }
     }
 }
@@ -243,6 +263,8 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                     {
                                         response->setStatus("301"); //moved permanently
                                         response->setRedirection("\nlocation:" + Path + "/");
+                                        std::string BodyTmp = getBodyFromFile(root +  "/errors/301.html");
+                                        response->setBody(BodyTmp);
                                     }
                                 }
                             }
