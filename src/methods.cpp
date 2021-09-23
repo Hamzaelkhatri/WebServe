@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/23 18:00:19 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/23 18:32:04 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string,
                     return (it2->second);
             }
         }
-        // std::string res = locations.find(indexOfServer)->second.find()->second;
     }
     return (std::string(""));
 }
@@ -166,7 +165,12 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
         response->setContentLength("");
     }
     else
-        std::cout << " 404 found" << std::endl;
+      {
+            response->setContentLength("");
+            response->setStatus("404");
+            std::string BodyTmp = getBodyFromFile(root +  "/errors/404.html");
+            response->setBody(BodyTmp);
+      }
     return;
 }
 

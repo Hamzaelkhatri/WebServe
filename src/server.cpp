@@ -18,7 +18,7 @@ std::map<std::string, std::string> Server::pars_request()
         else if (t == 0)
         {
             tmp1 = line1.substr(0, line1.find_first_of(" "));
-            std::cout << " tmp1  |" << tmp1 << "|" << std::endl;
+            // std::cout << " tmp1  |" << tmp1 << "|" << std::endl;
             tmp2 = line1.substr(line1.find_first_of(" ") + 1);
             stor[tmp1] = tmp2.substr(0, tmp2.find_first_of(" "));
             t++;
@@ -75,7 +75,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
             upload_path = "~/downloads";
         if (BodySize == "")
             BodySize = "10m";
-        std::cout << request->get_content_lenght() << " " << (std::stol(BodySize) * 1048576) << std::endl;
+        // std::cout << request->get_content_lenght() << " " << (std::stol(BodySize) * 1048576) << std::endl;
         if (upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0 && request->get_content_lenght() <= (std::stol(BodySize) * 1048576))
             SaveAsFile(upload_path + request->get_filename(), its->second, 1);
         else if ((upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0) && request->get_content_lenght() > (std::stol(BodySize) * 1048576))
@@ -90,7 +90,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
         }
         else if ((upload_status == "on" && std::stoi(BodySize) == 0) || (upload_status == "off" && request->get_content_lenght() > 0) || upload_status == "")
         {
-            std::cout << upload_status << "|" << std::stoi(BodySize) << "|" << request->get_content_lenght() << std::endl;
+            // std::cout << upload_status << "|" << std::stoi(BodySize) << "|" << request->get_content_lenght() << std::endl;
             response->setStatus("400");
             response->setBody("400 Bad Request");
         }
@@ -221,8 +221,10 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                     std::string BodyTmp = getBodyFromFile(root + request->get_path() + GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index"));
                                     if (BodyTmp.empty())
                                     {
-                                        std::cout << "403 forbidden" << std::endl; //403 forbidden
+                                        response->setContentLength("");
                                         response->setStatus("403");
+                                        std::string BodyTmp = getBodyFromFile(root +  "/errors/403.html");
+                                        response->setBody(BodyTmp);
                                     }
                                     response->setBody(BodyTmp);
                                     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
@@ -245,7 +247,12 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                 }
                             }
                             else
-                                std::cout << root + request->get_path() << " 404 not found" << std::endl;
+                            {
+                                    response->setContentLength("");
+                                    response->setStatus("404");
+                                    std::string BodyTmp = getBodyFromFile(root +  "/errors/404.html");
+                                    response->setBody(BodyTmp);
+                        }
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
                             Delete_methode(request, parsing, TargetServer, TargetLocation, response);
                             break;
@@ -262,12 +269,13 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
         }
         if (check_server == 0)
         {
-            std::cout << TargetServer << std::endl;
+            // std::cout << TargetServer << std::endl;
             response->setStatus("403");
             response->setContentType("text/html");
             response->setVersion("HTTP/1.1");
             response->setCharset("UTF-8");
-            response->setBody("<html><head><title>403</title></head><body><h1>403 </h1> </body> </html>");
+            std::string BodyTmp = getBodyFromFile(root +  "/errors/403.html");
+            response->setBody(BodyTmp);
             response->setContentLength("");
         }
     }
