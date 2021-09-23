@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   methods.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/15 10:49:30 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/23 09:54:58 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "../includes/Webserv.hpp"
-#include "../includes/request.hpp"
-#include <dirent.h>
 
-std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key)
+#include "../includes/request.hpp"
+#include "../includes/server.hpp"
+
+std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string> > locations, int indexOfServer, int indexOfLocation, std::string key)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = locations.begin(); it != locations.end(); ++it)
@@ -35,9 +35,9 @@ std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::
     return ("");
 }
 
-std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
+std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -48,9 +48,9 @@ std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::stri
     return (std::string(""));
 }
 
-std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key)
+std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key)
 {
-    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::map<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = servers.begin(); it != servers.end(); ++it)
@@ -81,9 +81,9 @@ int Server::check_if_file_or_dir(std::string path)
     return (-1);
 }
 
-bool Server::is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location)
+bool Server::is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -138,8 +138,8 @@ std::string Server::getBodyFromFile(std::string path)
 
 void Server::execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request)
 {
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
 
     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
         root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");

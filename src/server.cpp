@@ -32,9 +32,9 @@ std::map<std::string, std::string> Server::pars_request()
     return (stor);
 }
 
-int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string>>::iterator it, int &check_server, int indexOfServer)
+int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string> >::iterator it, int &check_server, int indexOfServer)
 {
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
     int TargetServer = 0;
     for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
     {
@@ -57,16 +57,14 @@ int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &roo
 
 void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
 {
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
     if (request->get_method() == "POST")
     {
         std::string BodySize = GetValueBykeyServer(servers, indexOfServer, "client_body_size");
         std::string upload_path = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload_path");
         std::string upload_status = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload");
         std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "http_methods");
-
-        //remove Double quotes
         if (methode_http.find("POST") == std::string::npos)
         {
             response->setStatus("405");
@@ -102,10 +100,10 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
 void Server::_GetDataServers(Parsing *parsing, Response *response, Request *request)
 {
     stor = pars_request();
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string>>::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
+    std::map<int, std::multimap<std::string, std::string> >servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
     std::multimap<std::string, std::string> LocationContent;
@@ -190,8 +188,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                 root = GetValueBykeyServer(servers, indexOfServer, "root");
                             else
                                 root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
-                            // std::cout << GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") << std::endl;
-
+                             // std::cout << GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") << std::endl;
                             if (check_if_file_or_dir(root + request->get_path()) == 1)
                             {
                                 response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));

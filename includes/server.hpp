@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/16 11:29:27 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/23 10:48:33 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ private:
     std::vector<std::string> Content;
     std::map<int, std::string> _clients;
          std::map<std::string, std::string> stor;
-    std::multimap<int, std::multimap<std::string, std::string>> loc;
+    std::multimap<int, std::multimap<std::string, std::string> > loc;
 
 public:
     Server(Parsing *pars, char *envp[]);
@@ -90,13 +90,12 @@ public:
     int check_index(std::string str);
     int check_dir(std::string dir, std::string str);
     bool checkRequest(std::string &req);
-    void Post_methode();
     void _GetDataServers(Parsing *parsing, Response *response,Request *request);
     void witch_server(std::map<int, std::string> str, Parsing *pars);
     void Post_Method(Request *request,Parsing *parsing,int indexOfServer,int indexOflocation,Response *response);
-    void Delete_methode();
+    void Delete_methode(Request *request,Parsing *parsing,int indexOfServer,int indexOflocation,Response *response);
     void Get_methode(cgi *c, char *envp[]);
-    std::string str5 = "";
+    std::string str5;
 
     std::string getBody(std::string path);
     std::map<int, std::string>::iterator its;
@@ -109,11 +108,11 @@ public:
     {
         virtual const char *what() const throw();
     };
-    std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key);
-    std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations);
-    std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key);
-    bool is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location);
-    int GetTargetServer(Request *request,Parsing *parsing,std::string &root,std::multimap<std::string, std::string>::iterator it3,std::map<int, std::multimap<std::string, std::string>>::iterator it,int &check_server,int indexOfServer);
+    std::string GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string> > locations, int indexOfServer, int indexOfLocation, std::string key);
+    std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations);
+    std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key);
+    bool is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location);
+    int GetTargetServer(Request *request,Parsing *parsing,std::string &root,std::multimap<std::string, std::string>::iterator it3,std::map<int, std::multimap<std::string, std::string> >::iterator it,int &check_server,int indexOfServer);
     int check_if_file_or_dir(std::string path);
     std::string CreateAutoIndexHtmlFile(std::string path, std::string locatioName);
     std::string getBodyFromFile(std::string path);

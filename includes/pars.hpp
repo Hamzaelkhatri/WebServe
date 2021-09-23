@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pars.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 19:31:17 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/18 17:25:29 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/23 09:57:54 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <iostream>
 #include <map>
 #include "ErrorHandling.hpp"
+#include <dirent.h>
 
 class LocationManage
 {
