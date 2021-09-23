@@ -55,6 +55,45 @@ int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &roo
     return (TargetServer);
 }
 
+int CountLines(std::string &file)
+{
+    std::stringstream in(file);
+    std::string line;
+    int count = 0;
+    while (std::getline(in, line, '\n'))
+        count++;
+    return (count);
+}
+
+std::string DeleteHeaderPost(std::string &str)
+{
+    std::string Boundry = "";
+    std::stringstream ss(str);
+    std::string line;
+    int count = 0;
+    while (std::getline(ss, line, '\n'))
+    {
+        if (line.find("Content-Type: multipart/form-data; boundary=") != std::string::npos)
+        {
+            Boundry = line.substr(line.find("boundary=") + 9);
+            Boundry = Boundry.substr(0, Boundry.find("\""));
+            break;
+        }
+    }
+    str = str.substr(str.find("\r\n\r\n")+4);
+    str = str.substr(str.find("\r\n\r\n")+4);
+    // str = str.substr(str.find("\r\n\r\n"));
+
+    std::stringstream ss2(str);
+    std::string line2;
+    while (std::getline(ss2, line2, '\n'))
+    {
+        if (line2.find("--" + Boundry) != std::string::npos)
+        break;
+    }
+    return (str.substr(0,str.find("\r\n--" + Boundry)));
+}
+
 void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
 {
     std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
@@ -78,21 +117,23 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
         if (BodySize == "")
             BodySize = "10m";
         std::cout << request->get_content_lenght() << " " << (std::stol(BodySize) * 1048576) << std::endl;
-        if (upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0 && request->get_content_lenght() <= (std::stol(BodySize) * 1048576))
+        if (request->get_filename() != "" && upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0 && request->get_content_lenght() <= (std::stol(BodySize) * 1048576))
+        {
+            its->second = DeleteHeaderPost(its->second);
             SaveAsFile(upload_path + request->get_filename(), its->second, 1);
+        }
         else if ((upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0) && request->get_content_lenght() > (std::stol(BodySize) * 1048576))
         {
             response->setStatus("413");
-            response->setBody("413 Request Entity  TooLarge");
+            response->setBody("413 Request Entity  Too Large");
         }
         else if (upload_status == "on" && request->get_content_lenght() == 0)
         {
             response->setStatus("411");
             response->setBody("411 Length Required");
         }
-        else if ((upload_status == "on" && std::stoi(BodySize) == 0) || (upload_status == "off" && request->get_content_lenght() > 0) || upload_status == "")
+        else
         {
-            std::cout << upload_status << "|" << std::stoi(BodySize) << "|" << request->get_content_lenght() << std::endl;
             response->setStatus("400");
             response->setBody("400 Bad Request");
         }
@@ -184,6 +225,9 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                     {
                         //BIG NOTICE HERE . WE NEED TO CONCAT BETWEEN ROOT AND LOCATION
                         root = GetValueBykeyServer(servers, indexOfServer, "root");
+                        if ((root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root")) != "")
+                        {
+                        }
                         if (location_tmp == pathLocation)
                         {
                             if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") == "")

@@ -15,6 +15,7 @@ std::string Request::get_host()
 std::string Request::get_filename()
 {
     //trim double quotes
+    std::cout << filename << std::endl;
     return filename.substr(1, filename.size() - 3);
 }
 
