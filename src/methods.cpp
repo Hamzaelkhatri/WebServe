@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   methods.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/15 10:49:30 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/23 14:16:56 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include "../includes/Webserv.hpp"
-#include "../includes/request.hpp"
-#include <dirent.h>
 
-std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key)
+#include "../includes/request.hpp"
+#include "../includes/server.hpp"
+
+std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string> > locations, int indexOfServer, int indexOfLocation, std::string key)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = locations.begin(); it != locations.end(); ++it)
@@ -35,9 +35,9 @@ std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::
     return ("");
 }
 
-std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
+std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -48,9 +48,9 @@ std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::stri
     return (std::string(""));
 }
 
-std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key)
+std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key)
 {
-    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::map<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = servers.begin(); it != servers.end(); ++it)
@@ -81,9 +81,9 @@ int Server::check_if_file_or_dir(std::string path)
     return (-1);
 }
 
-bool Server::is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location)
+bool Server::is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -138,12 +138,12 @@ std::string Server::getBodyFromFile(std::string path)
 
 void Server::execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request)
 {
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
 
     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
         root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
-    // std::cout << "root: " << root + request->get_path() << std::endl;
+    std::cout << "root: " << root + request->get_path() << std::endl;
     if (check_if_file_or_dir(root + request->get_path()) == 1)
     {
         response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
@@ -176,4 +176,65 @@ void Server::SaveAsFile(std::string path, std::string body, int b)
     file.open(path);
     file << body;
     file.close();
+}
+
+int checkPermission(const char *path)
+{
+    struct stat fileStat;
+    if (stat(path, &fileStat) == 0)
+    {
+        if (fileStat.st_mode & S_IWOTH)
+        {
+            return (1);
+        }
+        else
+            return(0);
+    }
+    return (0);
+}
+
+
+void Server::Delete_methode(Request *request,Parsing *parsing,int indexOfServer,int indexOflocation,Response *response)
+{
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::string root;
+    if(request->get_method() == "DELETE")
+    {
+        std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "http_methods");
+        if(methode_http.find("DELETE") != std::string::npos)
+        {
+            if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
+                   root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
+            std::string path = request->get_path();
+            // std::cout << root + path << std::endl;
+            if(check_if_file_or_dir(root + path) == 1)
+            {
+                     response->setContentLength("");
+                if(checkPermission((root + path).c_str()) == 1)
+                 {
+                    response->setStatus("200 ok");
+                    response->setBody("Deleted");
+                     response->setContentLength("");
+                    remove( (root + path).c_str()) ;
+                }
+                else
+                  {
+                      
+                   response->setStatus("403");
+                    response->setBody("Forbiden");
+                  }
+            }
+            else
+            {
+                         response->setStatus("404");
+            response->setBody("Method Not Allowed");
+        }
+        }
+        else
+        {
+            response->setStatus("405");
+            response->setBody("Method Not Allowed");
+        }
+    }
 }

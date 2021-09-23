@@ -80,8 +80,8 @@ std::string DeleteHeaderPost(std::string &str)
             break;
         }
     }
-    str = str.substr(str.find("\r\n\r\n")+4);
-    str = str.substr(str.find("\r\n\r\n")+4);
+    str = str.substr(str.find("\r\n\r\n") + 4);
+    str = str.substr(str.find("\r\n\r\n") + 4);
     // str = str.substr(str.find("\r\n\r\n"));
 
     std::stringstream ss2(str);
@@ -89,9 +89,9 @@ std::string DeleteHeaderPost(std::string &str)
     while (std::getline(ss2, line2, '\n'))
     {
         if (line2.find("--" + Boundry) != std::string::npos)
-        break;
+            break;
     }
-    return (str.substr(0,str.find("\r\n--" + Boundry)));
+    return (str.substr(0, str.find("\r\n--" + Boundry)));
 }
 
 void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
@@ -104,8 +104,6 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
         std::string upload_path = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload_path");
         std::string upload_status = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload");
         std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "http_methods");
-
-        //remove Double quotes
         if (methode_http.find("POST") == std::string::npos)
         {
             response->setStatus("405");
@@ -203,13 +201,14 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
                     TargetLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
+
                     if (pathLocation.find(".py") != std::string::npos)
                     {
                         if (location_tmp == "*.py")
                         {
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
-                            break;
+                            Delete_methode(request, parsing, TargetServer, TargetLocation, response);
                         }
                     }
                     else if (pathLocation.find(".php") != std::string::npos)
@@ -218,26 +217,20 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                         {
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
-                            break;
+                            Delete_methode(request, parsing, TargetServer, TargetLocation, response);
+                            // break;
                         }
                     }
-                    else
+                    else if (pathLocation.find(".php") == std::string::npos && pathLocation.find(".py") == std::string::npos)
                     {
-                        //BIG NOTICE HERE . WE NEED TO CONCAT BETWEEN ROOT AND LOCATION
-                        root = GetValueBykeyServer(servers, indexOfServer, "root");
-                        if ((root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root")) != "")
-                        {
-                        }
+                        if (pathLocation != "/"&&pathLocation.find_last_of("/") == pathLocation.size() - 1)
+                            pathLocation = pathLocation.substr(0, pathLocation.size() - 1);
                         if (location_tmp == pathLocation)
                         {
-                            if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") == "")
-                                root = GetValueBykeyServer(servers, indexOfServer, "root");
-                            else
-                                root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
-                            // std::cout << GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") << std::endl;
-
                             if (check_if_file_or_dir(root + request->get_path()) == 1)
                             {
+                                if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
+                                    root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
                                 response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
                                 response->setCookie("");
                                 response->setSetCookie("");
@@ -253,14 +246,17 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                 std::string Bodytmp = getBodyFromFile(root + request->get_path());
                                 response->setBody(Bodytmp);
                                 response->setContentLength("");
+                                // break;
                             }
                             else if (check_if_file_or_dir(root + request->get_path()) == 2)
                             {
+                                if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
+                                    root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
                                 if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") != "")
                                 {
                                     if (Path[Path.size() - 1] != '/')
                                     {
-                                        response->setStatus("301"); //moved permanently
+                                        response->setStatus("301");
                                         response->setRedirection("\nlocation:" + Path + "/");
                                         response->setPath(root + request->get_path() + "/");
                                     }
@@ -277,9 +273,12 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                     response->setSetCookie("");
                                     response->setContentLength("");
                                     body = response->getBody();
+                                    // break;
                                 }
                                 else if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "autoindex") != "" && GetValueBykeyLocation(locations, TargetServer, TargetLocation, "") == "off")
                                 {
+                                    if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
+                                        root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
                                     response->setBody(CreateAutoIndexHtmlFile(root + request->get_path(), pathLocation));
                                     response->setStatus("");
                                     response->setContentLength("");
@@ -293,13 +292,19 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                             else
                                 std::cout << root + request->get_path() << " 404 not found" << std::endl;
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
-                            break;
+                            Delete_methode(request, parsing, TargetServer, TargetLocation, response);
+                            TargetServer = -1;
+                            TargetLocation = -1;
+                            // break;
                         }
                     }
-                    if (pathLocation.find_last_of("/") != std::string::npos)
-                        pathLocation = pathLocation.substr(0, pathLocation.find_last_of("/"));
                     else
-                        pathLocation = "/";
+                    {
+                        if (pathLocation.find_last_of("/") != std::string::npos && TargetLocation > 0 && TargetServer > 0)
+                            pathLocation = pathLocation.substr(0, pathLocation.find_last_of("/"));
+                        else
+                            pathLocation = "/";
+                    }
                 }
                 TargetLocation++;
             }
