@@ -12,6 +12,12 @@ std::string Request::get_host()
     return host;
 }
 
+std::string Request::get_filename()
+{
+    //trim double quotes
+    return filename.substr(1, filename.size() - 3);
+}
+
 std::string Request::get_path()
 {
     return path;

@@ -31,6 +31,74 @@ std::map<std::string, std::string> Server::pars_request()
     }
     return (stor);
 }
+
+int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string>>::iterator it, int &check_server, int indexOfServer)
+{
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    int TargetServer = 0;
+    for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
+    {
+        if (it3->first.find("listen") != std::string::npos && request->get_port().find(it3->second) != std::string::npos)
+            TargetServer -= 1;
+        if (it3->first.find("server_addr") != std::string::npos && (request->get_host().find(it3->second) != std::string::npos || request->get_host().find("localhost") != std::string::npos))
+            TargetServer -= 1;
+        else if (it3->first.find("server_name") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
+            TargetServer -= 1;
+        if (TargetServer <= -2)
+        {
+            check_server = 1;
+            TargetServer = indexOfServer;
+            root = GetValueBykeyServer(servers, indexOfServer, "root");
+            break;
+        }
+    }
+    return (TargetServer);
+}
+
+void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
+{
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    if (request->get_method() == "POST")
+    {
+        std::string BodySize = GetValueBykeyServer(servers, indexOfServer, "client_body_size");
+        std::string upload_path = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload_path");
+        std::string upload_status = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload");
+        std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "http_methods");
+
+        //remove Double quotes
+        if (methode_http.find("POST") == std::string::npos)
+        {
+            response->setStatus("405");
+            response->setBody("Method Not Allowed");
+            return;
+        }
+        if (upload_path == "")
+            upload_path = "~/downloads";
+        if (BodySize == "")
+            BodySize = "10m";
+        std::cout << request->get_content_lenght() << " " << (std::stol(BodySize) * 1048576) << std::endl;
+        if (upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0 && request->get_content_lenght() <= (std::stol(BodySize) * 1048576))
+            SaveAsFile(upload_path + request->get_filename(), its->second, 1);
+        else if ((upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0) && request->get_content_lenght() > (std::stol(BodySize) * 1048576))
+        {
+            response->setStatus("413");
+            response->setBody("413 Request Entity  TooLarge");
+        }
+        else if (upload_status == "on" && request->get_content_lenght() == 0)
+        {
+            response->setStatus("411");
+            response->setBody("411 Length Required");
+        }
+        else if ((upload_status == "on" && std::stoi(BodySize) == 0) || (upload_status == "off" && request->get_content_lenght() > 0) || upload_status == "")
+        {
+            std::cout << upload_status << "|" << std::stoi(BodySize) << "|" << request->get_content_lenght() << std::endl;
+            response->setStatus("400");
+            response->setBody("400 Bad Request");
+        }
+    }
+}
+
 void Server::_GetDataServers(Parsing *parsing, Response *response, Request *request)
 {
     stor = pars_request();
@@ -55,8 +123,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
     {
         if (Content[j].find("Content-Disposition") != std::string::npos)
         {
-            // std::string tmp = Content[j].substr(Content[j].find("filename=") + 9, Content[j].size());
-            // tmp = tmp.substr(0, tmp.find(";"));
             Content_Disposition = Content[j].substr(Content[j].find("filename=") + 9, Content[j].size());
             break;
         }
@@ -71,12 +137,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
     request->set_content_lenght(std::stoi(Content_lenght));
     request->set_filename(Content_Disposition);
     cgi *c;
-
-    // std::cout << "Host: " << Host << std::endl;
-    // std::cout << "Port: " << Port << std::endl;
-    // std::cout << "Methode: " << Methode << std::endl;
-    // std::cout << "Path: " << Path << std::endl;
-
     response->setContentType("text/html");
     response->setVersion("HTTP/1.1");
     response->setCharset("UTF-8");
@@ -88,68 +148,41 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
 
     for (it = servers.begin(); it != servers.end(); it++)
     {
-        indexOfLocation = 0;
-        TargetServer = 0;
-        for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
-        {
-            if (it3->first.find("listen") != std::string::npos && request->get_port().find(it3->second) != std::string::npos)
-                TargetServer -= 1;
-            if (it3->first.find("server_addr") != std::string::npos && (request->get_host().find(it3->second) != std::string::npos || request->get_host().find("localhost") != std::string::npos))
-                TargetServer -= 1;
-            else if (it3->first.find("server_name") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
-                TargetServer -= 1;
-            if (TargetServer <= -2)
-            {
-                check_server = 1;
-                TargetServer = indexOfServer;
-                root = GetValueBykeyServer(servers, indexOfServer, "root");
-                break;
-            }
-        }
-        TargetLocation = 1;
+        indexOfLocation = 1;
+        TargetServer = 1;
 
+        TargetServer = GetTargetServer(request, parsing, root, it3, it, check_server, indexOfServer);
+        TargetLocation = 1;
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {
             std::string pathLocation = request->get_path();
             if (it2->first == TargetServer)
             {
                 location_tmp = _GetFirstLocation(it2);
-                // std::cout << location_tmp << std::endl;
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
                     TargetLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
                     if (pathLocation.find(".py") != std::string::npos)
                     {
                         if (location_tmp == "*.py")
+                        {
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
-                        break;
+                            Post_Method(request, parsing, TargetServer, TargetLocation, response);
+                            break;
+                        }
                     }
                     else if (pathLocation.find(".php") != std::string::npos)
                     {
                         if (location_tmp == "*.php")
                         {
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
-                            if (request->get_method() == "POST")
-                            {
-                                std::string BodySize = GetValueBykeyServer(servers, indexOfServer, "client_body_size");
-                                if (BodySize == "")
-                                    BodySize = "10m";
-                                std::cout << request->get_content_lenght()<< " " << (std::stol(BodySize)* 1048576) << std::endl;
-                                if (request->get_content_lenght() > 0 && std::stoi(BodySize) > 0 && request->get_content_lenght() <= (std::stol(BodySize)* 1048576))
-                                {
-                                    SaveAsFile("/home/hamza/Desktop/WebServe/output.txt", its->second, 1);
-                                }
-                                else
-                                {
-                                    response->setStatus("413");
-                                    response->setBody("413 Request Entity Too Large");
-                                }
-                            }
+                            Post_Method(request, parsing, TargetServer, TargetLocation, response);
+                            break;
                         }
-                        break;
                     }
                     else
                     {
+                        //BIG NOTICE HERE . WE NEED TO CONCAT BETWEEN ROOT AND LOCATION
                         root = GetValueBykeyServer(servers, indexOfServer, "root");
                         if (location_tmp == pathLocation)
                         {
@@ -215,6 +248,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                             }
                             else
                                 std::cout << root + request->get_path() << " 404 not found" << std::endl;
+                            Post_Method(request, parsing, TargetServer, TargetLocation, response);
                             break;
                         }
                     }
@@ -223,25 +257,22 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                     else
                         pathLocation = "/";
                 }
+                TargetLocation++;
             }
-            TargetLocation++;
+            indexOfServer++;
         }
-        indexOfServer++;
-    }
-    // std::cout << request->get_method();
-
-    if (check_server == 0)
-    {
-        std::cout << TargetServer << std::endl;
-        response->setStatus("403");
-        response->setContentType("text/html");
-        response->setVersion("HTTP/1.1");
-        response->setCharset("UTF-8");
-        response->setBody("<html><head><title>403</title></head><body><h1>403 </h1> </body> </html>");
-        response->setContentLength("");
+        if (check_server == 0)
+        {
+            std::cout << TargetServer << std::endl;
+            response->setStatus("403");
+            response->setContentType("text/html");
+            response->setVersion("HTTP/1.1");
+            response->setCharset("UTF-8");
+            response->setBody("<html><head><title>403</title></head><body><h1>403 </h1> </body> </html>");
+            response->setContentLength("");
+        }
     }
 }
-
 Server::Server(Parsing *p, char **envp)
 {
     std::string version;
@@ -309,17 +340,10 @@ Server::Server(Parsing *p, char **envp)
                             if (its != _clients.end())
                                 its->second += buffer;
                             someString = its->second;
-                            // std::cout << someString << std::endl;
                             if (checkRequest(its->second) == true)
                             {
-                                // puts("here");
-                                // someString = it->second;
                                 if (FD_ISSET(sock_fd, &writefds))
                                 {
-                                    //Show Stor
-                                    // std::cout << YEL << "***********************************" << reset << std::endl;
-                                    // std::cout << someString << std::endl;
-                                    // std::cout << YEL << "***********************************" << reset << std::endl;
                                     _GetDataServers(p, response, request);
                                     std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\n\n" + response->getBody();
                                     write(sock_fd, header.c_str(), strlen(header.c_str()));

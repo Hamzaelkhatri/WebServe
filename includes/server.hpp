@@ -93,6 +93,7 @@ public:
     void Post_methode();
     void _GetDataServers(Parsing *parsing, Response *response,Request *request);
     void witch_server(std::map<int, std::string> str, Parsing *pars);
+    void Post_Method(Request *request,Parsing *parsing,int indexOfServer,int indexOflocation,Response *response);
     void Delete_methode();
     void Get_methode(cgi *c, char *envp[]);
     std::string str5 = "";
@@ -112,6 +113,7 @@ public:
     std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations);
     std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key);
     bool is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location);
+    int GetTargetServer(Request *request,Parsing *parsing,std::string &root,std::multimap<std::string, std::string>::iterator it3,std::map<int, std::multimap<std::string, std::string>>::iterator it,int &check_server,int indexOfServer);
     int check_if_file_or_dir(std::string path);
     std::string CreateAutoIndexHtmlFile(std::string path, std::string locatioName);
     std::string getBodyFromFile(std::string path);
