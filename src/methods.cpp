@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/23 14:16:56 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/23 18:00:19 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,21 +214,24 @@ void Server::Delete_methode(Request *request,Parsing *parsing,int indexOfServer,
                 if(checkPermission((root + path).c_str()) == 1)
                  {
                     response->setStatus("200 ok");
-                    response->setBody("Deleted");
-                     response->setContentLength("");
+                    std::string BodyTmp = getBodyFromFile(root +  "/delete.html");
+                    response->setBody(BodyTmp);
+                    response->setContentLength("");
                     remove( (root + path).c_str()) ;
                 }
                 else
                   {
                       
                    response->setStatus("403");
-                    response->setBody("Forbiden");
+                    std::string BodyTmp = getBodyFromFile(root +  "/errors/403.html");
+                    response->setBody(BodyTmp);
                   }
             }
             else
             {
-                         response->setStatus("404");
-            response->setBody("Method Not Allowed");
+                    response->setStatus("405");
+                    std::string BodyTmp = getBodyFromFile(root +  "/errors/405.html");
+                    response->setBody(BodyTmp);
         }
         }
         else
