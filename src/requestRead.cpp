@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   requestRead.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:05:36 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/15 10:44:35 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/24 14:43:32 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
