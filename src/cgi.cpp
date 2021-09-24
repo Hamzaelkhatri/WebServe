@@ -33,6 +33,8 @@ std::string cgi::CGI(Response *r, char *envp[])
     setenv("SCRIPT_NAME", filename.c_str(), 1);           //name of file
     setenv("REDIRECT_STATUS", r->getStatus().c_str(), 1); //status of cnx
     setenv("QUERY_STRING", "?hello", 1);
+    setenv("HTTP_ACCEPT","image/gif,image/x-xbitmap,image/jpeg,image/pjeg,image/pgn,*/*",1);
+    // setenv("HTTP_COOKIE","user=Hello world",1);
     const char **av = new const char *[3];
     av[0] = strdup(r->getCGIPath().c_str());
     std::cout << r->getCGIPath().c_str() << std::endl;

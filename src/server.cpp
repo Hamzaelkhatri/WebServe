@@ -14,6 +14,7 @@ std::map<std::string, std::string> Server::pars_request()
             tmp1 = line1.substr(0, line1.find_first_of(":"));
             tmp2 = line1.substr(line1.find_first_of(":") + 1);
             stor[tmp1] = tmp2;
+            // std::cout << line1 << std::endl;
         }
         else if (t == 0)
         {
@@ -80,18 +81,24 @@ std::string DeleteHeaderPost(std::string &str)
             break;
         }
     }
-    str = str.substr(str.find("\r\n\r\n") + 4);
-    str = str.substr(str.find("\r\n\r\n") + 4);
-    // str = str.substr(str.find("\r\n\r\n"));
+    if (str.find("\r\n\r\n") != std::string::npos)
+        str = str.substr(str.find("\r\n\r\n") + 4);
+    if (str.find("\r\n\r\n") != std::string::npos)
+        str = str.substr(str.find("\r\n\r\n"));
+    // if (str.find("\r\n\r\n"))
+    //     str = str.substr(str.find("\r\n\r\n"));
 
     std::stringstream ss2(str);
     std::string line2;
+    std::string tmp = "";
     while (std::getline(ss2, line2, '\n'))
     {
         if (line2.find("--" + Boundry) != std::string::npos)
             break;
+        else
+            tmp += line2 + "\n";
     }
-    return (str.substr(0, str.find("\r\n--" + Boundry)));
+    return (tmp);
 }
 
 void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
@@ -104,6 +111,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
         std::string upload_path = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload_path");
         std::string upload_status = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload");
         std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "http_methods");
+        std::cout << request->get_content_lenght() << std::endl;
         if (methode_http.find("POST") == std::string::npos)
         {
             response->setStatus("405");
@@ -116,7 +124,10 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
             BodySize = "10m";
         // std::cout << request->get_content_lenght() << " " << (std::stol(BodySize) * 1048576) << std::endl;
         if (upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0 && request->get_content_lenght() <= (std::stol(BodySize) * 1048576) && request->get_filename().size() > 2)
+        {
+            its->second = DeleteHeaderPost(its->second);
             SaveAsFile(upload_path + request->get_filename(), its->second, 1);
+        }
         else if ((upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0) && request->get_content_lenght() > (std::stol(BodySize) * 1048576))
         {
             response->setStatus("413");
@@ -233,7 +244,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
                             Delete_methode(request, parsing, TargetServer, TargetLocation, response);
-                            // break;
+                            break;
                         }
                     }
                     else if (pathLocation.find(".php") == std::string::npos && pathLocation.find(".py") == std::string::npos)
@@ -292,7 +303,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                     body = response->getBody();
                                     // break;
                                 }
-                                else if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "autoindex") != "" && GetValueBykeyLocation(locations, TargetServer, TargetLocation, "") == "off")
+                                else if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "autoindex") != "" && GetValueBykeyLocation(locations, TargetServer, TargetLocation, "autoindex") == "off")
                                 {
                                     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
                                         root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
@@ -319,7 +330,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                             Delete_methode(request, parsing, TargetServer, TargetLocation, response);
                             // TargetServer = -1;
                             // TargetLocation = -1;
-                            // break;
+                            break;
                         }
                         else
                         {

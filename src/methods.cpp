@@ -158,6 +158,7 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
         response->setMethod(request->get_method());
         response->setRedirection("");
         std::string Bodytmp = c->CGI(response, parsing->get_env());
+        std::cout << Bodytmp << std::endl;
         if (Bodytmp.find("\r\n\r\n") != std::string::npos)
             response->setBody(Bodytmp.substr(Bodytmp.find("\r\n\r\n")));
         else
