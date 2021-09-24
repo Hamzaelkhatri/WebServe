@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/23 14:16:56 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/23 19:33:02 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string,
                     return (it2->second);
             }
         }
-        // std::string res = locations.find(indexOfServer)->second.find()->second;
     }
     return (std::string(""));
 }
@@ -166,7 +165,12 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
         response->setContentLength("");
     }
     else
-        std::cout << " 404 found" << std::endl;
+      {
+            response->setContentLength("");
+            response->setStatus("404");
+            std::string BodyTmp = getBodyFromFile(root +  "/errors/404.html");
+            response->setBody(BodyTmp);
+      }
     return;
 }
 
@@ -204,8 +208,10 @@ void Server::Delete_methode(Request *request,Parsing *parsing,int indexOfServer,
         std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "http_methods");
         if(methode_http.find("DELETE") != std::string::npos)
         {
-            if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
+                if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
                    root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
+                else
+                    root = GetValueBykeyServer(servers, indexOfServer, "root");
             std::string path = request->get_path();
             // std::cout << root + path << std::endl;
             if(check_if_file_or_dir(root + path) == 1)
@@ -214,21 +220,24 @@ void Server::Delete_methode(Request *request,Parsing *parsing,int indexOfServer,
                 if(checkPermission((root + path).c_str()) == 1)
                  {
                     response->setStatus("200 ok");
-                    response->setBody("Deleted");
-                     response->setContentLength("");
+                    std::string BodyTmp = getBodyFromFile(root +  "/delete.html");
+                    response->setBody(BodyTmp);
+                    response->setContentLength("");
                     remove( (root + path).c_str()) ;
                 }
                 else
                   {
                       
                    response->setStatus("403");
-                    response->setBody("Forbiden");
+                    std::string BodyTmp = getBodyFromFile(root +  "/errors/403.html");
+                    response->setBody(BodyTmp);
                   }
             }
             else
             {
-                         response->setStatus("404");
-            response->setBody("Method Not Allowed");
+                    response->setStatus("405");
+                    std::string BodyTmp = getBodyFromFile(root +  "/errors/405.html");
+                    response->setBody(BodyTmp);
         }
         }
         else
