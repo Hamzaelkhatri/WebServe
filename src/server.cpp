@@ -306,8 +306,21 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                         response->setBody(BodyTmp);
                                     }
                                     response->setBody(BodyTmp);
-                                    if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
-                                        response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
+                                   if(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
+                                {
+                                    std::string tmp = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return");
+                                    std::string err = tmp.substr(0,tmp.find(" "));
+                                    std::string err_path = tmp.substr(tmp.find_last_of(" ") ,sizeof(tmp));
+                                    if (std::stoi(err) >= 300 && std::stoi(err) < 400)
+                                    {
+                                        response->setStatus(err);
+                                        // if(err_path != "")
+                                        {
+                                            response->setRedirection("\nlocation:" + err_path + "/");
+                                            response->setPath(root + request->get_path() + "/");
+                                        }
+                                    }
+                                }
                                     response->setCookie("");
                                     response->setSetCookie("");
                                     response->setContentLength("");
