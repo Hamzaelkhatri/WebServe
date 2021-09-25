@@ -14,8 +14,8 @@ std::string Request::get_host()
 
 std::string Request::get_filename()
 {
-    //trim double quotes
-    std::cout << filename << std::endl;
+    if(filename.size()<2)
+        return filename;
     return filename.substr(1, filename.size() - 3);
 }
 
@@ -71,6 +71,16 @@ void Request::set_method(std::string method)
     this->method = method;
 }
 
+void Request::set_params(std::string param)
+{
+    this->params = param;
+}
+
+std::string Request::get_params()
+{
+    return params;
+}
+
 void Request::set_path(std::string path)
 {
     this->path = path;
@@ -91,7 +101,8 @@ Request::~Request()
 
 }
 
-Request::Request()
+//initialaze
+Request::Request(): client_sock(-1), content_lenght(0), filename(""), host(""), method(""), params(""), path(""), port(""), version("")
 {
 
 }

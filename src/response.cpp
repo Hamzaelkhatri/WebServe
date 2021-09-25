@@ -96,6 +96,16 @@ std::string Response::getCGIPath()
     return (cgipath);
 }
 
+void Response::set_params(std::string param)
+{
+    this->params = param;
+}
+
+std::string Response::get_params()
+{
+    return params;
+}
+
 std::string Response::getServerName()
 {
     return (servername);
@@ -111,7 +121,7 @@ void Response::setMethod(std::string method)
     this->method = method;
 }
 
-Response::Response() : status("200 OK"), version(" HTTP/1.1"), redirection(""), charset(""), content_type("text/html"), content_length(""), set_cookie(""), cookie(""), path("/"), host("localhost"), port("80"), method("GET")
+Response::Response() : status("200 OK"), version(" HTTP/1.1"), redirection(""), charset(""), content_type("text/html"), content_length(""), set_cookie(""), cookie(""), path("/"), host("localhost"), port("5000"), method("GET")
 {
 }
 

@@ -18,6 +18,7 @@ private:
     std::string path;
     std::string method;
     std::string version;
+    std::string params;
     std::string body;
     std::string filename;
     int client_sock;
@@ -33,6 +34,9 @@ public:
     std::string get_body();
     int get_client_sock();
     int get_content_lenght();
+
+    std::string get_params();
+    void set_params(std::string param);
     void set_port(std::string port);
     void set_host(std::string host);
     void set_path(std::string path);

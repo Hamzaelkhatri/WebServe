@@ -28,7 +28,9 @@ private:
     std::string port;
     std::string method;
     std::string servername;
+    std::string query;
     std::string cgipath;
+    std::string params;
 
 public:
     Response();
@@ -56,6 +58,8 @@ public:
     void setBody(std::string body);
     void setRedirection(std::string redirection);
     void setContentType(std::string content_type);
+    void set_params(std::string param);
+    std::string get_params();
     void setContentLength(std::string content_length);
     void setCharset(std::string charset);
     void setSetCookie(std::string set_cookie);
