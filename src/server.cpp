@@ -20,7 +20,6 @@ std::map<std::string, std::string> Server::pars_request()
         {
             std::cout << line1 << std::endl;
             tmp1 = line1.substr(0, line1.find_first_of(" "));
-            // std::cout << " tmp1  |" << tmp1 << "|" << std::endl;
             tmp2 = line1.substr(line1.find_first_of(" ") + 1);
             stor[tmp1] = tmp2.substr(0, tmp2.find_first_of(" "));
             t++;
@@ -90,8 +89,6 @@ std::string DeleteHeaderPost(std::string &str)
         str = str.substr(str.find("\r\n\r\n") + 4);
     if (str.find("\r\n\r\n") != std::string::npos)
         str = str.substr(str.find("\r\n\r\n"));
-    // if (str.find("\r\n\r\n"))
-    //     str = str.substr(str.find("\r\n\r\n"));
 
     std::stringstream ss2(str);
     std::string line2;
@@ -266,7 +263,22 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                             {
                                 if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
                                     root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
-                                response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
+                                // response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
+                                if(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
+                                {
+                                    std::string tmp = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return");
+                                    std::string err = tmp.substr(0,tmp.find(" "));
+                                    std::string err_path = tmp.substr(tmp.find_last_of(" ") ,sizeof(tmp));
+                                    if (std::stoi(err) >= 300 && std::stoi(err) < 400)
+                                    {
+                                        response->setStatus(err);
+                                        // if(err_path != "")
+                                        {
+                                            response->setRedirection("\nlocation:" + err_path + "/");
+                                            response->setPath(root + request->get_path() + "/");
+                                        }
+                                    }
+                                }
                                 response->setCookie("");
                                 response->setSetCookie("");
                                 response->setPath(root + request->get_path());
@@ -305,8 +317,21 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                         response->setBody(BodyTmp);
                                     }
                                     response->setBody(BodyTmp);
-                                    if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
-                                        response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
+                                   if(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
+                                {
+                                    std::string tmp = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return");
+                                    std::string err = tmp.substr(0,tmp.find(" "));
+                                    std::string err_path = tmp.substr(tmp.find_last_of(" ") ,sizeof(tmp));
+                                    if (std::stoi(err) >= 300 && std::stoi(err) < 400)
+                                    {
+                                        response->setStatus(err);
+                                        // if(err_path != "")
+                                        {
+                                            response->setRedirection("\nlocation:" + err_path + "/");
+                                            response->setPath(root + request->get_path() + "/");
+                                        }
+                                    }
+                                }
                                     response->setCookie("");
                                     response->setSetCookie("");
                                     response->setContentLength("");
