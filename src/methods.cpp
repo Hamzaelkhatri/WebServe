@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/27 17:38:38 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/27 17:51:25 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,7 +178,6 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
             tmp = tmp.substr(0, tmp.find("\r\n"));
             response->setSetCookie(tmp);
         }
-        std::cout << "Coookies " << response->getSetCookie() << std::endl;
         if (requestHttp.find("\r\n\r\n") != std::string::npos)
             response->setBody(requestHttp.substr(requestHttp.find("\r\n\r\n")));
         else

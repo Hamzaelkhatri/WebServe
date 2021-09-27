@@ -87,6 +87,7 @@ public:
     Server(Parsing *pars, char *envp[]);
     int _Accept_client(int sock);
     int _Get_request(int csock);
+    int check_header(std::string header);
     int check_index(std::string str);
     int check_dir(std::string dir, std::string str);
     bool checkRequest(std::string &req);

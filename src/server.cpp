@@ -18,7 +18,7 @@ std::map<std::string, std::string> Server::pars_request()
         }
         else if (t == 0)
         {
-            std::cout << line1 << std::endl;
+            // std::cout << line1 << std::endl;
             tmp1 = line1.substr(0, line1.find_first_of(" "));
             tmp2 = line1.substr(line1.find_first_of(" ") + 1);
             stor[tmp1] = tmp2.substr(0, tmp2.find_first_of(" "));
@@ -274,8 +274,8 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                 if(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
                                 {
                                     std::string tmp = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return");
-                                    std::string err = tmp.substr(0,tmp.find(" "));
-                                    std::string err_path = tmp.substr(tmp.find_last_of(" ") ,sizeof(tmp));
+                                    std::string err = tmp.substr(0, tmp.find(" "));
+                                    std::string err_path = tmp.substr(tmp.find_last_of(" "), sizeof(tmp));
                                     if (std::stoi(err) >= 300 && std::stoi(err) < 400)
                                     {
                                         response->setStatus(err);
@@ -339,18 +339,21 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                         }
                                     }
                                     response->setBody(BodyTmp);
-                                   if(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
-                                {
-                                    std::string tmp = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return");
-                                    std::string err = tmp.substr(0,tmp.find(" "));
-                                    std::string err_path = tmp.substr(tmp.find_last_of(" ") ,sizeof(tmp));
-                                    if (std::stoi(err) >= 300 && std::stoi(err) < 400)
+                                    if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
                                     {
-                                        response->setStatus(err);
-                                        response->setRedirection("\nlocation:" + err_path + "/");
-                                        response->setPath(root + request->get_path() + "/");
+                                        std::string tmp = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return");
+                                        std::string err = tmp.substr(0, tmp.find(" "));
+                                        std::string err_path = tmp.substr(tmp.find_last_of(" "), sizeof(tmp));
+                                        if (std::stoi(err) >= 300 && std::stoi(err) < 400)
+                                        {
+                                            response->setStatus(err);
+                                            // if(err_path != "")
+                                            {
+                                                response->setRedirection("\nlocation:" + err_path + "/");
+                                                response->setPath(root + request->get_path() + "/");
+                                            }
+                                        }
                                     }
-                                }
                                     response->setCookie("");
                                     response->setSetCookie("");
                                     response->setContentLength("");
@@ -401,8 +404,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                             }
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
                             Delete_methode(request, parsing, TargetServer, TargetLocation, response);
-                            // TargetServer = -1;
-                            // TargetLocation = -1;
                             break;
                         }
                         else
@@ -521,7 +522,13 @@ Server::Server(Parsing *p, char **envp)
                                 if (FD_ISSET(sock_fd, &writefds))
                                 {
                                     _GetDataServers(p, response, request);
-                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\nset-cookie: "+response->getSetCookie() + "\n\n" + response->getBody();
+                                    if (!check_header(its->second))
+                                    {
+                                        response->setBody("<html>\n<body>\n<h1>400 Bad Request</h1>\n</body>\n</html>\n");
+                                        response->setStatus("400");
+                                        response->setContentLength("");
+                                    }
+                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: " + response->getContentType() + "; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\nset-cookie: " + response->getSetCookie() + "\n\n" + response->getBody();
                                     write(sock_fd, header.c_str(), strlen(header.c_str()));
                                     its->second.clear();
                                 }
@@ -553,16 +560,3 @@ Server::~Server()
 {
     delete this->sock;
 }
-
-/*
-   #include <limits>
-
-
-    int func(int a)
-    {
-        if(a == MIN_INT)
-        {
-            write(1,)
-        }
-    }
-*/
