@@ -28,7 +28,7 @@ int Server::_Accept_client(int sock)
         std::cout << csock << "\t  =  New connection" << std::endl;
     }
     else
-      throw(AcceptFailed());
+        throw(AcceptFailed());
     _clients.insert(std::pair<int, std::string>(csock, ""));
     return (csock);
 }
@@ -51,28 +51,48 @@ int Server::_Get_request(int sock)
     }
     return (n);
 }
-bool Server::checkRequest(std::string &req)
+
+int Server::check_header(std::string header)
 {
-	if (!(req.find("\r\n\r\n") == std::string::npos))
-	{
-		std::string headers = req.substr(0, req.find("\r\n\r\n") + 4);
-		if (headers.find("Content-Length") != std::string::npos)
-		{
-			size_t length = std::atoi(headers.substr(headers.find("Content-Length: ")).c_str() + 16);
-			std::string body = req.substr(req.find("\r\n\r\n") + 4);
-			if (body.length() < length)
-				return false;
-		}
-		return true;
-	}
-	return false;
+    int i = 0;
+    //check if header is valid
+    if((header.find("HTTP/1.1") == std::string::npos))
+        return (0);
+    else if((header.find("GET") == std::string::npos) && (header.find("POST") == std::string::npos) && (header.find("DELETE") == std::string::npos))
+        return (0);
+    std::string line;
+    std::stringstream ss(header);
+    while (std::getline(ss, line))
+    {
+        if (line.find("Host:") != std::string::npos)
+            i++;
+    }
+    if(i == 0)
+        return (0);
+    return (1);
 }
 
-void    Server::witch_server(std::map<int,std::string> str ,Parsing *pars)
+bool Server::checkRequest(std::string &req)
 {
-    std::multimap <int, std::multimap<std::string, std::string> > _loc_map;
+    if ((req.find("\r\n\r\n") != std::string::npos))
+    {
+        std::string headers = req.substr(0, req.find("\r\n\r\n") + 4);
+        if (headers.find("Content-Length") != std::string::npos)
+        {
+            size_t length = std::atoi(headers.substr(headers.find("Content-Length: ")).c_str() + 16);
+            std::string body = req.substr(req.find("\r\n\r\n") + 4);
+            if (body.length() < length)
+                return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+void Server::witch_server(std::map<int, std::string> str, Parsing *pars)
+{
+    std::multimap<int, std::multimap<std::string, std::string>> _loc_map;
     // _loc_map = p->Getloc_map();
-    
 }
 
 // char * removeHTTPHeader(char *buffer, int &bodySize)
@@ -80,12 +100,11 @@ void    Server::witch_server(std::map<int,std::string> str ,Parsing *pars)
 //     char *t = strstr(buffer, "\r\n\r\n");
 //     t = t + 4;
 
-//     for (char* it = buffer; it != t; ++it) 
+//     for (char* it = buffer; it != t; ++it)
 //         ++bodySize;
 
 //     return t;
 // }
-
 
 int Server::check_index(std::string str)
 {
@@ -173,5 +192,3 @@ int Server::check_dir(std::string dir, std::string str)
 //         file.close();
 //     }
 // }
-
-
