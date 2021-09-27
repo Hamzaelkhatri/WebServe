@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/10 14:23:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/23 10:48:33 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/27 16:16:29 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,9 +80,9 @@ private:
     std::vector<int> MasterSockets;
     std::vector<std::string> Content;
     std::map<int, std::string> _clients;
-         std::map<std::string, std::string> stor;
+    std::map<std::string, std::string> stor;
     std::multimap<int, std::multimap<std::string, std::string> > loc;
-
+    std::map<std::string, std::string> errors;
 public:
     Server(Parsing *pars, char *envp[]);
     int _Accept_client(int sock);
