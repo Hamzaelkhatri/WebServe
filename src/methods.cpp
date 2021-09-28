@@ -13,10 +13,9 @@
 #include "../includes/request.hpp"
 #include "../includes/server.hpp"
 
-std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string> > locations, int indexOfServer, int indexOfLocation, std::string key)
+std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key)
 {
-    std::multimap<int, std::multimap<std::string, std::string>
- >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = locations.begin(); it != locations.end(); ++it)
@@ -35,10 +34,9 @@ std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::
     return ("");
 }
 
-std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations)
+std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
 {
-    std::multimap<int, std::multimap<std::string, std::string>
- >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -49,10 +47,9 @@ std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::stri
     return (std::string(""));
 }
 
-std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key)
+std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key)
 {
-    std::map<int, std::multimap<std::string, std::string>
- >::iterator it;
+    std::map<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = servers.begin(); it != servers.end(); ++it)
@@ -63,13 +60,12 @@ std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string,
             {
                 if (it2->first.find(key) != std::string::npos)
                     return (it2->second);
-                if(it2->first.find("error_page") != std::string::npos)
+                if (it2->first.find("error_page") != std::string::npos)
                 {
                     std::string err = it2->second.substr(0, it2->second.find(" "));
                     std::string err_path = it2->second.substr(it2->second.find(" ") + 1, sizeof(it2->second));
                     this->errors[trim(err)] = trim(err_path);
                 }
-                
             }
         }
     }
@@ -89,10 +85,9 @@ int Server::check_if_file_or_dir(std::string path)
     return (-1);
 }
 
-bool Server::is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location)
+bool Server::is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location)
 {
-    std::multimap<int, std::multimap<std::string, std::string>
- >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -147,10 +142,8 @@ std::string Server::getBodyFromFile(std::string path)
 
 void Server::execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request)
 {
-    std::multimap<int, std::multimap<std::string, std::string>
- > locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string>
- > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
 
     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
         root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
@@ -172,45 +165,44 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
         response->setMethod(request->get_method());
         response->setRedirection("");
         std::string requestHttp = c->CGI(response, parsing->get_env());
-        if (requestHttp.find("Set-Cookie:") != std::string::npos)
-        {
-            std::string tmp = requestHttp.substr(requestHttp.find("Set-Cookie:") + 12);
-            tmp = tmp.substr(0, tmp.find("\r\n"));
-            response->setSetCookie(tmp);
-        }
+        // if (requestHttp.find("Set-Cookie:") != std::string::npos)
+        // {
+        //     std::string tmp = requestHttp.substr(requestHttp.find("Set-Cookie:") + 12);
+        //     tmp = tmp.substr(0, tmp.find("\r\n"));
+        //     response->setSetCookie(tmp);
+        // }
         if (requestHttp.find("\r\n\r\n") != std::string::npos)
-            response->setBody(requestHttp.substr(requestHttp.find("\r\n\r\n")));
-        else
-            response->setBody(requestHttp.substr(requestHttp.find("()") + 2));
+            response->setBody(requestHttp.substr(requestHttp.find("\r\n\r\n") + 4));
+        // else
+        //     response->setBody(requestHttp.substr(requestHttp.find("()") + 2));
         response->setContentLength("");
     }
     else
     {
-            std::map<std::string, std::string>::iterator it = errors.begin();
-            int  err_code = 0;
-            for (it = errors.begin() ; it != errors.end(); it++)
-            {
-                if(it->first == "404")
-                {
-                    response->setContentLength("");
-                    response->setStatus("404");
-                    std::string tmp = root + it->second;
-                    if(check_if_file_or_dir(tmp) == 1)
-                        response->setBody(getBodyFromFile(tmp));
-                    else
-                        response->setBody(getBodyFromFile(root + "/errors/404.html"));
-                    err_code = 1;
-                    break;
-                }  
-            }
-            if(err_code == 0)
+        std::map<std::string, std::string>::iterator it = errors.begin();
+        int err_code = 0;
+        for (it = errors.begin(); it != errors.end(); it++)
+        {
+            if (it->first == "404")
             {
                 response->setContentLength("");
                 response->setStatus("404");
-                std::string BodyTmp = getBodyFromFile(root + "/errors/404.html");
-                response->setBody(BodyTmp);
+                std::string tmp = root + it->second;
+                if (check_if_file_or_dir(tmp) == 1)
+                    response->setBody(getBodyFromFile(tmp));
+                else
+                    response->setBody(getBodyFromFile(root + "/errors/404.html"));
+                err_code = 1;
+                break;
             }
-
+        }
+        if (err_code == 0)
+        {
+            response->setContentLength("");
+            response->setStatus("404");
+            std::string BodyTmp = getBodyFromFile(root + "/errors/404.html");
+            response->setBody(BodyTmp);
+        }
     }
     return;
 }
@@ -240,10 +232,8 @@ int checkPermission(const char *path)
 
 void Server::Delete_methode(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
 {
-    std::map<int, std::multimap<std::string, std::string>
- > servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>
- > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
     std::string root;
     if (request->get_method() == "DELETE")
     {
@@ -282,24 +272,24 @@ void Server::Delete_methode(Request *request, Parsing *parsing, int indexOfServe
         }
         else
         {
-             std::map<std::string, std::string>::iterator it = errors.begin();
-            int  err_code = 0;
-            for (it = errors.begin() ; it != errors.end(); it++)
+            std::map<std::string, std::string>::iterator it = errors.begin();
+            int err_code = 0;
+            for (it = errors.begin(); it != errors.end(); it++)
             {
-                if(it->first == "405")
+                if (it->first == "405")
                 {
                     response->setContentLength("");
                     response->setStatus("405");
                     std::string tmp = root + it->second;
-                    if(check_if_file_or_dir(tmp) == 1)
+                    if (check_if_file_or_dir(tmp) == 1)
                         response->setBody(getBodyFromFile(tmp));
                     else
                         response->setBody(getBodyFromFile(root + "/errors/405.html"));
                     err_code = 1;
                     break;
-                }  
+                }
             }
-            if(err_code == 0)
+            if (err_code == 0)
             {
                 response->setContentLength("");
                 response->setStatus("405");
