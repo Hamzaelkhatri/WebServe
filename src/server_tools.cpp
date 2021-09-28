@@ -77,17 +77,17 @@ bool Server::checkRequest(std::string &req)
     if ((req.find("\r\n\r\n") != std::string::npos))
     {
         std::string headers = req.substr(0, req.find("\r\n\r\n") + 4);
-        if (headers.find("Content-Length") != std::string::npos)
+        if (headers.find("Transfer-Encoding: chunked") != std::string::npos)
+        {
+            chunked = true;
+            if (req.find("\r\n\r\n") == std::string::npos)
+                return false;
+        }
+        else if (headers.find("Content-Length") != std::string::npos)
         {
             size_t length = std::atoi(headers.substr(headers.find("Content-Length: ")).c_str() + 16);
             std::string body = req.substr(req.find("\r\n\r\n") + 4);
             if (body.length() < length)
-                return false;
-        }
-        else if (headers.find("Transfer-Encoding: chunked") != std::string::npos)
-        {
-            chunked = true;
-            if (headers.find("0\r\n\r\n") == std::string::npos)
                 return false;
         }
         return true;
@@ -103,30 +103,31 @@ int get_size_of_chunked(std::string str)
     return (i);
 }
 
-void Server::unchunkRequest(std::string &req,Response *res)
+void Server::unchunkRequest(std::string &req, Response *res)
 {
     int new_size = 0;
     int i = 0;
-    its->second = req.substr(0, req.find("\r\n\r\n") + 4);
+    std::cout << its->second << std::endl;
+    std::string output = req.substr(0, req.find("\r\n\r\n") + 4);
+    req = req.substr(req.find("\r\n\r\n") + 4);
     std::string line;
     int size = 0;
-    std::stringstream bodyStream(body);
-    while (1)
+    std::stringstream bodyStream(req);
+    while (line != "\r\n")
     {
+        i = 0;
         std::getline(bodyStream, line);
         new_size = get_size_of_chunked(line);
         std::getline(bodyStream, line);
+        if(i == 0)
+        output+= line;
         if (new_size == 0)
-            i++;
-        if (line == "\r\n")
-            i++;
-        its->second.append(line,new_size);
-        if (i == 2) //finish of unchunking process 
             break;
         size += new_size;
-        i  = 0;
     }
     res->setContentLength(std::to_string(size));
+    std::cout << "Unchunked request: \n" << output << std::endl;
+    its->second = output;
 }
 
 int Server::check_index(std::string str)
