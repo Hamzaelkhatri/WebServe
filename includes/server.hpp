@@ -62,6 +62,7 @@ private:
     int csock;
     int lenght;
     int selected;
+    int chunked;
     char *request;
     Socket *sock;
     fd_set readfds;
@@ -85,6 +86,7 @@ private:
     std::map<std::string, std::string> errors;
 public:
     Server(Parsing *pars, char *envp[]);
+    void unchunkRequest(std::string &req,Response *res);
     int _Accept_client(int sock);
     int _Get_request(int csock);
     int check_header(std::string header);

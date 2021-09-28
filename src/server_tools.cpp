@@ -56,9 +56,9 @@ int Server::check_header(std::string header)
 {
     int i = 0;
     //check if header is valid
-    if((header.find("HTTP/1.1") == std::string::npos))
+    if ((header.find("HTTP/1.1") == std::string::npos))
         return (0);
-    else if((header.find("GET") == std::string::npos) && (header.find("POST") == std::string::npos) && (header.find("DELETE") == std::string::npos))
+    else if ((header.find("GET") == std::string::npos) && (header.find("POST") == std::string::npos) && (header.find("DELETE") == std::string::npos))
         return (0);
     std::string line;
     std::stringstream ss(header);
@@ -67,7 +67,7 @@ int Server::check_header(std::string header)
         if (line.find("Host:") != std::string::npos)
             i++;
     }
-    if(i == 0)
+    if (i == 0)
         return (0);
     return (1);
 }
@@ -84,27 +84,55 @@ bool Server::checkRequest(std::string &req)
             if (body.length() < length)
                 return false;
         }
+        else if (headers.find("Transfer-Encoding: chunked") != std::string::npos)
+        {
+            chunked = true;
+            if (headers.find("0\r\n\r\n") == std::string::npos)
+                return false;
+        }
         return true;
     }
     return false;
 }
 
+int get_size_of_chunked(std::string str)
+{
+    int i = 0;
+    std::stringstream sstream(str);
+    sstream >> std::hex >> i;
+    return (i);
+}
+
+void Server::unchunkRequest(std::string &req,Response *res)
+{
+    int new_size = 0;
+    int i = 0;
+    its->second = req.substr(0, req.find("\r\n\r\n") + 4);
+    std::string line;
+    int size = 0;
+    std::stringstream bodyStream(body);
+    while (1)
+    {
+        std::getline(bodyStream, line);
+        new_size = get_size_of_chunked(line);
+        std::getline(bodyStream, line);
+        if (new_size == 0)
+            i++;
+        if (line == "\r\n")
+            i++;
+        its->second.append(line,new_size);
+        if (i == 2) //finish of unchunking process 
+            break;
+        size += new_size;
+        i  = 0;
+    }
+    res->setContentLength(std::to_string(size));
+}
+
 void Server::witch_server(std::map<int, std::string> str, Parsing *pars)
 {
     std::multimap<int, std::multimap<std::string, std::string>> _loc_map;
-    // _loc_map = p->Getloc_map();
 }
-
-// char * removeHTTPHeader(char *buffer, int &bodySize)
-//  {
-//     char *t = strstr(buffer, "\r\n\r\n");
-//     t = t + 4;
-
-//     for (char* it = buffer; it != t; ++it)
-//         ++bodySize;
-
-//     return t;
-// }
 
 int Server::check_index(std::string str)
 {

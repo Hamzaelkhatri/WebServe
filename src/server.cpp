@@ -521,6 +521,12 @@ Server::Server(Parsing *p, char **envp)
                             {
                                 if (FD_ISSET(sock_fd, &writefds))
                                 {
+                                    if(chunked == 1)
+                                    {
+                                        unchunkRequest(its->second, response);
+                                        chunked = 0;
+                                        someString=its->second;
+                                    }
                                     _GetDataServers(p, response, request);
                                     if (!check_header(its->second))
                                     {
