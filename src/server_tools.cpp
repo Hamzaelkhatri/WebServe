@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server_tools.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/03 21:46:25 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/16 12:16:50 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/28 16:29:01 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,11 +127,6 @@ void Server::unchunkRequest(std::string &req,Response *res)
         i  = 0;
     }
     res->setContentLength(std::to_string(size));
-}
-
-void Server::witch_server(std::map<int, std::string> str, Parsing *pars)
-{
-    std::multimap<int, std::multimap<std::string, std::string>> _loc_map;
 }
 
 int Server::check_index(std::string str)

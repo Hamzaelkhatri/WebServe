@@ -1,6 +1,6 @@
-<?php
+<?php 
+    session_start();
 
-session_start();
 ?>
 <!DOCTYPE html>
 <html>
@@ -10,18 +10,11 @@ session_start();
 </head>
 
 <body>
-    <form action="form.php" method="post" enctype="application/x-www-form-urlencoded" >
+    <form enctype="application/x-www-form-urlencoded">
+        <input type="text" name="name" placeholder="Name">
         <input type="text" name="email" placeholder="Email">
-        <input type="text" name="phone" placeholder="Phone">
-        <input type="submit" value="Submit">
+        < <input type="submit" value="Submit">
     </form>
-    <?php
-    if (isset($_POST['email']) && isset($_POST['phone']))
-    {
-        $_SESSION['email'] = $_POST['email'];
-        $_SESSION['phone'] = $_POST['phone'];
-    }
-    ?>
 </body>
 
 </html>

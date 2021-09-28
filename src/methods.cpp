@@ -6,16 +6,16 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/27 17:51:25 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/28 16:41:02 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/request.hpp"
 #include "../includes/server.hpp"
 
-std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string>> locations, int indexOfServer, int indexOfLocation, std::string key)
+std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::string, std::string> > locations, int indexOfServer, int indexOfLocation, std::string key)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = locations.begin(); it != locations.end(); ++it)
@@ -34,9 +34,9 @@ std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::
     return ("");
 }
 
-std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations)
+std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -47,9 +47,9 @@ std::string Server::_GetFirstLocation(std::multimap<int, std::multimap<std::stri
     return (std::string(""));
 }
 
-std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string>> servers, int indexOfserver, std::string key)
+std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key)
 {
-    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::map<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it = servers.begin(); it != servers.end(); ++it)
@@ -85,9 +85,9 @@ int Server::check_if_file_or_dir(std::string path)
     return (-1);
 }
 
-bool Server::is_location(std::multimap<int, std::multimap<std::string, std::string>>::iterator locations, std::string location)
+bool Server::is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location)
 {
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it2;
 
     for (it2 = locations->second.begin(); it2 != locations->second.end(); ++it2)
@@ -142,8 +142,8 @@ std::string Server::getBodyFromFile(std::string path)
 
 void Server::execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request)
 {
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
 
     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
         root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
@@ -165,11 +165,13 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
         response->setMethod(request->get_method());
         response->setRedirection("");
         std::string requestHttp = c->CGI(response, parsing->get_env());
-        std::cout << requestHttp << std::endl;
         if (requestHttp.find("Set-Cookie:") != std::string::npos)
         {
+            std::cout << "Cookies Request:\t" << requestHttp << std::endl;
             std::string tmp = requestHttp.substr(requestHttp.find("Set-Cookie:") + 12);
             tmp = tmp.substr(0, tmp.find("\r\n"));
+            // std::cout << "tmp:\t " << tmp;
+            response->setSSID(tmp);
             response->setSetCookie(tmp);
         }
         if (requestHttp.find("\r\n\r\n") != std::string::npos)
@@ -233,8 +235,8 @@ int checkPermission(const char *path)
 
 void Server::Delete_methode(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
 {
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
     std::string root;
     if (request->get_method() == "DELETE")
     {

@@ -1,7 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   response.hpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/09/28 16:44:29 by zainabdnaya       #+#    #+#             */
+/*   Updated: 2021/09/28 19:49:46 by zainabdnaya      ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 
-#include <string>
+#include <cstring>
 #include <vector>
 #include <map>
 #include <iostream>
@@ -31,6 +43,7 @@ private:
     std::string query;
     std::string cgipath;
     std::string params;
+    std::string ssid;
 
 public:
     Response();
@@ -52,6 +65,7 @@ public:
     std::string getMethod();
     std::string getServerName();
     std::string getCGIPath();
+    std::string getSSID();
     //setters
     void setStatus(std::string status);
     void setVersion(std::string version);
@@ -70,6 +84,7 @@ public:
     void setMethod(std::string method);
     void setServerName(std::string servername);
     void setCGIPath(std::string cgipath);
+    void setSSID(std::string ssid);
 };
 
 #endif

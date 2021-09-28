@@ -59,7 +59,10 @@ void Request::set_filename(std::string filename)
     this->filename = filename;
 }
 
-
+std::vector<std::string> Request::getparams()
+{
+    return this->params;
+}
 
 void Request::set_host(std::string host)
 {
@@ -73,13 +76,9 @@ void Request::set_method(std::string method)
 
 void Request::set_params(std::string param)
 {
-    this->params = param;
+    this->params.push_back(param);
 }
 
-std::string Request::get_params()
-{
-    return params;
-}
 
 void Request::set_path(std::string path)
 {
@@ -102,7 +101,7 @@ Request::~Request()
 }
 
 //initialaze
-Request::Request(): client_sock(-1), content_lenght(0), filename(""), host(""), method(""), params(""), path(""), port(""), version("")
+Request::Request(): client_sock(-1), content_lenght(0), filename(""), host(""), method(""), path(""), port(""), version("")
 {
 
 }

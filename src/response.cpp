@@ -1,9 +1,26 @@
-#include "response.hpp"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   response.cpp                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2021/09/28 16:45:47 by zainabdnaya       #+#    #+#             */
+/*   Updated: 2021/09/28 19:50:09 by zainabdnaya      ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "../includes/response.hpp"
 
 //read file
 #include <fstream>
 #include <iostream>
 #include <string>
+
+Response::Response() : status("200 OK"), version(" HTTP/1.1"), redirection(""), charset(""), content_type("text/html"), content_length(""), set_cookie(""), cookie(""), path("/"), host("localhost"), port("5000"), method("GET"), ssid(""), cgipath(""), params("")
+{
+}
+
 
 std::string Response::getStatus()
 {
@@ -69,6 +86,11 @@ std::string Response::getMethod()
     return (method);
 }
 
+
+std::string Response::getSSID()
+{
+    return(ssid);
+}
 //seters
 
 void Response::setPath(std::string path)
@@ -121,14 +143,10 @@ void Response::setMethod(std::string method)
     this->method = method;
 }
 
-Response::Response() : status("200 OK"), version(" HTTP/1.1"), redirection(""), charset(""), content_type("text/html"), content_length(""), set_cookie(""), cookie(""), path("/"), host("localhost"), port("5000"), method("GET")
+void Response::setSSID(std::string ssid)    
 {
+    this->ssid = ssid;
 }
-
-Response::~Response()
-{
-}
-
 void Response::setStatus(std::string status)
 {
     if(status == "")
@@ -176,4 +194,8 @@ void Response::setVersion(std::string version)
 void Response::setSetCookie(std::string set_cookie)
 {
     this->set_cookie = set_cookie;
+}
+
+Response::~Response()
+{
 }

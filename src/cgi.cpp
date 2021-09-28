@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cgi.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
+/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/03 12:22:53 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/16 12:15:49 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/28 19:49:10 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,32 @@ std::string cgi::CGI(Response *r, char *envp[])
     setenv("QUERY_STRING", r->get_params().c_str(), 1); 
     setenv("HTTP_COOKIE",r->getSetCookie().c_str(),1);
     std::string params = r->get_params();
+    params = params.substr(params.find("?") + 1, params.length());
+    // std::cout << "=======================patrams:       " << tmp << std::endl;
+    // r->set_params(tmp0);
+    //soplit parms
+
+    std::string res = "";
+    std::vector<std::string> parm;
+    for (int i = 0; i < params.size(); i++)
+    {
+        if(params[i] != '&')
+            res+=params[i];
+        else 
+        {
+            parm.push_back("\nSet-Cookie: "+res);
+            res = "";
+        }
+        
+    }
+    parm.push_back("\nSet-Cookie: "+res);
+    std::string tmp = "";
+    for (int i = 0; i < parm.size(); i++)
+    {
+        tmp =parm[i];
+    }
+    r->set_params(tmp);
+    std::cout << tmp << std::endl;
     std::string::size_type pos = 0;
     const char **av = new const char *[3];
     av[0] = strdup(r->getCGIPath().c_str());
@@ -43,7 +69,7 @@ std::string cgi::CGI(Response *r, char *envp[])
     extern char **environ;
     av[1] = fullpath.c_str();
     av[2] = NULL;
-    if (pipe(fd) == -1) // cat hel.txt | cat -e  FD[1] ---> FD[0] 0 1 2 3
+    if (pipe(fd) == -1)
         std::cout << "pipe" << std::endl;
     if ((pid = fork()) == -1)
         std::cout << "fork" << std::endl;
