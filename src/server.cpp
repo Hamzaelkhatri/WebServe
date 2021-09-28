@@ -468,6 +468,7 @@ Server::Server(Parsing *p, char **envp)
     std::map<int, std::string> ips;
     Request *request = new Request();
     int b = 0;
+    chunked = 0;
     int o = 0;
     while (1)
     {
@@ -515,6 +516,7 @@ Server::Server(Parsing *p, char **envp)
                                     if (chunked == 1)
                                     {
                                         unchunkRequest(its->second, response);
+                                        puts("here");
                                         chunked = 0;
                                         someString = its->second;
                                     }
