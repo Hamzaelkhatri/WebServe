@@ -153,7 +153,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
                 root = GetValueBykeyServer(servers, indexOfServer, "root");
             std::string BodyTmp = getBodyFromFile(root + "/errors/411.html");
         }
-        else if(its->second.find("Content-Type: multipart/form-data; boundary=") != std::string::npos)
+        else if (its->second.find("Content-Type: multipart/form-data; boundary=") != std::string::npos)
         {
             response->setStatus("400");
             std::string root = "";
@@ -524,9 +524,8 @@ Server::Server(Parsing *p, char **envp)
                                         response->setBody("<html>\n<body>\n<h1>400 Bad Request</h1>\n</body>\n</html>\n");
                                         response->setStatus("400");
                                         response->setContentLength("");
-                                    
                                     }
-                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: text/html; charset=utf-8 ; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) +"\n\n" + response->getBody();
+                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: text/html; charset=utf-8 ; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\nSet-Cookie: SESSID=nmdr6qd2man5oqogjobceg7cug; path=/" + "\n\n" + response->getBody();
                                     // std::cout << header << std::endl;
 
                                     //print detaill of header
