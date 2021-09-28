@@ -153,7 +153,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
                 root = GetValueBykeyServer(servers, indexOfServer, "root");
             std::string BodyTmp = getBodyFromFile(root + "/errors/411.html");
         }
-        else
+        else if(its->second.find("Content-Type: multipart/form-data; boundary=") != std::string::npos)
         {
             response->setStatus("400");
             std::string root = "";

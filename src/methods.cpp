@@ -165,16 +165,17 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
         response->setMethod(request->get_method());
         response->setRedirection("");
         std::string requestHttp = c->CGI(response, parsing->get_env());
-        // if (requestHttp.find("Set-Cookie:") != std::string::npos)
-        // {
-        //     std::string tmp = requestHttp.substr(requestHttp.find("Set-Cookie:") + 12);
-        //     tmp = tmp.substr(0, tmp.find("\r\n"));
-        //     response->setSetCookie(tmp);
-        // }
+        std::cout << requestHttp << std::endl;
+        if (requestHttp.find("Set-Cookie:") != std::string::npos)
+        {
+            std::string tmp = requestHttp.substr(requestHttp.find("Set-Cookie:") + 12);
+            tmp = tmp.substr(0, tmp.find("\r\n"));
+            response->setSetCookie(tmp);
+        }
         if (requestHttp.find("\r\n\r\n") != std::string::npos)
             response->setBody(requestHttp.substr(requestHttp.find("\r\n\r\n") + 4));
-        // else
-        //     response->setBody(requestHttp.substr(requestHttp.find("()") + 2));
+        else
+            response->setBody(requestHttp.substr(requestHttp.find("()") + 2));
         response->setContentLength("");
     }
     else
