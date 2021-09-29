@@ -183,6 +183,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
     std::string Methode = (stor.find("GET") != stor.end() ? "GET" : (stor.find("POST") != stor.end()) ? "POST"
                                                                 : (stor.find("DELETE") != stor.end()) ? "DELETE"
                                                                                                       : "UNKNOWN");
+    std::string cookies = stor["Cookie"];
     std::string Content_lenght = (stor.find("Content-Length") != stor.end()) ? stor["Content-Length"] : "0";
     std::string Content_Disposition = "";
     for (int j = 0; j < Content.size(); j++)
@@ -211,6 +212,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
     response->setContentType("text/html");
     response->setVersion("HTTP/1.1");
     response->setCharset("UTF-8");
+    response->setSetCookie(cookies);
     std::string root = "";
     int TargetServer = 0;
     int TargetLocation = 0;
@@ -233,6 +235,18 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                 {
                     TargetLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
                     int i = 0;
+                    if (request->get_method() == "GET")
+                    {
+                        std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, TargetLocation, "http_methods");
+                        if (methode_http.find("GET") == std::string::npos)
+                        {
+                            response->setStatus("405");
+                            std::string root = GetValueBykeyServer(servers, indexOfServer, "root");
+                            std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
+                            response->setBody(BodyTmp);
+                            return;
+                        }
+                    }
                     if (pathLocation.find(".py") != std::string::npos)
                     {
                         if (location_tmp == "*.py")

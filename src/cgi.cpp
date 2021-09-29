@@ -33,27 +33,38 @@ std::string cgi::CGI(Response *r, char *envp[])
     setenv("SERVER_NAME", r->getServerName().c_str(), 1); //
     setenv("SCRIPT_NAME", filename.c_str(), 1);           //name of file
     setenv("REDIRECT_STATUS", r->getStatus().c_str(), 1); //status of cnx
-    setenv("QUERY_STRING", r->get_params().c_str(), 1); 
+    setenv("QUERY_STRING", r->get_params().c_str(), 1);
     std::string params = r->get_params();
     params = params.substr(params.find("?") + 1, params.length());
 
     std::string res = "";
     std::vector<std::string> parm;
+    std::string tmp = "";
+    int j = 0;
     for (int i = 0; i < params.size(); i++)
     {
-        if(params[i] != '&')
-            res+=params[i];
-        else 
+        if (params[i] != '&')
+            res += params[i];
+        else
         {
-            parm.push_back("\nSet-Cookie: "+res);
+            parm.push_back("\nSet-Cookie: " + res + "\n");
+            tmp += res + ";";
             res = "";
+            j = 1;
         }
-        
     }
-    parm.push_back("\nSet-Cookie: "+res);
-    std::string tmp = "";
+    parm.push_back("Set-Cookie: " + res + ";\n");
+    tmp += res + ";\n";
+    if (!r->getSetCookie().empty())
+        setenv("HTTP_COOKIE", r->getSetCookie().c_str(), 1);
+    std::cout << "-->" << r->getSetCookie() << std::endl;
+    tmp = "";
     for (int i = 0; i < parm.size(); i++)
-        tmp +=parm[i];
+    {
+        tmp += parm[i];
+    }
+    if (r->getSetCookie().empty())
+        setenv("HTTP_COOKIE", tmp.c_str(), 1);
     r->set_params(tmp);
     std::string::size_type pos = 0;
     const char **av = new const char *[3];

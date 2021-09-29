@@ -150,7 +150,6 @@ int Server::execute_cgi(Response *response, int TargetServer, int TargetLocation
     if (check_if_file_or_dir(root + request->get_path()) == 1)
     {
         response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
-        response->setSetCookie("");
         if (its->second.find("Content-Type:") != std::string::npos)
             response->setContentType(its->second.substr(its->second.find("Content-Type:") + 13, its->second.find("\r\n") - its->second.find("Content-Type:") - 13));
         response->setContentLength(std::to_string(request->get_content_lenght()));
@@ -167,7 +166,7 @@ int Server::execute_cgi(Response *response, int TargetServer, int TargetLocation
         std::cout << requestHttp << std::endl;
         if (requestHttp.find("Set-Cookie:") != std::string::npos)
         {
-            std::cout << "Cookies Request:\t" << requestHttp << std::endl;
+            // std::cout << "Cookies Request:\t" << requestHttp << std::endl;
             std::string tmp = requestHttp.substr(requestHttp.find("Set-Cookie:") + 12);
             tmp = tmp.substr(0, tmp.find("\r\n"));
             // std::cout << "tmp:\t " << tmp;
