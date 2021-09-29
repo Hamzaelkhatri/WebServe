@@ -140,7 +140,7 @@ std::string Server::getBodyFromFile(std::string path)
     return (res);
 }
 
-void Server::execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request)
+int Server::execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request)
 {
     std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
     std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
@@ -150,7 +150,6 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
     if (check_if_file_or_dir(root + request->get_path()) == 1)
     {
         response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
-        // response->setCookie();
         response->setSetCookie("");
         if (its->second.find("Content-Type:") != std::string::npos)
             response->setContentType(its->second.substr(its->second.find("Content-Type:") + 13, its->second.find("\r\n") - its->second.find("Content-Type:") - 13));
@@ -196,7 +195,7 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
                 else
                     response->setBody(getBodyFromFile(root + "/errors/404.html"));
                 err_code = 1;
-                break;
+                return (-1);
             }
         }
         if (err_code == 0)
@@ -205,9 +204,10 @@ void Server::execute_cgi(Response *response, int TargetServer, int TargetLocatio
             response->setStatus("404");
             std::string BodyTmp = getBodyFromFile(root + "/errors/404.html");
             response->setBody(BodyTmp);
+            return(-1);
         }
     }
-    return;
+    return 1;
 }
 
 void Server::SaveAsFile(std::string path, std::string body, int b)

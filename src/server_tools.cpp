@@ -126,7 +126,6 @@ void Server::unchunkRequest(std::string &req, Response *res)
         size += new_size;
     }
     res->setContentLength(std::to_string(size));
-    std::cout << "Unchunked request: \n" << output << std::endl;
     its->second = output;
 }
 

@@ -232,22 +232,38 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
                     TargetLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
-
+                    int i = 0;
                     if (pathLocation.find(".py") != std::string::npos)
                     {
                         if (location_tmp == "*.py")
                         {
                             execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
+                            if (i == -1)
+                            {
+                                response->setStatus("404");
+                                std::string BodyTmp = getBodyFromFile(root + "/errors/404.html");
+                                response->setContentLength("");
+                                response->setBody(BodyTmp);
+                                return;
+                            }
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
                             Delete_methode(request, parsing, TargetServer, TargetLocation, response);
-                            break;
+                            // break;
                         }
                     }
                     else if (pathLocation.find(".php") != std::string::npos)
                     {
                         if (location_tmp == "*.php")
                         {
-                            execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
+                            i = execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
+                            if (i == -1)
+                            {
+                                response->setStatus("404");
+                                std::string BodyTmp = getBodyFromFile(root + "/errors/404.html");
+                                response->setContentLength("");
+                                response->setBody(BodyTmp);
+                                return;
+                            }
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
                             Delete_methode(request, parsing, TargetServer, TargetLocation, response);
                             return;
@@ -311,9 +327,9 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                         {
                                             if (it->first == "403")
                                             {
+                                                std::string tmp = root + it->second;
                                                 response->setContentLength("");
                                                 response->setStatus("403");
-                                                std::string tmp = root + it->second;
                                                 if (check_if_file_or_dir(tmp) == 1)
                                                     response->setBody(getBodyFromFile(tmp));
                                                 else
@@ -388,10 +404,10 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                 }
                                 if (err_code == 0)
                                 {
-                                    response->setContentLength("");
                                     response->setStatus("404");
-                                    std::string BodyTmp = getBodyFromFile(root + "/errors/404.html");
-                                    response->setBody(BodyTmp);
+                                    response->setBody(getBodyFromFile(root + "/errors/404.html"));
+                                    response->setContentLength("");
+                                    break;
                                 }
                             }
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
@@ -511,15 +527,13 @@ Server::Server(Parsing *p, char **envp)
                             someString = its->second;
                             if (checkRequest(its->second) == true)
                             {
-                                puts("here1");
                                 if (FD_ISSET(sock_fd, &writefds))
                                 {
                                     if (chunked == 1)
                                     {
                                         unchunkRequest(its->second, response);
-                                        puts("here");
-                                        chunked = 0;
                                         someString = its->second;
+                                        chunked = 0;
                                     }
                                     _GetDataServers(p, response, request);
                                     if (!check_header(its->second))
@@ -529,11 +543,7 @@ Server::Server(Parsing *p, char **envp)
                                         response->setContentLength("");
                                     }
                                     std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: text/html; charset=utf-8 ; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\nSet-Cookie: " + response->getSSID() + "\nSet-Cookie: " + response->get_params() + "\n\n" + response->getBody();
-                                    // std::cout << header << std::endl;
-
-                                    //print detaill of header
                                     send(sock_fd, header.c_str(), header.size(), 0);
-                                    // write(sock_fd, header.c_str(), strlen(header.c_str()));
                                     its->second.clear();
                                 }
                             }
