@@ -33,9 +33,9 @@ std::map<std::string, std::string> Server::pars_request()
     return (stor);
 }
 
-int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string> >::iterator it, int &check_server, int indexOfServer)
+int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string>>::iterator it, int &check_server, int indexOfServer)
 {
-    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
     int TargetServer = 0;
     for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
     {
@@ -105,8 +105,8 @@ std::string DeleteHeaderPost(std::string &str)
 
 void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
 {
-    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
     if (request->get_method() == "POST")
     {
         std::string BodySize = GetValueBykeyServer(servers, indexOfServer, "client_body_size");
@@ -168,10 +168,10 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
 void Server::_GetDataServers(Parsing *parsing, Response *response, Request *request)
 {
     stor = pars_request();
-    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string> >::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
     std::multimap<std::string, std::string> LocationContent;
@@ -250,32 +250,29 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                 response->setBody(BodyTmp);
                                 return;
                             }
-                               if (request->get_method() == "GET")
-                        {
-                            if(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods") != "")
+                            if (request->get_method() == "GET")
                             {
-                                std::string methode_http = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods");
-                                std::cout << methode_http << std::endl;
-                                if (methode_http.find("GET") == std::string::npos)
+                                if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods") != "")
+                                {
+                                    std::string methode_http = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods");
+                                    if (methode_http.find("GET") == std::string::npos)
+                                    {
+                                        response->setStatus("405");
+                                        std::string root = GetValueBykeyServer(servers, TargetServer, "root");
+                                        std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
+                                        response->setBody(BodyTmp);
+                                        return;
+                                    }
+                                }
+                                else
                                 {
                                     response->setStatus("405");
                                     std::string root = GetValueBykeyServer(servers, TargetServer, "root");
                                     std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
-                                    std::cout << root + "/errors/405.html" << std::endl;
                                     response->setBody(BodyTmp);
-                                    std::cout << "--> " << BodyTmp << std::endl;
                                     return;
                                 }
                             }
-                            else
-                            {
-                                  response->setStatus("405");
-                                    std::string root = GetValueBykeyServer(servers, TargetServer, "root");
-                                    std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
-                                    response->setBody(BodyTmp);
-                                    return;
-                            }
-                        }
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
                             Delete_methode(request, parsing, TargetServer, TargetLocation, response);
                         }
@@ -294,32 +291,29 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                 return;
                             }
                             if (request->get_method() == "GET")
-                        {
-                            if(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods") != "")
                             {
-                                std::string methode_http = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods");
-                                std::cout << methode_http << std::endl;
-                                if (methode_http.find("GET") == std::string::npos)
+                                if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods") != "")
+                                {
+                                    std::string methode_http = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods");
+                                    if (methode_http.find("GET") == std::string::npos)
+                                    {
+                                        response->setStatus("405");
+                                        std::string root = GetValueBykeyServer(servers, TargetServer, "root");
+                                        std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
+                                        response->setBody(BodyTmp);
+                                        return;
+                                    }
+                                }
+                                else
                                 {
                                     response->setStatus("405");
                                     std::string root = GetValueBykeyServer(servers, TargetServer, "root");
                                     std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
-                                    std::cout << root + "/errors/405.html" << std::endl;
                                     response->setBody(BodyTmp);
-                                    std::cout << "--> " << BodyTmp << std::endl;
                                     return;
                                 }
                             }
-                            else
-                            {
-                                  response->setStatus("405");
-                                    std::string root = GetValueBykeyServer(servers, TargetServer, "root");
-                                    std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
-                                    response->setBody(BodyTmp);
-                                    return;
-                            }
-                        }
-                          
+
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
                             Delete_methode(request, parsing, TargetServer, TargetLocation, response);
                             return;
@@ -331,13 +325,21 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                             pathLocation = pathLocation.substr(0, pathLocation.size() - 1);
                         if (location_tmp == pathLocation)
                         {
-                        if (request->get_method() == "GET")
-                        {
-                            if(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods") != "")
+                            if (request->get_method() == "GET")
                             {
-                                std::string methode_http = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods");
-                                std::cout << methode_http << std::endl;
-                                if (methode_http.find("GET") == std::string::npos)
+                                if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods") != "")
+                                {
+                                    std::string methode_http = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "http_methods");
+                                    if (methode_http.find("GET") == std::string::npos)
+                                    {
+                                        response->setStatus("405");
+                                        std::string root = GetValueBykeyServer(servers, indexOfServer, "root");
+                                        std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
+                                        response->setBody(BodyTmp);
+                                        break;
+                                    }
+                                }
+                                else
                                 {
                                     response->setStatus("405");
                                     std::string root = GetValueBykeyServer(servers, indexOfServer, "root");
@@ -346,21 +348,12 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                     break;
                                 }
                             }
-                            else
+                            if (check_if_file_or_dir(root + request->get_path()) == 1)
                             {
-                                  response->setStatus("405");
-                                    std::string root = GetValueBykeyServer(servers, indexOfServer, "root");
-                                    std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
-                                    response->setBody(BodyTmp);
-                                    break;
-                            }
-                        }
-                        if (check_if_file_or_dir(root + request->get_path()) == 1)
-                        {
-                        if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
-                            root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
-                        if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
-                        {
+                                if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
+                                    root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
+                                if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
+                                {
                                     std::string tmp = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return");
                                     std::string err = tmp.substr(0, tmp.find(" "));
                                     std::string err_path = tmp.substr(tmp.find_last_of(" "), sizeof(tmp));
@@ -369,6 +362,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                         response->setStatus(err);
                                         response->setRedirection("\nlocation:" + err_path + "/");
                                         response->setPath(root + request->get_path() + "/");
+                                        return;
                                     }
                                 }
                                 response->setCookie("");
@@ -388,7 +382,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                             }
                             else if (check_if_file_or_dir(root + request->get_path()) == 2)
                             {
-                    
+
                                 if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
                                     root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
                                 if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index") != "")
@@ -398,6 +392,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                         response->setStatus("301"); //redirection
                                         response->setRedirection("\nlocation:" + Path + "/");
                                         response->setPath(root + request->get_path() + "/");
+                                        return;
                                     }
                                     std::string BodyTmp = getBodyFromFile(root + request->get_path() + GetValueBykeyLocation(locations, TargetServer, TargetLocation, "index"));
                                     if (BodyTmp.empty())
@@ -421,10 +416,12 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                         }
                                         if (err_code == 0)
                                         {
+                                            root = GetValueBykeyServer(servers, TargetServer, "root");
                                             response->setContentLength("");
                                             response->setStatus("403");
                                             std::string BodyTmp = getBodyFromFile(root + "/errors/403.html");
                                             response->setBody(BodyTmp);
+                                            return;
                                         }
                                     }
                                     response->setBody(BodyTmp);
@@ -531,6 +528,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
             {
                 if (it->first == "403")
                 {
+
                     response->setContentLength("");
                     response->setStatus("403");
                     std::string tmp = root + it->second;
