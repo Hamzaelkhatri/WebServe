@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/29 18:02:05 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/29 20:28:09 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,17 +253,17 @@ void Server::Delete_methode(Request *request, Parsing *parsing, int indexOfServe
             std::string path = request->get_path();
             if (check_if_file_or_dir(root + path) == 1)
             {
-                response->setContentLength("");
                 if (checkPermission((root + path).c_str()) == 1)
                 {
-                    response->setStatus("200 ok");
-                    std::string BodyTmp = getBodyFromFile(root + "/delete.html");
-                    response->setBody(BodyTmp);
+                    response->setStatus("200 OK");
                     response->setContentLength("");
                     remove((root + path).c_str());
+                    std::string BodyTmp = getBodyFromFile(root + "/delete.html");
+                    response->setBody(BodyTmp);
                 }
                 else
                 {
+                    response->setContentLength("");
                     response->setStatus("403");
                     std::string BodyTmp = getBodyFromFile(root + "/errors/403.html");
                     response->setBody(BodyTmp);
@@ -271,6 +271,7 @@ void Server::Delete_methode(Request *request, Parsing *parsing, int indexOfServe
             }
             else
             {
+                response->setContentLength("");
                 response->setStatus("405");
                 std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
                 response->setBody(BodyTmp);
