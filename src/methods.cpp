@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/28 16:41:02 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/29 16:24:25 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,10 @@ std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::
         {
             for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
             {
-                if (it2->first.find(std::to_string(indexOfLocation) + " " + key) != std::string::npos)
+                // std::cout << "|" << it2->first << "|\t|" << it2->second << "|" << std::endl;
+                // std::cout << "---->" << std::to_string(indexOfLocation) + " " + trim(key)<< std::endl;
+                
+                if (it2->first.find(std::to_string(indexOfLocation) + " " + trim(key)) != std::string::npos)
                 {
                     return (it2->second);
                 }
