@@ -237,7 +237,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                     {
                         if (location_tmp == "*.py")
                         {
-                            execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
+                            i = execute_cgi(response, TargetServer, TargetLocation, root, parsing, c, request);
                             if (i == -1)
                             {
                                 response->setStatus("404");
@@ -248,7 +248,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                             }
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
                             Delete_methode(request, parsing, TargetServer, TargetLocation, response);
-                            // break;
                         }
                     }
                     else if (pathLocation.find(".php") != std::string::npos)
@@ -380,6 +379,21 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                         response->setRedirection("\nlocation:" + Path + "/");
                                         std::string BodyTmp = getBodyFromFile(root + "/errors/301.html");
                                         response->setBody(BodyTmp);
+                                    }
+                                    if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
+                                    {
+                                        std::string tmp = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return");
+                                        std::string err = tmp.substr(0, tmp.find(" "));
+                                        std::string err_path = tmp.substr(tmp.find_last_of(" "), sizeof(tmp));
+                                        if (std::stoi(err) >= 300 && std::stoi(err) < 400)
+                                        {
+                                            response->setStatus(err);
+                                            // if(err_path != "")
+                                            {
+                                                response->setRedirection("\nlocation:" + err_path + "/");
+                                                response->setPath(root + request->get_path() + "/");
+                                            }
+                                        }
                                     }
                                 }
                             }

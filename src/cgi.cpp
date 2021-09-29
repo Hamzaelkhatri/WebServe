@@ -34,12 +34,8 @@ std::string cgi::CGI(Response *r, char *envp[])
     setenv("SCRIPT_NAME", filename.c_str(), 1);           //name of file
     setenv("REDIRECT_STATUS", r->getStatus().c_str(), 1); //status of cnx
     setenv("QUERY_STRING", r->get_params().c_str(), 1); 
-    setenv("HTTP_COOKIE",r->getSetCookie().c_str(),1);
     std::string params = r->get_params();
     params = params.substr(params.find("?") + 1, params.length());
-    // std::cout << "=======================patrams:       " << tmp << std::endl;
-    // r->set_params(tmp0);
-    //soplit parms
 
     std::string res = "";
     std::vector<std::string> parm;
@@ -57,15 +53,11 @@ std::string cgi::CGI(Response *r, char *envp[])
     parm.push_back("\nSet-Cookie: "+res);
     std::string tmp = "";
     for (int i = 0; i < parm.size(); i++)
-    {
-        tmp =parm[i];
-    }
+        tmp +=parm[i];
     r->set_params(tmp);
-    std::cout << tmp << std::endl;
     std::string::size_type pos = 0;
     const char **av = new const char *[3];
     av[0] = strdup(r->getCGIPath().c_str());
-    std::cout << r->getCGIPath().c_str() << std::endl;
     extern char **environ;
     av[1] = fullpath.c_str();
     av[2] = NULL;

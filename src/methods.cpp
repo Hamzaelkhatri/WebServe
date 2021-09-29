@@ -164,6 +164,7 @@ int Server::execute_cgi(Response *response, int TargetServer, int TargetLocation
         response->setMethod(request->get_method());
         response->setRedirection("");
         std::string requestHttp = c->CGI(response, parsing->get_env());
+        std::cout << requestHttp << std::endl;
         if (requestHttp.find("Set-Cookie:") != std::string::npos)
         {
             std::cout << "Cookies Request:\t" << requestHttp << std::endl;
