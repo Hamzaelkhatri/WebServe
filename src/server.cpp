@@ -33,9 +33,9 @@ std::map<std::string, std::string> Server::pars_request()
     return (stor);
 }
 
-int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string>>::iterator it, int &check_server, int indexOfServer)
+int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string> >::iterator it, int &check_server, int indexOfServer)
 {
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
     int TargetServer = 0;
     for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
     {
@@ -105,8 +105,8 @@ std::string DeleteHeaderPost(std::string &str)
 
 void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
 {
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
     if (request->get_method() == "POST")
     {
         std::string BodySize = GetValueBykeyServer(servers, indexOfServer, "client_body_size");
@@ -168,10 +168,10 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
 void Server::_GetDataServers(Parsing *parsing, Response *response, Request *request)
 {
     stor = pars_request();
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string>>::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
     std::multimap<std::string, std::string> LocationContent;
@@ -437,6 +437,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                             {
                                                 response->setRedirection("\nlocation:" + err_path + "/");
                                                 response->setPath(root + request->get_path() + "/");
+                                                return;
                                             }
                                         }
                                     }

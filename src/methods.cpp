@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/29 16:24:25 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/29 18:02:05 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,6 +237,7 @@ int checkPermission(const char *path)
 
 void Server::Delete_methode(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
 {
+
     std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
     std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
     std::string root;
