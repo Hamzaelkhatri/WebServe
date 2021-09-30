@@ -6,11 +6,23 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/02 16:39:32 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/30 16:20:06 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/30 16:49:00 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/Webserv.hpp"
+
+void check_server_keys(std::string key)
+{
+    if (key != "listen"  && key != "server_name" && key != "server_addr" && key != "root" && key != "error_page" && key != "client_body_size")
+        throw std::runtime_error("Key " + key + " is not valid In server ");
+}
+
+void check_location_keys(std::string key)
+{
+    if (key != "index" && key != "location" && key != "http_methods" && key != "upload_path" && key != "root" && key != "autoindex" && key != "return" && key != "cgi_path")
+        throw std::runtime_error("Key " + key + " is not valid In location");
+}
 
 int main(int ac, char *av[], char *envp[])
 {
@@ -35,6 +47,7 @@ int main(int ac, char *av[], char *envp[])
                 for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
                 {
                     std::cout << "\t|" << it2->first << "|\t\t\t|" << it2->second  << "|"<< "\n\n";
+                    check_server_keys( it2->first);
                 }
             }
             std::cout << YEL << "\n\n";
@@ -49,6 +62,7 @@ int main(int ac, char *av[], char *envp[])
                 for (it1 = it3->second.begin(); it1 != it3->second.end(); ++it1)
                 {
                     std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second  << "|" << "\n\n";
+                    check_location_keys(it1->first.substr(it1->first.find(" ")+1));
                 }
             }
             std::cout << YEL << "" << reset << std::endl;

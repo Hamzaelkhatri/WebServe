@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 19:03:57 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/30 16:30:33 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/30 17:08:47 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,8 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
         name = 0;
         for (it1 = it->second.begin(); it1 != it->second.end(); ++it1)
         {
-            std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second << "|" << "\n\n";
+            std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second << "|"
+                      << "\n\n";
             if (it1->first == "listen")
                 port++;
             if (it1->first == "server_addr")
@@ -119,18 +120,6 @@ void Parsing::set_env(char **env)
 char **Parsing::get_env()
 {
     return (this->env);
-}
-
-void check_server_key(std::string key)
-{
-    if (key != "listen"  && key != "server_name" && key != "server_addr" && key != "root" && key != "error_page" && key != "client_body_size")
-        throw std::runtime_error("Key " + key + " is not valid In server ");
-}
-
-void check_location_key(std::string key)
-{
-    if (key != "index" && key != "location" && key != "http_methods" && key != "upload_path" && key != "root" && key != "autoindex" && key != "return" && key != "cgi_path")
-        throw std::runtime_error("Key " + key + " is not valid In location");
 }
 
 Parsing::Parsing(char *av)
@@ -211,6 +200,7 @@ Parsing::Parsing(char *av)
             this->server_map.clear();
             s = 0;
         }
+        int loc = 1;
         if (line[i].find("location") != std::string::npos)
         {
             s++;
@@ -232,20 +222,8 @@ Parsing::Parsing(char *av)
             this->_loc_map.insert(std::pair<int, std::multimap<std::string, std::string> >(serverIndex, tmp1));
             this->loc_map.clear();
             i--;
+            loc = 0;
         }
-        // if (s == 0 && line[i] == "}")
-        // {
-        //     std::multimap<std::string, std::string> tmp;
-        //     locIndex++;
-        //     this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex) + " location", "/"));
-        //     this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex) + " index", "/index.html"));
-        //     this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex) + " method", "GET"));
-        //     tmp = this->loc_map;
-        //     this->_loc_map.insert(std::pair<int, std::multimap<std::string, std::string> >(serverIndex, tmp));
-        //     this->loc_map.clear();
-        //     //  i--;
-        // }
-
         i++;
     }
     myfile.close();
