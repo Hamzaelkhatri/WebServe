@@ -6,12 +6,14 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 16:02:50 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/18 16:18:21 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/30 16:23:44 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/ErrorHandling.hpp"
 #include "../includes/tools.hpp"
+#define OUT 0
+#define IN 1
 
 ErrorHandling::ErrorHandling(char *file)
 {
@@ -22,6 +24,9 @@ ErrorHandling::ErrorHandling(char *file)
     this->file = file;
 
     set_map(clean_map(get_map(file)));
+    get_map_s();
+    if (this->map_s.size() == 0)
+        throw std::runtime_error("Erorr : Empty file");
 }
 
 int ErrorHandling::get_nbr_server(void)
@@ -37,16 +42,52 @@ void ErrorHandling::set_map(std::map<int, std::string> map)
 {
     this->map_s = map;
 }
+unsigned countWords(std::string str)
+{
+    int state = OUT;
+    unsigned wc = 0; // word count
+ 
+    // Scan all characters one by one
+    int i = 0;
+    while (str[i])
+    {
+        // If next character is a separator, set the
+        // state as OUT
+        if (str[i] ==  ' ' || str[i] == '\n' || str[i] == '\t')
+            state = OUT;
+ 
+        // If next character is not a word separator and
+        // state is OUT, then set the state as IN and
+        // increment word count
+        else if (state == OUT)
+        {
+            state = IN;
+            ++wc;
+        }
+ 
+        // Move to next character
+    i++;
+    }
+ 
+    return wc;
+}
 
 std::map<int, std::string> ErrorHandling::get_map_s()
 {
-    // std::map<int, std::string>::iterator it = this->map_s.begin();
-    // for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
-    // {
-    //     std::cout << "[" << CYN << it->first << RESET;
-    //     std::cout << "] \t\t\t ==> [";
-    //     std::cout << CYN << it->second << RESET  << "]" << std::endl;
-    // }
+    std::map<int, std::string>::iterator it = this->map_s.begin();
+    for (it = this->map_s.begin(); it != this->map_s.end(); ++it)
+    {
+        // std::cout  <<  "count each word \t\t|" <<  countWords((char *)(it->second.c_str())) << "|\t\t" ;
+        // std::cout << "[" << CYN << it->first << RESET;
+        // std::cout << "] \t\t\t ==> [";
+        // std::cout << CYN << it->second << RESET  << "]" << std::endl;
+        if(it->second != "server" && it->second != "{" && it->second != "}" )
+        {
+            if(countWords((it->second)) == 1)
+                throw std::runtime_error("Error : add an argument infront of " + it->second);
+            
+        }
+    }
     return (this->map_s);
 }
 
@@ -84,8 +125,9 @@ std::map<int, std::string> get_map(char *av)
         while (i < 1024)
             line1[i++] = 0;
     }
-    int len = nbr_lines(result);
-    std::string line[len];
+    int len = 0;
+    len = nbr_lines(result);
+    std::string line[len + 1];
     std::ifstream myfile;
     myfile.open(file);
     if(myfile.is_open())

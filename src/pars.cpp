@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pars.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
+/*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 19:03:57 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/22 10:01:01 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/09/30 16:30:33 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,14 +53,14 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
     std::vector<int> TargetServer;
     for (it = srv.begin(); it != srv.end(); it++)
     {
-        // std::cout << "\t\tServer\t\t" << it->first << ":" << std::endl;
+        std::cout << "\t\tServer\t\t" << it->first << ":" << std::endl;
         port = 0;
         addr = 0;
         root = 0;
         name = 0;
         for (it1 = it->second.begin(); it1 != it->second.end(); ++it1)
         {
-            // std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second << "|" << "\n\n";
+            std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second << "|" << "\n\n";
             if (it1->first == "listen")
                 port++;
             if (it1->first == "server_addr")
@@ -119,6 +119,18 @@ void Parsing::set_env(char **env)
 char **Parsing::get_env()
 {
     return (this->env);
+}
+
+void check_server_key(std::string key)
+{
+    if (key != "listen"  && key != "server_name" && key != "server_addr" && key != "root" && key != "error_page" && key != "client_body_size")
+        throw std::runtime_error("Key " + key + " is not valid In server ");
+}
+
+void check_location_key(std::string key)
+{
+    if (key != "index" && key != "location" && key != "http_methods" && key != "upload_path" && key != "root" && key != "autoindex" && key != "return" && key != "cgi_path")
+        throw std::runtime_error("Key " + key + " is not valid In location");
 }
 
 Parsing::Parsing(char *av)
