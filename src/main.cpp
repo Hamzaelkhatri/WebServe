@@ -54,6 +54,7 @@ int main(int ac, char *av[], char *envp[])
             // }
             // std::cout << YEL << "" << reset << std::endl;
             Server serv(pars, envp);
+            delete pars;
         }
 
         catch (const std::exception &e)

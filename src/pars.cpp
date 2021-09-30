@@ -67,7 +67,7 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
                 addr++;
             if (it1->first == "root")
                 root++;
-            if(it1->first == "server_name")
+            if (it1->first == "server_name")
                 name++;
         }
         if (port == 0)
@@ -76,9 +76,9 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
             throw std::runtime_error("No address  in server nbr " + std::to_string(it->first));
         if (root == 0)
             TargetServer.push_back(it->first);
-        if(addr > 1)
+        if (addr > 1)
             throw std::runtime_error("More than one server_addr in server nbr " + std::to_string(it->first));
-        if(name > 1)
+        if (name > 1)
             throw std::runtime_error("More than one server_name in server nbr " + std::to_string(it->first));
         indexOfServer++;
     }
@@ -162,7 +162,7 @@ Parsing::Parsing(char *av)
     }
     else
         throw std::runtime_error("Error opening file");
-    char **ptr = new char *[len + 1];
+    char **ptr;
     int l = 0;
     int serverIndex = 0;
     int d = 0;
@@ -180,24 +180,16 @@ Parsing::Parsing(char *av)
                 i++;
             while (line[i] != "server" && i < len && line[i].find("location") == std::string::npos)
             {
+                std::string key = "";
+                std::string str = "";
                 locIndex = 0;
                 while (line[i] == "{" || line[i] == "}")
                     i++;
                 if (line[i] != "" && line[i].find("location") == std::string::npos)
                 {
-                    char **ptr = ft_charSplit(line[i].c_str(), (char *)"\t ");
-                    std::string str;
-                    std::string key = ptr[0];
-                    int k = 1;
-                    while (ptr[k])
-                    {
-                        if (k == 1)
-                            str = ptr[k];
-                        else
-                            str = str + " " + ptr[k];
-                        k++;
-                    }
-                    this->server_map.insert(std::pair<std::string, std::string>(key, str));
+                    key = line[i].substr(0, line[i].find(" "));
+                    str = line[i].substr(key.length() + 1, line[i].length());
+                    this->server_map.insert(std::pair<std::string, std::string>(trim(key), trim(str)));
                 }
                 i++;
             }
@@ -213,21 +205,13 @@ Parsing::Parsing(char *av)
             locIndex++;
             while (line[i].find("}") == std::string::npos)
             {
+                std::string key = "";
+                std::string str = "";
                 if (line[i] != "" && line[i] != "}" && line[i] != "{")
                 {
-                    char **ptr = ft_charSplit(line[i].c_str(), (char *)" \t");
-                    std::string str;
-                    std::string key = ptr[0];
-                    int k = 1;
-                    while (ptr[k])
-                    {
-                        if (k == 1)
-                            str = ptr[k];
-                        else
-                            str = str + " " + ptr[k];
-                        k++;
-                    }
-                    this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex) + " " + key, str));
+                    key = line[i].substr(0, line[i].find(" "));
+                    str = line[i].substr(key.length() + 1, line[i].length());
+                    this->loc_map.insert(std::pair<std::string, std::string>(std::to_string(locIndex) + " " + trim(key), trim(str)));
                 }
                 i++;
             }

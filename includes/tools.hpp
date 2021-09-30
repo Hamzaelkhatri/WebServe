@@ -25,9 +25,6 @@ bool line_equal(std::string const &line, std::string const &str);
 int check_details(std::string line);
 int nbr_lines(std::string source);
 bool is_whitespace(const std::string &s);
-char **ft_charSplit(char const *s, char *set);
 std::string trim(const std::string &s);
-
-
 
 #endif
