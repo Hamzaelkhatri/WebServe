@@ -18,12 +18,12 @@ Server_element::Server_element()
     this->port = 0;
 }
 
-std::multimap<int, std::multimap<std::string, std::string> > Parsing::Getloc_map()
+std::multimap<int, std::multimap<std::string, std::string>> Parsing::Getloc_map()
 {
     return (this->_loc_map);
 }
 
-std::map<int, std::multimap<std::string, std::string> > Parsing::GetServerMap()
+std::map<int, std::multimap<std::string, std::string>> Parsing::GetServerMap()
 {
     return (this->_server_map);
 }
@@ -40,13 +40,13 @@ int SearchIntoVector(std::vector<int> index, int i)
     return (0);
 }
 
-void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string> > srv, std::multimap<int, std::multimap<std::string, std::string> > loc)
+void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string>> srv, std::multimap<int, std::multimap<std::string, std::string>> loc)
 {
     int addr = 0;
     int port = 0;
     int name = 0;
     int root = 0;
-    std::map<int, std::multimap<std::string, std::string> >::iterator it;
+    std::map<int, std::multimap<std::string, std::string>>::iterator it;
     std::multimap<std::string, std::string>::iterator it1;
     srv = this->_server_map;
     int indexOfServer = 1;
@@ -85,7 +85,7 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
     }
 
     loc = this->_loc_map;
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
     int indexOfLoc = 1;
     for (it2 = loc.begin(); it2 != loc.end(); it2++)
     {
@@ -96,7 +96,6 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
         }
         if (root == 0 && SearchIntoVector(TargetServer, it2->first))
         {
-            // std::cout << " I m here" << std::endl;
             it = srv.begin();
             for (it = srv.begin(); it != srv.end(); it++)
             {
@@ -170,19 +169,21 @@ Parsing::Parsing(char *av)
     int locIndex = 0;
     int i = 0;
     int s = 0;
+    int t = 0;
     while (i < len)
     {
+        std::string key = "";
+        std::string str = "";
         if (line[i] == "server")
         {
-
             i++;
             serverIndex++;
             while (line[i] == "{" || line[i] == "}")
                 i++;
             while (line[i] != "server" && i < len && line[i].find("location") == std::string::npos)
             {
-                std::string key = "";
-                std::string str = "";
+                key = "";
+                str = "";
                 locIndex = 0;
                 while (line[i] == "{" || line[i] == "}")
                     i++;
@@ -198,12 +199,13 @@ Parsing::Parsing(char *av)
             tmp = this->server_map;
             this->_server_map[serverIndex] = tmp;
             this->server_map.clear();
-            s = 0;
+            s = 1;
         }
         int loc = 1;
+        t = i;
         if (line[i].find("location") != std::string::npos)
         {
-            s++;
+            // s++;
             locIndex++;
             while (line[i].find("}") == std::string::npos)
             {
@@ -219,10 +221,22 @@ Parsing::Parsing(char *av)
             }
             std::multimap<std::string, std::string> tmp1;
             tmp1 = this->loc_map;
-            this->_loc_map.insert(std::pair<int, std::multimap<std::string, std::string> >(serverIndex, tmp1));
+            this->_loc_map.insert(std::pair<int, std::multimap<std::string, std::string>>(serverIndex, tmp1));
             this->loc_map.clear();
             i--;
+            // loc = 0;
+        }
+        if (i + 2 < len && line[i + 2] != "" && line[i + 2].find("{") == std::string::npos && line[i + 2].find("location") == std::string::npos && line[i + 2].find("server") == std::string::npos && line[i + 2].find("}") == std::string::npos)
+        {
+            key = line[i + 2].substr(0, line[i + 2].find(" "));
+            str = line[i + 2].substr(key.length() + 1, line[i + 2].length());
+            // this->server_map.insert(std::pair<std::string, std::string>(trim(key), trim(str)));
+            std::cout << YEL << line[i + 2] << std::endl;
+            std::cout << YEL << "____________" << std::endl;
+            this->_server_map[serverIndex].insert(std::pair<std::string, std::string>(trim(key), trim(str)));
+            this->server_map.clear();
             loc = 0;
+            i++;
         }
         i++;
     }
