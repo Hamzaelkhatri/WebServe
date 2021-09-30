@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/22 19:03:57 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/30 17:08:47 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/30 17:29:33 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,15 +53,15 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
     std::vector<int> TargetServer;
     for (it = srv.begin(); it != srv.end(); it++)
     {
-        std::cout << "\t\tServer\t\t" << it->first << ":" << std::endl;
+        // std::cout << "\t\tServer\t\t" << it->first << ":" << std::endl;
         port = 0;
         addr = 0;
         root = 0;
         name = 0;
         for (it1 = it->second.begin(); it1 != it->second.end(); ++it1)
         {
-            std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second << "|"
-                      << "\n\n";
+            // std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second << "|"
+            //           << "\n\n";
             if (it1->first == "listen")
                 port++;
             if (it1->first == "server_addr")

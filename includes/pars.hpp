@@ -6,7 +6,7 @@
 /*   By: zdnaya <zdnaya@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/08/21 19:31:17 by zainabdnaya       #+#    #+#             */
-/*   Updated: 2021/09/30 16:51:20 by zdnaya           ###   ########.fr       */
+/*   Updated: 2021/09/30 17:24:52 by zdnaya           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 #define MAG "\e[0;35m"
 #define CYN "\e[0;36m"
 #define WHT "\e[0;37m"
-#define reset "\e[0m"
+#define reeset "\e[0m"
 
 
 
