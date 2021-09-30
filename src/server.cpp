@@ -37,22 +37,24 @@ int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &roo
 {
     std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
     int TargetServer = 0;
+    int i = 0;
     for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
     {
         if (it3->first.find("listen") != std::string::npos && request->get_port().find(it3->second) != std::string::npos)
-            TargetServer -= 1;
+            i -= 1;
         if (it3->first.find("server_addr") != std::string::npos && (request->get_host().find(it3->second) != std::string::npos || request->get_host().find("localhost") != std::string::npos))
-            TargetServer -= 1;
+            i -= 1;
         else if (it3->first.find("server_name") != std::string::npos && request->get_host().find(it3->second) != std::string::npos)
-            TargetServer -= 1;
-        if (TargetServer <= -2)
+            i -= 1;
+        if (i <= -2)
         {
-            check_server = 1;
-            TargetServer = indexOfServer;
-            root = GetValueBykeyServer(servers, indexOfServer, "root");
-            break;
+            this->check_server = 1;
+            TargetServer = it->first;
+            root = GetValueBykeyServer(servers, TargetServer, "root");
+            return (TargetServer);
         }
     }
+
     return (TargetServer);
 }
 
@@ -216,14 +218,13 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
     std::string root = "";
     int TargetServer = 0;
     int TargetLocation = 0;
-    int check_server = 0;
 
     for (it = servers.begin(); it != servers.end(); it++)
     {
         indexOfLocation = 1;
         TargetServer = 1;
 
-        TargetServer = GetTargetServer(request, parsing, root, it3, it, check_server, indexOfServer);
+        TargetServer = GetTargetServer(request, parsing, root, it3, it, this->check_server, indexOfServer);
         TargetLocation = 1;
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {
@@ -234,7 +235,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                 for (it4 = it2->second.begin(); it4 != it2->second.end(); it4++)
                 {
                     TargetLocation = std::stoi(it4->first.substr(0, it4->first.find(" ")));
-                    // std::cout << "Target location " << TargetLocation  << std::endl;
                     int i = 0;
 
                     if (pathLocation.find(".py") != std::string::npos)
@@ -411,7 +411,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                                 else
                                                     response->setBody(getBodyFromFile(root + "/errors/403.html"));
                                                 err_code = 1;
-                                                break;
+                                                return;
                                             }
                                         }
                                         if (err_code == 0)
@@ -521,33 +521,33 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
             }
             indexOfServer++;
         }
-        if (check_server == 0)
+    }
+    if (check_server == 0)
+    {
+        std::map<std::string, std::string>::iterator it = errors.begin();
+        int err_code = 0;
+        for (it = errors.begin(); it != errors.end(); it++)
         {
-            std::map<std::string, std::string>::iterator it = errors.begin();
-            int err_code = 0;
-            for (it = errors.begin(); it != errors.end(); it++)
+            if (it->first == "403")
             {
-                if (it->first == "403")
-                {
 
-                    response->setContentLength("");
-                    response->setStatus("403");
-                    std::string tmp = root + it->second;
-                    if (check_if_file_or_dir(tmp) == 1)
-                        response->setBody(getBodyFromFile(tmp));
-                    else
-                        response->setBody(getBodyFromFile(root + "/errors/403.html"));
-                    err_code = 1;
-                    break;
-                }
-            }
-            if (err_code == 0)
-            {
                 response->setContentLength("");
                 response->setStatus("403");
-                std::string BodyTmp = getBodyFromFile(root + "/errors/403.html");
-                response->setBody(BodyTmp);
+                std::string tmp = root + it->second;
+                if (check_if_file_or_dir(tmp) == 1)
+                    response->setBody(getBodyFromFile(tmp));
+                else
+                    response->setBody(getBodyFromFile(root + "/errors/403.html"));
+                err_code = 1;
+                break;
             }
+        }
+        if (err_code == 0)
+        {
+            response->setContentLength("");
+            response->setStatus("403");
+            std::string BodyTmp = getBodyFromFile(root + "/errors/403.html");
+            response->setBody(BodyTmp);
         }
     }
 }
@@ -561,6 +561,7 @@ Server::Server(Parsing *p, char **envp)
     maxfd = 0;
     int j = 0;
     int rc = 0;
+    this->check_server = 0;
     char buffer[BUFFER_SIZE + 1];
     // cgi *c;
     p->set_env(envp);
@@ -631,6 +632,7 @@ Server::Server(Parsing *p, char **envp)
                                         chunked = 0;
                                     }
                                     _GetDataServers(p, response, request);
+
                                     if (!check_header(its->second))
                                     {
                                         response->setBody("<html>\n<body>\n<h1>400 Bad Request</h1>\n</body>\n</html>\n");
@@ -640,6 +642,8 @@ Server::Server(Parsing *p, char **envp)
                                     std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: text/html; charset=utf-8 ; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\nSet-Cookie: " + response->getSSID() + "\nSet-Cookie: " + response->get_params() + "\n\n" + response->getBody();
                                     send(sock_fd, header.c_str(), header.size(), 0);
                                     its->second.clear();
+                                    this->check_server = 0;
+                                    response->setStatus("");
                                 }
                             }
                         }

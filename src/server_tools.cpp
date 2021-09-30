@@ -24,12 +24,12 @@ int Server::_Accept_client(int sock)
         FD_SET(csock, &writefds);
         if (csock > maxfd)
             maxfd = csock;
+        _clients.insert(std::pair<int, std::string>(csock, ""));
 
         std::cout << csock << "\t  =  New connection" << std::endl;
     }
     else
         throw(AcceptFailed());
-    _clients.insert(std::pair<int, std::string>(csock, ""));
     return (csock);
 }
 
@@ -119,8 +119,8 @@ void Server::unchunkRequest(std::string &req, Response *res)
         std::getline(bodyStream, line);
         new_size = get_size_of_chunked(line);
         std::getline(bodyStream, line);
-        if(i == 0)
-        output+= line;
+        if (i == 0)
+            output += line;
         if (new_size == 0)
             break;
         size += new_size;

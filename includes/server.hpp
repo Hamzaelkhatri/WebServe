@@ -64,6 +64,7 @@ private:
     int selected;
     int chunked;
     char *request;
+    int check_server;
     Socket *sock;
     fd_set readfds;
     fd_set writefds;
@@ -84,19 +85,20 @@ private:
     std::map<std::string, std::string> stor;
     std::multimap<int, std::multimap<std::string, std::string> > loc;
     std::map<std::string, std::string> errors;
+
 public:
     Server(Parsing *pars, char *envp[]);
-    void unchunkRequest(std::string &req,Response *res);
+    void unchunkRequest(std::string &req, Response *res);
     int _Accept_client(int sock);
     int _Get_request(int csock);
     int check_header(std::string header);
     int check_index(std::string str);
     int check_dir(std::string dir, std::string str);
     bool checkRequest(std::string &req);
-    void _GetDataServers(Parsing *parsing, Response *response,Request *request);
+    void _GetDataServers(Parsing *parsing, Response *response, Request *request);
     void witch_server(std::map<int, std::string> str, Parsing *pars);
-    void Post_Method(Request *request,Parsing *parsing,int indexOfServer,int indexOflocation,Response *response);
-    void Delete_methode(Request *request,Parsing *parsing,int indexOfServer,int indexOflocation,Response *response);
+    void Post_Method(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response);
+    void Delete_methode(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response);
     void Get_methode(cgi *c, char *envp[]);
     std::string str5;
 
@@ -115,13 +117,13 @@ public:
     std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations);
     std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key);
     bool is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location);
-    int GetTargetServer(Request *request,Parsing *parsing,std::string &root,std::multimap<std::string, std::string>::iterator it3,std::map<int, std::multimap<std::string, std::string> >::iterator it,int &check_server,int indexOfServer);
+    int GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string> >::iterator it, int &check_server, int indexOfServer);
     int check_if_file_or_dir(std::string path);
     std::string CreateAutoIndexHtmlFile(std::string path, std::string locatioName);
     std::string getBodyFromFile(std::string path);
-int execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request);
-void SaveAsFile(std::string path, std::string body, int b);
-std::map<std::string, std::string> pars_request();
+    int execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request);
+    void SaveAsFile(std::string path, std::string body, int b);
+    std::map<std::string, std::string> pars_request();
     ~Server();
 };
 
