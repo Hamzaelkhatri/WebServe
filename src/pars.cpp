@@ -236,11 +236,12 @@ Parsing::Parsing(char *av)
             this->_server_map[serverIndex].insert(std::pair<std::string, std::string>(trim(key), trim(str)));
             this->server_map.clear();
             loc = 0;
-            i++;
+            // i++;
         }
         i++;
     }
     myfile.close();
+
     set_serverMap(this->_server_map, this->_loc_map);
 }
 
