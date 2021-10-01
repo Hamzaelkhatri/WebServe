@@ -33,9 +33,9 @@ std::map<std::string, std::string> Server::pars_request()
     return (stor);
 }
 
-int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string> >::iterator it, int &check_server, int indexOfServer)
+int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string>>::iterator it, int &check_server, int indexOfServer)
 {
-    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
     int TargetServer = 0;
     int i = 0;
     for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
@@ -107,8 +107,8 @@ std::string DeleteHeaderPost(std::string &str)
 
 void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
 {
-    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
     if (request->get_method() == "POST")
     {
         std::string BodySize = GetValueBykeyServer(servers, indexOfServer, "client_body_size");
@@ -155,14 +155,35 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
                 root = GetValueBykeyServer(servers, indexOfServer, "root");
             std::string BodyTmp = getBodyFromFile(root + "/errors/411.html");
         }
-        else if (its->second.find("Content-Type: multipart/form-data; boundary=") != std::string::npos)
+        else if (its->second.find("Content-Type: multipart/form-data; boundary=") != std::string::npos || BodySize == "0m" || request->get_content_lenght() < (std::stol(BodySize) * 1048576))
         {
-            response->setStatus("400");
-            std::string root = "";
-            root = GetValueBykeyServer(servers, indexOfServer, "root");
-            std::string BodyTmp = getBodyFromFile(root + "/errors/400.html");
-            response->setContentLength("");
-            response->setBody(BodyTmp);
+            std::map<std::string, std::string>::iterator it = errors.begin();
+            std::string root = GetValueBykeyServer(servers, indexOfServer, "root");
+            int err_code = 0;
+            for (it = errors.begin(); it != errors.end(); it++)
+            {
+                if (it->first == "400")
+                {
+                    std::string tmp = root + it->second;
+                    response->setContentLength("");
+                    response->setStatus("400");
+                    if (check_if_file_or_dir(tmp) == 1)
+                        response->setBody(getBodyFromFile(tmp));
+                    else
+                        response->setBody(getBodyFromFile(root + "/errors/400.html"));
+                    err_code = 1;
+                    return;
+                }
+            }
+            if (err_code == 0)
+            {
+                root = GetValueBykeyServer(servers, indexOfServer, "root");
+                response->setContentLength("");
+                response->setStatus("400");
+                std::string BodyTmp = getBodyFromFile(root + "/errors/400.html");
+                response->setBody(BodyTmp);
+                return;
+            }
         }
     }
 }
@@ -170,10 +191,10 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
 void Server::_GetDataServers(Parsing *parsing, Response *response, Request *request)
 {
     stor = pars_request();
-    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string> >::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
+    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
     std::multimap<std::string, std::string> LocationContent;

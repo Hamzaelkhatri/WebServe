@@ -231,8 +231,8 @@ Parsing::Parsing(char *av)
             key = line[i + 2].substr(0, line[i + 2].find(" "));
             str = line[i + 2].substr(key.length() + 1, line[i + 2].length());
             // this->server_map.insert(std::pair<std::string, std::string>(trim(key), trim(str)));
-            std::cout << YEL << line[i + 2] << std::endl;
-            std::cout << YEL << "____________" << std::endl;
+            // std::cout << YEL << line[i + 2] << std::endl;
+            // std::cout << YEL << "____________" << std::endl;
             this->_server_map[serverIndex].insert(std::pair<std::string, std::string>(trim(key), trim(str)));
             this->server_map.clear();
             loc = 0;

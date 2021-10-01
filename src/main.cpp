@@ -42,37 +42,34 @@ int main(int ac, char *av[], char *envp[])
             std::map<int, std::multimap<std::string, std::string> > tmp = pars->GetServerMap();
             for (it = tmp.begin(); it != tmp.end(); ++it)
             {
-                std::cout << YEL << "Server" << reset << std::endl;
-                std::cout << RED << "\t\tServer\t\t" << it->first << ":" << reset << std::endl;
+                // std::cout << YEL << "Server" << reset << std::endl;
+                // std::cout << RED << "\t\tServer\t\t" << it->first << ":" << reset << std::endl;
                 for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
                 {
-                    std::cout << "\t|" << it2->first << "|\t\t\t|" << it2->second  << "|"<< "\n\n";
+                    // std::cout << "\t|" << it2->first << "|\t\t\t|" << it2->second  << "|"<< "\n\n";
                     check_server_keys( it2->first);
                 }
             }
-            std::cout << YEL << "\n\n";
+            // std::cout << YEL << "\n\n";
 
             std::multimap<int, std::multimap<std::string, std::string> > tmp1 = pars->Getloc_map();
             std::multimap<int, std::multimap<std::string, std::string> >::iterator it3;
             std::multimap<std::string, std::string>::iterator it1;
             for (it3 = tmp1.begin(); it3 != tmp1.end(); ++it3)
             {
-                std::cout << YEL << "Location" << reset << std::endl;
-                std::cout << RED << "\t\tLocation\t\t" << it3->first << ":" << reset << std::endl;
                 for (it1 = it3->second.begin(); it1 != it3->second.end(); ++it1)
                 {
-                    std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second  << "|" << "\n\n";
+                    // std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second  << "|" << "\n\n";
                     check_location_keys(it1->first.substr(it1->first.find(" ")+1));
                 }
             }
-            std::cout << YEL << "" << reset << std::endl;
-            // Server serv(pars, envp);
+            Server serv(pars, envp);
             delete pars;
         }
 
         catch (const std::exception &e)
         {
-            std::cerr << e.what() << '\n';
+            // std::cerr << e.what() << '\n';
         }
     }
     else
