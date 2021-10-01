@@ -6,7 +6,7 @@
 /*   By: zainabdnayagmail.com <zainabdnayagmail.    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 18:02:30 by zdnaya            #+#    #+#             */
-/*   Updated: 2021/09/29 20:28:09 by zainabdnaya      ###   ########.fr       */
+/*   Updated: 2021/10/01 14:06:50 by zainabdnaya      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ std::string Server::GetValueBykeyServer(std::map<int, std::multimap<std::string,
                 if (it2->first.find("error_page") != std::string::npos)
                 {
                     std::string err = it2->second.substr(0, it2->second.find(" "));
-                    std::string err_path = it2->second.substr(it2->second.find(" ") + 1, sizeof(it2->second));
+                    std::string err_path = it2->second.substr(it2->second.find(" ") + 1, it2->second.size()-1);
                     this->errors[trim(err)] = trim(err_path);
                 }
             }
@@ -145,6 +145,8 @@ int Server::execute_cgi(Response *response, int TargetServer, int TargetLocation
 
     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
         root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
+    else
+        root = GetValueBykeyServer(servers, TargetServer, "root");
     if (check_if_file_or_dir(root + request->get_path()) == 1)
     {
         response->setStatus(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return"));
@@ -236,15 +238,16 @@ void Server::Delete_methode(Request *request, Parsing *parsing, int indexOfServe
     std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
     std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
     std::string root;
+        if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
+                root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
+        else
+                root = GetValueBykeyServer(servers, indexOfServer, "root");
     if (request->get_method() == "DELETE")
     {
         std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "http_methods");
+        
         if (methode_http.find("DELETE") != std::string::npos)
         {
-            if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
-                root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
-            else
-                root = GetValueBykeyServer(servers, indexOfServer, "root");
             std::string path = request->get_path();
             if (check_if_file_or_dir(root + path) == 1)
             {
@@ -258,17 +261,20 @@ void Server::Delete_methode(Request *request, Parsing *parsing, int indexOfServe
                 }
                 else
                 {
+                root = GetValueBykeyServer(servers, indexOfServer, "root");
                     response->setContentLength("");
                     response->setStatus("403");
                     std::string BodyTmp = getBodyFromFile(root + "/errors/403.html");
                     response->setBody(BodyTmp);
+                    return;
                 }
             }
             else
             {
+                root = GetValueBykeyServer(servers, indexOfServer, "root");
                 response->setContentLength("");
-                response->setStatus("405");
-                std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");
+                response->setStatus("404");
+                std::string BodyTmp = getBodyFromFile(root + "/errors/404.html");
                 response->setBody(BodyTmp);
             }
         }
@@ -280,6 +286,7 @@ void Server::Delete_methode(Request *request, Parsing *parsing, int indexOfServe
             {
                 if (it->first == "405")
                 {
+                root = GetValueBykeyServer(servers, indexOfServer, "root");
                     response->setContentLength("");
                     response->setStatus("405");
                     std::string tmp = root + it->second;
@@ -293,6 +300,8 @@ void Server::Delete_methode(Request *request, Parsing *parsing, int indexOfServe
             }
             if (err_code == 0)
             {
+                root = GetValueBykeyServer(servers, indexOfServer, "root");
+
                 response->setContentLength("");
                 response->setStatus("405");
                 std::string BodyTmp = getBodyFromFile(root + "/errors/405.html");

@@ -504,6 +504,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                 {
                                     if (it->first == "404")
                                     {
+                                        // std::cout << it->second << std::endl;
                                         response->setContentLength("");
                                         response->setStatus("404");
                                         std::string tmp = root + it->second;
@@ -670,6 +671,7 @@ Server::Server(Parsing *p, char **envp)
                             {
                                 b = 0;
                                 its->second.clear();
+
                                 std::cout << RED << "[-]"
                                           << reset<<  "Client Diconnected " << std::endl;
                                 close(sock_fd);
