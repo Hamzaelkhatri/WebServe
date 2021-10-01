@@ -112,7 +112,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
     {
         std::string BodySize = GetValueBykeyServer(servers, indexOfServer, "client_body_size");
         std::string upload_path = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload_path");
-        std::string upload_status = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload");
+        std::string upload_status = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "upload_status");
         std::string methode_http = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "http_methods");
         if (methode_http.find("POST") == std::string::npos)
         {
@@ -136,10 +136,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
             response->setStatus("413");
             response->setContentLength("");
             std::string root = "";
-            if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
-                root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
-            else
-                root = GetValueBykeyServer(servers, indexOfServer, "root");
+            root = GetValueBykeyServer(servers, indexOfServer, "root");
             std::string BodyTmp = getBodyFromFile(root + "/errors/413.html");
             response->setBody(BodyTmp);
         }
@@ -148,13 +145,41 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
             response->setStatus("411");
             response->setContentLength("");
             std::string root = "";
-            if (GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root") != "")
-                root = GetValueBykeyLocation(locations, indexOfServer, indexOflocation, "root");
-            else
-                root = GetValueBykeyServer(servers, indexOfServer, "root");
+            root = GetValueBykeyServer(servers, indexOfServer, "root");
             std::string BodyTmp = getBodyFromFile(root + "/errors/411.html");
         }
-        else if (its->second.find("Content-Type: multipart/form-data; boundary=") != std::string::npos || BodySize == "0m" || request->get_content_lenght() < (std::stol(BodySize) * 1048576))
+        else if (its->second.find("Content-Type: multipart/form-data; boundary=") != std::string::npos && (BodySize == "0m" || request->get_content_lenght() < (std::stol(BodySize) * 1048576)))
+        {
+            std::map<std::string, std::string>::iterator it = errors.begin();
+            std::string root = GetValueBykeyServer(servers, indexOfServer, "root");
+            puts("here");
+            int err_code = 0;
+            for (it = errors.begin(); it != errors.end(); it++)
+            {
+                if (it->first == "400")
+                {
+                    std::string tmp = root + it->second;
+                    response->setContentLength("");
+                    response->setStatus("400");
+                    if (check_if_file_or_dir(tmp) == 1)
+                        response->setBody(getBodyFromFile(tmp));
+                    else
+                        response->setBody(getBodyFromFile(root + "/errors/400.html"));
+                    err_code = 1;
+                    return;
+                }
+            }
+            if (err_code == 0)
+            {
+                root = GetValueBykeyServer(servers, indexOfServer, "root");
+                response->setContentLength("");
+                response->setStatus("400");
+                std::string BodyTmp = getBodyFromFile(root + "/errors/400.html");
+                response->setBody(BodyTmp);
+                return;
+            }
+        }
+        else if (BodySize == "0m")
         {
             std::map<std::string, std::string>::iterator it = errors.begin();
             std::string root = GetValueBykeyServer(servers, indexOfServer, "root");
@@ -651,12 +676,12 @@ Server::Server(Parsing *p, char **envp)
                                     }
                                     _GetDataServers(p, response, request);
 
-                                    if (!check_header(its->second))
-                                    {
-                                        response->setBody("<html>\n<body>\n<h1>400 Bad Request</h1>\n</body>\n</html>\n");
-                                        response->setStatus("400");
-                                        response->setContentLength("");
-                                    }
+                                    // if (!check_header(its->second))
+                                    // {
+                                    //     response->setBody("<html>\n<body>\n<h1>400 Bad Request</h1>\n</body>\n</html>\n");
+                                    //     response->setStatus("400");
+                                    //     response->setContentLength("");
+                                    // }
                                     std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: text/html; charset=utf-8 ; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\nSet-Cookie: " + response->getSSID() + "\nSet-Cookie: " + response->get_params() + "\n\n" + response->getBody();
                                     send(sock_fd, header.c_str(), header.size(), 0);
                                     its->second.clear();
@@ -673,7 +698,7 @@ Server::Server(Parsing *p, char **envp)
                                 its->second.clear();
 
                                 std::cout << RED << "[-]"
-                                          << reset<<  "Client Diconnected " << std::endl;
+                                          << reset << "Client Diconnected " << std::endl;
                                 close(sock_fd);
                                 FD_CLR(sock_fd, &masterfds);
                                 FD_CLR(sock_fd, &writefds);
