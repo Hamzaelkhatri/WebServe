@@ -18,19 +18,19 @@ Server_element::Server_element()
     this->port = 0;
 }
 
-std::multimap<int, std::multimap<std::string, std::string>> Parsing::Getloc_map()
+std::multimap<int, std::multimap<std::string, std::string> > Parsing::Getloc_map()
 {
     return (this->_loc_map);
 }
 
-std::map<int, std::multimap<std::string, std::string>> Parsing::GetServerMap()
+std::map<int, std::multimap<std::string, std::string> > Parsing::GetServerMap()
 {
     return (this->_server_map);
 }
 
 int SearchIntoVector(std::vector<int> index, int i)
 {
-    for (int j = 0; j < index.size(); j++)
+    for (int j = 0; j < (int)index.size(); j++)
     {
         if (index[j] == i)
         {
@@ -40,13 +40,13 @@ int SearchIntoVector(std::vector<int> index, int i)
     return (0);
 }
 
-void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string>> srv, std::multimap<int, std::multimap<std::string, std::string>> loc)
+void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string> > srv, std::multimap<int, std::multimap<std::string, std::string> > loc)
 {
     int addr = 0;
     int port = 0;
     int name = 0;
     int root = 0;
-    std::map<int, std::multimap<std::string, std::string>>::iterator it;
+    std::map<int, std::multimap<std::string, std::string> >::iterator it;
     std::multimap<std::string, std::string>::iterator it1;
     srv = this->_server_map;
     int indexOfServer = 1;
@@ -85,7 +85,7 @@ void Parsing::set_serverMap(std::map<int, std::multimap<std::string, std::string
     }
 
     loc = this->_loc_map;
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
     int indexOfLoc = 1;
     for (it2 = loc.begin(); it2 != loc.end(); it2++)
     {
@@ -123,7 +123,6 @@ char **Parsing::get_env()
 
 Parsing::Parsing(char *av)
 {
-    int z = 0;
     int res = 0;
     std::map<int, std::string> map_s;
     std::string result = "";
@@ -162,10 +161,7 @@ Parsing::Parsing(char *av)
     }
     else
         throw std::runtime_error("Error opening file");
-    char **ptr;
-    int l = 0;
     int serverIndex = 0;
-    int d = 0;
     int locIndex = 0;
     int i = 0;
     int s = 0;
@@ -221,22 +217,17 @@ Parsing::Parsing(char *av)
             }
             std::multimap<std::string, std::string> tmp1;
             tmp1 = this->loc_map;
-            this->_loc_map.insert(std::pair<int, std::multimap<std::string, std::string>>(serverIndex, tmp1));
+            this->_loc_map.insert(std::pair<int, std::multimap<std::string, std::string> >(serverIndex, tmp1));
             this->loc_map.clear();
             i--;
-            // loc = 0;
         }
         if (i + 2 < len && line[i + 2] != "" && line[i + 2].find("{") == std::string::npos && line[i + 2].find("location") == std::string::npos && line[i + 2].find("server") == std::string::npos && line[i + 2].find("}") == std::string::npos)
         {
             key = line[i + 2].substr(0, line[i + 2].find(" "));
             str = line[i + 2].substr(key.length() + 1, line[i + 2].length());
-            // this->server_map.insert(std::pair<std::string, std::string>(trim(key), trim(str)));
-            // std::cout << YEL << line[i + 2] << std::endl;
-            // std::cout << YEL << "____________" << std::endl;
             this->_server_map[serverIndex].insert(std::pair<std::string, std::string>(trim(key), trim(str)));
             this->server_map.clear();
             loc = 0;
-            // i++;
         }
         i++;
     }

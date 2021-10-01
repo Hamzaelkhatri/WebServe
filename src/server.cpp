@@ -33,9 +33,9 @@ std::map<std::string, std::string> Server::pars_request()
     return (stor);
 }
 
-int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string>>::iterator it, int &check_server, int indexOfServer)
+int Server::GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string> >::iterator it)
 {
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
     int TargetServer = 0;
     int i = 0;
     for (it3 = it->second.begin(); it3 != it->second.end(); ++it3)
@@ -73,7 +73,6 @@ std::string DeleteHeaderPost(std::string &str)
     std::string Boundry = "";
     std::stringstream ss(str);
     std::string line;
-    int count = 0;
     int j = 0;
     while (std::getline(ss, line, '\n'))
     {
@@ -107,8 +106,8 @@ std::string DeleteHeaderPost(std::string &str)
 
 void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, int indexOflocation, Response *response)
 {
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
     if (request->get_method() == "POST")
     {
         std::string BodySize = GetValueBykeyServer(servers, indexOfServer, "client_body_size");
@@ -130,7 +129,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
         if (upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0 && request->get_content_lenght() <= (std::stol(BodySize) * 1048576) && request->get_filename().size() > 2)
         {
             its->second = DeleteHeaderPost(its->second);
-            SaveAsFile(upload_path + request->get_filename(), its->second, 1);
+            SaveAsFile(upload_path + request->get_filename(), its->second);
         }
         else if ((upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0) && request->get_content_lenght() > (std::stol(BodySize) * 1048576))
         {
@@ -191,10 +190,10 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
 void Server::_GetDataServers(Parsing *parsing, Response *response, Request *request)
 {
     stor = pars_request();
-    std::map<int, std::multimap<std::string, std::string>> servers = parsing->GetServerMap();
-    std::multimap<int, std::multimap<std::string, std::string>> locations = parsing->Getloc_map();
-    std::map<int, std::multimap<std::string, std::string>>::iterator it;
-    std::multimap<int, std::multimap<std::string, std::string>>::iterator it2;
+    std::map<int, std::multimap<std::string, std::string> > servers = parsing->GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > locations = parsing->Getloc_map();
+    std::map<int, std::multimap<std::string, std::string> >::iterator it;
+    std::multimap<int, std::multimap<std::string, std::string> >::iterator it2;
     std::multimap<std::string, std::string>::iterator it3;
     std::multimap<std::string, std::string>::iterator it4;
     std::multimap<std::string, std::string> LocationContent;
@@ -209,7 +208,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
     std::string cookies = stor["Cookie"];
     std::string Content_lenght = (stor.find("Content-Length") != stor.end()) ? stor["Content-Length"] : "0";
     std::string Content_Disposition = "";
-    for (int j = 0; j < Content.size(); j++)
+    for (int j = 0; j < (int)Content.size(); j++)
     {
         if (Content[j].find("Content-Disposition") != std::string::npos)
         {
@@ -231,7 +230,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
         request->set_path(Path);
     request->set_content_lenght(std::stoi(Content_lenght));
     request->set_filename(Content_Disposition);
-    cgi *c;
+    cgi *c = NULL;
     response->setContentType("text/html");
     response->setVersion("HTTP/1.1");
     response->setCharset("UTF-8");
@@ -245,7 +244,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
         indexOfLocation = 1;
         TargetServer = 1;
 
-        TargetServer = GetTargetServer(request, parsing, root, it3, it, this->check_server, indexOfServer);
+        TargetServer = GetTargetServer(request, parsing, root, it3, it);
         TargetLocation = 1;
         for (it2 = locations.begin(); it2 != locations.end(); it2++)
         {
@@ -334,7 +333,6 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                     return;
                                 }
                             }
-
                             Post_Method(request, parsing, TargetServer, TargetLocation, response);
                             Delete_methode(request, parsing, TargetServer, TargetLocation, response);
                             return;
@@ -580,7 +578,6 @@ Server::Server(Parsing *p, char **envp)
 
     this->sock = new Socket(p);
     maxfd = 0;
-    int j = 0;
     int rc = 0;
     this->check_server = 0;
     char buffer[BUFFER_SIZE + 1];
@@ -602,7 +599,6 @@ Server::Server(Parsing *p, char **envp)
     Request *request = new Request();
     int b = 0;
     chunked = 0;
-    int o = 0;
     while (1)
     {
         FD_ZERO(&readfds);
@@ -617,7 +613,7 @@ Server::Server(Parsing *p, char **envp)
                 if (FD_ISSET(sock_fd, &readfds))
                 {
                     int newCnx = 0;
-                    for (int j = 0; j < MasterSockets.size(); j++)
+                    for (int j = 0; j < (int)MasterSockets.size(); j++)
                     {
                         if (sock_fd == MasterSockets[j])
                         {
@@ -673,13 +669,12 @@ Server::Server(Parsing *p, char **envp)
                             if (rc == 0)
                             {
                                 b = 0;
-                                // someString = "";
                                 its->second.clear();
-                                std::cout << sock_fd << "\t  =   Diconnected" << std::endl;
+                                std::cout << RED << "[-]"
+                                          << reset<<  "Client Diconnected " << std::endl;
                                 close(sock_fd);
                                 FD_CLR(sock_fd, &masterfds);
                                 FD_CLR(sock_fd, &writefds);
-                                // exit(0);
                             }
                             else
                                 continue;

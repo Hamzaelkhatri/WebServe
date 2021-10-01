@@ -20,7 +20,7 @@ void check_server_keys(std::string key)
 
 void check_location_keys(std::string key)
 {
-    if (key != "index" && key != "location" && key != "http_methods" && key != "upload_path" && key != "root" && key != "autoindex" && key != "return" && key != "cgi_path")
+    if (key != "index" && key != "location" && key != "http_methods" && key != "upload_path" && key != "root" && key != "autoindex" && key != "return" && key != "cgi_path" && key != "upload_status")
         throw std::runtime_error("Key " + key + " is not valid In location");
 }
 
@@ -42,16 +42,11 @@ int main(int ac, char *av[], char *envp[])
             std::map<int, std::multimap<std::string, std::string> > tmp = pars->GetServerMap();
             for (it = tmp.begin(); it != tmp.end(); ++it)
             {
-                // std::cout << YEL << "Server" << reset << std::endl;
-                // std::cout << RED << "\t\tServer\t\t" << it->first << ":" << reset << std::endl;
                 for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
                 {
-                    // std::cout << "\t|" << it2->first << "|\t\t\t|" << it2->second  << "|"<< "\n\n";
                     check_server_keys( it2->first);
                 }
             }
-            // std::cout << YEL << "\n\n";
-
             std::multimap<int, std::multimap<std::string, std::string> > tmp1 = pars->Getloc_map();
             std::multimap<int, std::multimap<std::string, std::string> >::iterator it3;
             std::multimap<std::string, std::string>::iterator it1;
@@ -59,7 +54,6 @@ int main(int ac, char *av[], char *envp[])
             {
                 for (it1 = it3->second.begin(); it1 != it3->second.end(); ++it1)
                 {
-                    // std::cout << "\t|" << it1->first << "|\t\t\t|" << it1->second  << "|" << "\n\n";
                     check_location_keys(it1->first.substr(it1->first.find(" ")+1));
                 }
             }
@@ -69,7 +63,7 @@ int main(int ac, char *av[], char *envp[])
 
         catch (const std::exception &e)
         {
-            // std::cerr << e.what() << '\n';
+            std::cerr << e.what() << '\n';
         }
     }
     else

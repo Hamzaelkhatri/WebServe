@@ -24,13 +24,8 @@ std::string Server::GetValueBykeyLocation(std::multimap<int, std::multimap<std::
         {
             for (it2 = it->second.begin(); it2 != it->second.end(); ++it2)
             {
-                // std::cout << "|" << it2->first << "|\t|" << it2->second << "|" << std::endl;
-                // std::cout << "---->" << std::to_string(indexOfLocation) + " " + trim(key)<< std::endl;
-                
                 if (it2->first.find(std::to_string(indexOfLocation) + " " + trim(key)) != std::string::npos)
-                {
                     return (it2->second);
-                }
             }
         }
     }
@@ -119,7 +114,7 @@ std::string Server::CreateAutoIndexHtmlFile(std::string path, std::string locati
         files.push_back(tmp);
     }
     std::sort(files.begin(), files.end());
-    for (int i = 0; i < files.size(); i++)
+    for (int i = 0; i <(int) files.size(); i++)
     {
         std::string tmp = files[i];
         body += "<a href=\"" + tmp + "\">" + tmp + "</a><br>";
@@ -165,13 +160,13 @@ int Server::execute_cgi(Response *response, int TargetServer, int TargetLocation
         response->setCGIPath(GetValueBykeyLocation(locations, TargetServer, TargetLocation, "cgi_path"));
         response->setMethod(request->get_method());
         response->setRedirection("");
-        std::string requestHttp = c->CGI(response, parsing->get_env());
+        std::string requestHttp = c->CGI(response);
+        if(requestHttp == "NO")
+            return (-1);
         if (requestHttp.find("Set-Cookie:") != std::string::npos)
         {
-            // std::cout << "Cookies Request:\t" << requestHttp << std::endl;
             std::string tmp = requestHttp.substr(requestHttp.find("Set-Cookie:") + 12);
             tmp = tmp.substr(0, tmp.find("\r\n"));
-            // std::cout << "tmp:\t " << tmp;
             response->setSSID(tmp);
             response->setSetCookie(tmp);
         }
@@ -212,7 +207,7 @@ int Server::execute_cgi(Response *response, int TargetServer, int TargetLocation
     return 1;
 }
 
-void Server::SaveAsFile(std::string path, std::string body, int b)
+void Server::SaveAsFile(std::string path, std::string body)
 {
     std::ofstream file;
     file.open(path);

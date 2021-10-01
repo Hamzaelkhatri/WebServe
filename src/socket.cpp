@@ -23,10 +23,6 @@ Socket::Socket(Parsing *p)
     set_socket();// creat and set all sockets
     _set_tmp(p); // server map
     _set_addr( addr_map(_get_tmp()),_get_tmp());
-    // {
-    //     char *str = inet_ntoa(_Get_addr()[i].sin_addr);
-    //     std::cout << "Socket " << i << ": " << str << ":" << ntohs(_Get_addr()[i].sin_port) << std::endl;
-    // }
     _Set_Binding();
 }
 

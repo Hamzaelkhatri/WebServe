@@ -14,7 +14,6 @@
 
 int Server::_Accept_client(int sock)
 {
-    socklen_t client_len = sizeof(client);
     int addrlen = sizeof(client);
     csock = accept(sock, (struct sockaddr *)&client, (socklen_t *)&addrlen);
     if (csock != -1)
@@ -25,8 +24,10 @@ int Server::_Accept_client(int sock)
         if (csock > maxfd)
             maxfd = csock;
         _clients.insert(std::pair<int, std::string>(csock, ""));
-
-        std::cout << csock << "\t  =  New connection" << std::endl;
+        std::string ip = inet_ntoa(client.sin_addr);
+        int port = ntohs(client.sin_port);
+        std::cout << CYN << "[+]"
+                  << reset << "New connection from : " << ip << ":" << port << std::endl;
     }
     else
         throw(AcceptFailed());
@@ -166,7 +167,6 @@ int Server::check_dir(std::string dir, std::string str)
         else if (dp->d_type == DT_REG && str.find(".") != std::string::npos)
         {
             std::string tmp = dir + "" + dp->d_name;
-            // std::cout << tmp << " || " << str << "\n";
             if (tmp.find(str) != std::string::npos)
                 return (2);
         }

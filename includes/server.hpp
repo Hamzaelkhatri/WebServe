@@ -117,12 +117,12 @@ public:
     std::string _GetFirstLocation(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations);
     std::string GetValueBykeyServer(std::map<int, std::multimap<std::string, std::string> > servers, int indexOfserver, std::string key);
     bool is_location(std::multimap<int, std::multimap<std::string, std::string> >::iterator locations, std::string location);
-    int GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string> >::iterator it, int &check_server, int indexOfServer);
+    int GetTargetServer(Request *request, Parsing *parsing, std::string &root, std::multimap<std::string, std::string>::iterator it3, std::map<int, std::multimap<std::string, std::string> >::iterator it);
     int check_if_file_or_dir(std::string path);
     std::string CreateAutoIndexHtmlFile(std::string path, std::string locatioName);
     std::string getBodyFromFile(std::string path);
     int execute_cgi(Response *response, int TargetServer, int TargetLocation, std::string root, Parsing *parsing, cgi *c, Request *request);
-    void SaveAsFile(std::string path, std::string body, int b);
+    void SaveAsFile(std::string path, std::string body);
     std::map<std::string, std::string> pars_request();
     ~Server();
 };

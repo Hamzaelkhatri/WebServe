@@ -1,6 +1,6 @@
 NAME= Webserv
 COMP= clang++
-# FLAGS= -Wall -Wextra -Werror
+FLAGS= -Wall -Wextra -Werror
 
 SRC_PATH= ./src
 HDR_PATH= ./includes

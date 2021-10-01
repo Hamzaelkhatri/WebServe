@@ -17,10 +17,24 @@
 #include <iostream>
 #include <string>
 
-Response::Response() : status("200 OK"), version(" HTTP/1.1"), redirection(""), charset(""), content_type("text/html"), content_length(""), set_cookie(""), cookie(""), path("/"), host("localhost"), port("5000"), method("GET"), ssid(""), cgipath(""), params("")
+Response::Response()
 {
+    status = "200 OK";
+    version = " HTTP/1.1";
+    redirection = "";
+    charset = "";
+    content_type = "text/html";
+    content_length = "";
+    set_cookie = "";
+    cookie = "";
+    path = "/";
+    host = "localhost";
+    port = "5000";
+    method = "GET";
+    ssid = "";
+    cgipath = "";
+    params = "";
 }
-
 
 std::string Response::getStatus()
 {
@@ -86,10 +100,9 @@ std::string Response::getMethod()
     return (method);
 }
 
-
 std::string Response::getSSID()
 {
-    return(ssid);
+    return (ssid);
 }
 //seters
 
@@ -143,13 +156,13 @@ void Response::setMethod(std::string method)
     this->method = method;
 }
 
-void Response::setSSID(std::string ssid)    
+void Response::setSSID(std::string ssid)
 {
     this->ssid = ssid;
 }
 void Response::setStatus(std::string status)
 {
-    if(status == "")
+    if (status == "")
         this->status = "200 OK";
     else
         this->status = status;
@@ -162,7 +175,6 @@ void Response::setRedirection(std::string redirection)
 
 void Response::setBody(std::string body)
 {
-    //read from Body Path
     this->body = body;
 }
 
@@ -179,6 +191,7 @@ void Response::setCookie(std::string cookie)
 void Response::setContentLength(std::string content_length)
 {
     this->content_length = std::to_string(body.size());
+    (void)content_length;
 }
 
 void Response::setContentType(std::string content_type)

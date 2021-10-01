@@ -26,8 +26,6 @@
 #define WHT "\e[0;37m"
 #define reeset "\e[0m"
 
-
-
 class LocationManage
 {
 private:
@@ -50,21 +48,20 @@ public:
 class Parsing
 {
 private:
-    Server_element *server;
     char **env;
     std::map<int, Server_element> parsing;
     std::multimap<std::string, std::string> server_map;
     std::multimap<std::string, std::string> loc_map;
-    std::map< int , std::multimap<std::string, std::string> > _server_map;
-    std::multimap <int, std::multimap<std::string, std::string> > _loc_map;
+    std::map<int, std::multimap<std::string, std::string> > _server_map;
+    std::multimap<int, std::multimap<std::string, std::string> > _loc_map;
 
 public:
-    Parsing( char *av);
-    void set_env(char **env); 
+    Parsing(char *av);
+    void set_env(char **env);
     char **get_env();
-    std::map< int , std::multimap<std::string, std::string> > GetServerMap();
-    std::multimap <int, std::multimap<std::string, std::string> > Getloc_map();
-    void set_serverMap(std::map< int , std::multimap<std::string, std::string> >  srv ,std::multimap <int, std::multimap<std::string, std::string> > loc);
+    std::map<int, std::multimap<std::string, std::string> > GetServerMap();
+    std::multimap<int, std::multimap<std::string, std::string> > Getloc_map();
+    void set_serverMap(std::map<int, std::multimap<std::string, std::string> > srv, std::multimap<int, std::multimap<std::string, std::string> > loc);
     ~Parsing();
 };
 #endif

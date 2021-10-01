@@ -12,7 +12,7 @@
 
 #include "../includes/cgi.hpp"
 
-std::string cgi::CGI(Response *r, char *envp[])
+std::string cgi::CGI(Response *r)
 {
     int fd[2];
     pid_t pid;
@@ -41,7 +41,7 @@ std::string cgi::CGI(Response *r, char *envp[])
     std::vector<std::string> parm;
     std::string tmp = "";
     int j = 0;
-    for (int i = 0; i < params.size(); i++)
+    for (int i = 0; i < (int)params.size(); i++)
     {
         if (params[i] != '&')
             res += params[i];
@@ -57,16 +57,14 @@ std::string cgi::CGI(Response *r, char *envp[])
     tmp += res + ";\n";
     if (!r->getSetCookie().empty())
         setenv("HTTP_COOKIE", r->getSetCookie().c_str(), 1);
-    std::cout << "-->" << r->getSetCookie() << std::endl;
     tmp = "";
-    for (int i = 0; i < parm.size(); i++)
+    for (int i = 0; i < (int)parm.size(); i++)
     {
         tmp += parm[i];
     }
     if (r->getSetCookie().empty())
         setenv("HTTP_COOKIE", tmp.c_str(), 1);
     r->set_params(tmp);
-    std::string::size_type pos = 0;
     const char **av = new const char *[3];
     av[0] = strdup(r->getCGIPath().c_str());
     extern char **environ;
@@ -76,14 +74,16 @@ std::string cgi::CGI(Response *r, char *envp[])
         std::cout << "pipe" << std::endl;
     if ((pid = fork()) == -1)
         std::cout << "fork" << std::endl;
-    //child --> parent
     if (pid == 0) //child
     {
         dup2(fd[1], STDOUT_FILENO); // 1
         close(fd[0]);
         chdir(path.c_str());
         if (execve(av[0], (char **)av, environ) < 0)
-            perror("exeve");
+        {
+            std::cout << "CGI_PATH NOT FOUND" << std::endl;
+            return ("NO");
+        }
     }
     else
     {
@@ -98,8 +98,3 @@ std::string cgi::CGI(Response *r, char *envp[])
     delete[] av;
     return (str);
 }
-
-// const char *cgi::cgiFailed::what() const throw()
-// {
-//     return "CGI failed";
-// }

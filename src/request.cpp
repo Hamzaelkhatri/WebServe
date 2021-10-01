@@ -26,7 +26,7 @@ std::string Request::get_host()
 
 std::string Request::get_filename()
 {
-    if(filename.size()<2)
+    if (filename.size() < 2)
         return filename;
     return filename.substr(1, filename.size() - 3);
 }
@@ -78,7 +78,7 @@ std::vector<std::string> Request::getparams()
 
 void Request::set_host(std::string host)
 {
-    this->host =host;
+    this->host = host;
 }
 
 void Request::set_method(std::string method)
@@ -91,7 +91,6 @@ void Request::set_params(std::string param)
     this->params.push_back(param);
 }
 
-
 void Request::set_path(std::string path)
 {
     this->path = path;
@@ -99,7 +98,7 @@ void Request::set_path(std::string path)
 
 void Request::set_port(std::string port)
 {
-    this->port = port;  
+    this->port = port;
 }
 
 void Request::set_version(std::string version)
@@ -109,21 +108,25 @@ void Request::set_version(std::string version)
 
 Request::~Request()
 {
-
 }
 
 //initialaze
-Request::Request(): client_sock(-1), content_lenght(0), filename(""), host(""), method(""), path(""), port(""), version("")
+Request::Request()
 {
-
+    host = "";
+    port = "";
+    method = "";
+    path = "";
+    version = "";
+    filename = "";
+    client_sock = -1;
+    content_lenght = 0;
 }
 
 int Request::get_content_lenght()
 {
     return content_lenght;
 }
-
-
 
 Request::Request(int client_sock)
 {
