@@ -139,6 +139,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
             root = GetValueBykeyServer(servers, indexOfServer, "root");
             std::string BodyTmp = getBodyFromFile(root + "/errors/413.html");
             response->setBody(BodyTmp);
+            return;
         }
         else if (upload_status == "on" && request->get_content_lenght() == 0)
         {
@@ -147,12 +148,12 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
             std::string root = "";
             root = GetValueBykeyServer(servers, indexOfServer, "root");
             std::string BodyTmp = getBodyFromFile(root + "/errors/411.html");
+            return;
         }
         else if (its->second.find("Content-Type: multipart/form-data; boundary=") != std::string::npos && (BodySize == "0m" || request->get_content_lenght() < (std::stol(BodySize) * 1048576)))
         {
             std::map<std::string, std::string>::iterator it = errors.begin();
             std::string root = GetValueBykeyServer(servers, indexOfServer, "root");
-            puts("here");
             int err_code = 0;
             for (it = errors.begin(); it != errors.end(); it++)
             {
@@ -674,15 +675,15 @@ Server::Server(Parsing *p, char **envp)
                                         someString = its->second;
                                         chunked = 0;
                                     }
+                                    if (!check_header(its->second))
+                                    {
+                                        response->setBody("<html>\n<body>\n<h1>400 Bad Request</h1>\n</body>\n</html>\n");
+                                        response->setStatus("400");
+                                        response->setContentLength("");
+                                    }
                                     _GetDataServers(p, response, request);
 
-                                    // if (!check_header(its->second))
-                                    // {
-                                    //     response->setBody("<html>\n<body>\n<h1>400 Bad Request</h1>\n</body>\n</html>\n");
-                                    //     response->setStatus("400");
-                                    //     response->setContentLength("");
-                                    // }
-                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: text/html; charset=utf-8 ; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\nSet-Cookie: " + response->getSSID() + "\nSet-Cookie: " + response->get_params() + "\n\n" + response->getBody();
+                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: text/html; charset=utf-8 ; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\nSet-Cookie: " + response->get_params() +"\n\n" + response->getBody();
                                     send(sock_fd, header.c_str(), header.size(), 0);
                                     its->second.clear();
                                     this->check_server = 0;
