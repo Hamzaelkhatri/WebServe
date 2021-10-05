@@ -28,8 +28,14 @@ std::map<std::string, std::string> Server::pars_request()
         {
             t++;
             Content.push_back(line1);
+            // std::cout << line1 << std::endl;
         }
     }
+    //print stor variable without auto
+    // for(std::map<std::string, std::string>::iterator it = stor.begin(); it != stor.end(); ++it)
+    // {
+    //     std::cout << it->first << " " << it->second << std::endl;
+    // }
     return (stor);
 }
 
@@ -126,12 +132,13 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
             upload_path = "~/downloads";
         if (BodySize == "")
             BodySize = "10m";
-        if (upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0 && request->get_content_lenght() <= (std::stol(BodySize) * 1048576) && request->get_filename().size() > 2)
+        std::cout << request->get_content_lenght() << std::endl;
+        if (upload_status == "on" && request->get_content_lenght() >= 0 && std::stoi(BodySize) >= 0 && request->get_content_lenght() <= (std::stol(BodySize) * 1048576) && request->get_filename().size() > 2)
         {
             its->second = DeleteHeaderPost(its->second);
             SaveAsFile(upload_path + request->get_filename(), its->second);
         }
-        else if ((upload_status == "on" && request->get_content_lenght() > 0 && std::stoi(BodySize) > 0) && request->get_content_lenght() > (std::stol(BodySize) * 1048576))
+        else if ((upload_status == "on" && request->get_content_lenght() >= 0 && std::stoi(BodySize) >= 0) && request->get_content_lenght() > (std::stol(BodySize) * 1048576))
         {
             response->setStatus("413");
             response->setContentLength("");
@@ -150,7 +157,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
             std::string BodyTmp = getBodyFromFile(root + "/errors/411.html");
             return;
         }
-        else if (its->second.find("Content-Type: multipart/form-data; boundary=") != std::string::npos && (BodySize == "0m" || request->get_content_lenght() < (std::stol(BodySize) * 1048576)))
+        else if (its->second.find("Content-Type: multipart/form-data; boundary=") != std::string::npos && (BodySize == "0m"))
         {
             std::map<std::string, std::string>::iterator it = errors.begin();
             std::string root = GetValueBykeyServer(servers, indexOfServer, "root");
@@ -180,7 +187,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
                 return;
             }
         }
-        else if (BodySize == "0m")
+        else if (BodySize == "0m" && request->get_content_lenght() > 0)
         {
             std::map<std::string, std::string>::iterator it = errors.begin();
             std::string root = GetValueBykeyServer(servers, indexOfServer, "root");
@@ -210,6 +217,7 @@ void Server::Post_Method(Request *request, Parsing *parsing, int indexOfServer, 
                 return;
             }
         }
+        // std::cout << "here " << request->get_content_lenght() << std::endl;
     }
 }
 
@@ -233,15 +241,9 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                                                                                       : "UNKNOWN");
     std::string cookies = stor["Cookie"];
     std::string Content_lenght = (stor.find("Content-Length") != stor.end()) ? stor["Content-Length"] : "0";
+    // std::cout << "HERE" << Content_lenght << std::endl;
     std::string Content_Disposition = "";
-    for (int j = 0; j < (int)Content.size(); j++)
-    {
-        if (Content[j].find("Content-Disposition") != std::string::npos)
-        {
-            Content_Disposition = Content[j].substr(Content[j].find("filename=") + 9, Content[j].size());
-            break;
-        }
-    }
+    //print stor details
     std::string Path = stor[Methode];
 
     request->set_host(Host);
@@ -264,7 +266,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
     std::string root = "";
     int TargetServer = 0;
     int TargetLocation = 0;
-
+    stor.clear();
     for (it = servers.begin(); it != servers.end(); it++)
     {
         indexOfLocation = 1;
@@ -405,9 +407,8 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                     if (std::stoi(err) >= 300 && std::stoi(err) < 400)
                                     {
                                         response->setStatus(err);
-                                        response->setRedirection("\nlocation:" + err_path + "/");
-                                        response->setPath(root + request->get_path() + "/");
-                                        return;
+                                        response->setRedirection("\nlocation:" + err_path + "");
+                                        response->setPath(root + request->get_path() + "");
                                     }
                                 }
                                 response->setCookie("");
@@ -434,6 +435,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                 {
                                     if (Path[Path.size() - 1] != '/')
                                     {
+
                                         response->setStatus("301"); //redirection
                                         response->setRedirection("\nlocation:" + Path + "/");
                                         response->setPath(root + request->get_path() + "/");
@@ -478,7 +480,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                         if (std::stoi(err) >= 300 && std::stoi(err) < 400)
                                         {
                                             response->setStatus(err);
-                                            // if(err_path != "")
+                                            if(err_path != "")
                                             {
                                                 response->setRedirection("\nlocation:" + err_path + "/");
                                                 response->setPath(root + request->get_path() + "/");
@@ -491,7 +493,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                     response->setContentLength("");
                                     body = response->getBody();
                                 }
-                                else if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "autoindex") != "" && GetValueBykeyLocation(locations, TargetServer, TargetLocation, "autoindex") == "off")
+                                else if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "autoindex") != "" && GetValueBykeyLocation(locations, TargetServer, TargetLocation, "autoindex") == "on")
                                 {
                                     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root") != "")
                                         root = GetValueBykeyLocation(locations, TargetServer, TargetLocation, "root");
@@ -504,6 +506,7 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                         response->setRedirection("\nlocation:" + Path + "/");
                                         std::string BodyTmp = getBodyFromFile(root + "/errors/301.html");
                                         response->setBody(BodyTmp);
+                                        return;
                                     }
                                     if (GetValueBykeyLocation(locations, TargetServer, TargetLocation, "return") != "")
                                     {
@@ -515,8 +518,9 @@ void Server::_GetDataServers(Parsing *parsing, Response *response, Request *requ
                                             response->setStatus(err);
                                             // if(err_path != "")
                                             {
-                                                response->setRedirection("\nlocation:" + err_path + "/");
-                                                response->setPath(root + request->get_path() + "/");
+                                                response->setRedirection("\nlocation:" + err_path + "");
+                                                response->setPath(root + request->get_path() + "");
+                                                return;
                                             }
                                         }
                                     }
@@ -608,7 +612,6 @@ Server::Server(Parsing *p, char **envp)
     int rc = 0;
     this->check_server = 0;
     char buffer[BUFFER_SIZE + 1];
-    // cgi *c;
     p->set_env(envp);
     FD_ZERO(&masterfds);
     MasterSockets = this->sock->_Get_server_fds();
@@ -683,7 +686,13 @@ Server::Server(Parsing *p, char **envp)
                                     }
                                     _GetDataServers(p, response, request);
 
-                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: text/html; charset=utf-8 ; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\nSet-Cookie: " + response->get_params() +"\n\n" + response->getBody();
+                                    if (!check_header(its->second))
+                                    {
+                                        response->setBody("<html>\n<body>\n<h1>400 Bad Request</h1>\n</body>\n</html>\n");
+                                        response->setStatus("400");
+                                        response->setContentLength("");
+                                    }
+                                    std::string header = response->getVersion() + " " + response->getStatus() + "\nContent-type: text/html; charset=utf-8 ; charset= " + response->getCharset() + response->getRedirection() + "\nContent-Length: " + std::to_string(response->getBody().size()) + "\nSet-Cookie: " + response->getSSID() + "\nSet-Cookie: " + response->get_params() + "\n\n" + response->getBody();
                                     send(sock_fd, header.c_str(), header.size(), 0);
                                     its->second.clear();
                                     this->check_server = 0;
